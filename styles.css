@@ -1,0 +1,525 @@
+/* ============================================================
+   THE IDALA FAMILY — Global Stylesheet
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&display=swap');
+
+/* ===== CSS VARIABLES ===== */
+:root {
+  --root-bg: #FAF8F4;
+  --beige:   #F4F0E8;
+  --beige-2: #EDE8DC;
+  --text:       #2C2A25;
+  --text-light: #7A7268;
+  --gold:       #C9A96E;
+  --gold-light: #E8D5B0;
+  --gold-dark:  #B8945A;
+
+  /* Chakra pastels */
+  --c1: #FFB5B5; /* root     – soft red     */
+  --c2: #FFCFA8; /* sacral   – soft orange  */
+  --c3: #FFF0A0; /* solar    – soft yellow  */
+  --c4: #B8E8C2; /* heart    – soft green   */
+  --c5: #A8D4F0; /* throat   – soft blue    */
+  --c6: #C5B8F0; /* 3rd eye  – soft indigo  */
+  --c7: #E8B8F0; /* crown    – soft violet  */
+
+  --radius: 2px;
+  --shadow-sm: 0 2px 16px rgba(0,0,0,0.05);
+  --shadow-md: 0 8px 32px rgba(0,0,0,0.08);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.10);
+
+  --transition: 0.3s ease;
+  --px: 80px; /* horizontal page padding */
+}
+
+/* ===== RESET ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; font-size: 16px; }
+body {
+  background: var(--root-bg);
+  color: var(--text);
+  font-family: 'Jost', sans-serif;
+  font-weight: 300;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+img { display: block; max-width: 100%; }
+a { text-decoration: none; color: inherit; }
+button { cursor: pointer; font-family: inherit; }
+
+/* ===== TYPOGRAPHY HELPERS ===== */
+.serif { font-family: 'Cormorant Garamond', serif; }
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: block;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 42px;
+  font-weight: 300;
+  letter-spacing: 1px;
+  color: var(--text);
+  line-height: 1.15;
+}
+.body-text {
+  font-size: 14.5px;
+  line-height: 1.95;
+  color: var(--text-light);
+}
+.divider {
+  width: 36px;
+  height: 1px;
+  background: var(--gold-light);
+  margin: 20px 0;
+}
+.divider-center { margin: 20px auto; }
+
+/* ===== LAYOUT ===== */
+.page-wrap { padding: 0 var(--px); }
+.section    { padding: 80px var(--px); }
+.section-sm { padding: 48px var(--px); }
+
+/* ===== NAV BAR ===== */
+.topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  height: 64px;
+  background: rgba(250,248,244,0.96);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(201,169,110,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--px);
+}
+
+.topbar-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.topbar-nav a {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-light);
+  padding: 0 18px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  transition: color var(--transition), border-color var(--transition);
+  white-space: nowrap;
+}
+
+.topbar-nav a:hover,
+.topbar-nav a.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+
+.lang-toggle {
+  display: flex;
+  gap: 2px;
+  margin-left: 28px;
+}
+
+.lang-btn {
+  font-size: 10px;
+  letter-spacing: 2px;
+  padding: 5px 13px;
+  border: 1px solid var(--gold-light);
+  background: transparent;
+  color: var(--text-light);
+  transition: all var(--transition);
+  font-family: 'Jost', sans-serif;
+}
+
+.lang-btn.active {
+  background: var(--gold);
+  color: white;
+  border-color: var(--gold);
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Jost', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.btn-gold {
+  padding: 13px 30px;
+  background: var(--gold);
+  color: white;
+  border: none;
+}
+.btn-gold:hover {
+  background: var(--gold-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(201,169,110,0.3);
+}
+
+.btn-outline {
+  padding: 12px 28px;
+  background: transparent;
+  color: var(--gold);
+  border: 1px solid var(--gold-light);
+}
+.btn-outline:hover {
+  border-color: var(--gold);
+  background: rgba(201,169,110,0.06);
+  transform: translateY(-2px);
+}
+
+.btn-sm {
+  padding: 9px 20px;
+  font-size: 9px;
+  letter-spacing: 2.5px;
+}
+
+/* ===== CIRCLE LOGO ===== */
+.circle-logo {
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.circle-logo-main {
+  width: 180px; height: 180px;
+  background: linear-gradient(135deg, var(--c6) 0%, var(--c7) 50%, var(--c5) 100%);
+  box-shadow:
+    0 20px 60px rgba(197,184,240,0.3),
+    0 0 0 18px rgba(232,184,240,0.08),
+    0 0 0 36px rgba(168,212,240,0.05);
+  position: relative;
+}
+.circle-logo-main::before {
+  content: '';
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,169,110,0.22);
+}
+.circle-logo-main::after {
+  content: '';
+  position: absolute;
+  inset: -38px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,169,110,0.10);
+}
+
+.logo-word {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 30px;
+  font-weight: 600;
+  color: white;
+  letter-spacing: 7px;
+  line-height: 1;
+}
+.logo-sub {
+  font-size: 8px;
+  letter-spacing: 4px;
+  color: rgba(255,255,255,0.75);
+  margin-top: 5px;
+  text-transform: uppercase;
+}
+
+/* ===== CHAKRA BAR ===== */
+.chakra-bar {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px var(--px) 56px;
+  flex-wrap: wrap;
+}
+.chakra-dot {
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  flex-shrink: 0;
+}
+.chakra-dot::after {
+  content: attr(data-name);
+  position: absolute;
+  bottom: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--text-light);
+  white-space: nowrap;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.card-icon {
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  background: var(--beige);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 18px;
+  flex-shrink: 0;
+}
+
+.card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
+}
+
+/* ===== TESTIMONIALS ===== */
+.testimonials-wrap {
+  background: var(--beige);
+  padding: 64px 0;
+  border-top: 1px solid rgba(201,169,110,0.15);
+  overflow: hidden;
+}
+
+.testimonials-header {
+  text-align: center;
+  padding: 0 var(--px);
+  margin-bottom: 48px;
+}
+
+.testimonials-track-outer {
+  position: relative;
+  overflow: hidden;
+  cursor: grab;
+}
+.testimonials-track-outer:active { cursor: grabbing; }
+
+.testimonials-track {
+  display: flex;
+  gap: 24px;
+  padding: 0 var(--px) 16px;
+  animation: scroll-left 44s linear infinite;
+  width: max-content;
+}
+.testimonials-track:hover { animation-play-state: paused; }
+
+@keyframes scroll-left {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.tcard {
+  flex-shrink: 0;
+  width: 340px;
+  background: white;
+  padding: 32px;
+  border-radius: var(--radius);
+  border-left: 3px solid var(--c6);
+  box-shadow: var(--shadow-sm);
+}
+.tcard:nth-child(6n+2) { border-left-color: var(--c4); }
+.tcard:nth-child(6n+3) { border-left-color: var(--c2); }
+.tcard:nth-child(6n+4) { border-left-color: var(--c5); }
+.tcard:nth-child(6n+5) { border-left-color: var(--c7); }
+.tcard:nth-child(6n+6) { border-left-color: var(--c3); }
+
+.tcard-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 16px;
+  font-style: italic;
+  line-height: 1.85;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.tcard-author {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.tcard-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 32px;
+  padding: 0 var(--px);
+}
+
+.tcard-btn {
+  width: 42px; height: 42px;
+  border: 1px solid var(--gold-light);
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  color: var(--gold);
+  transition: all var(--transition);
+}
+.tcard-btn:hover { background: var(--gold); color: white; border-color: var(--gold); }
+
+/* ===== PRICING CARDS ===== */
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  padding: 60px var(--px);
+}
+
+.pricing-card {
+  background: white;
+  padding: 40px 32px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  border-bottom: 3px solid var(--c6);
+  transition: transform var(--transition), box-shadow var(--transition);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pricing-card:nth-child(2) { border-bottom-color: var(--c7); }
+.pricing-card:nth-child(3) { border-bottom-color: var(--c5); }
+.pricing-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+
+.pricing-duration {
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 8px;
+}
+.pricing-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+.pricing-amount {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 48px;
+  font-weight: 300;
+  color: var(--text);
+  line-height: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.pricing-amount sup {
+  font-size: 20px;
+  margin-top: 10px;
+}
+.pricing-divider { margin: 20px auto 24px; }
+.pricing-desc {
+  font-size: 13.5px;
+  line-height: 1.9;
+  color: var(--text-light);
+  margin-bottom: 32px;
+  flex-grow: 1;
+  text-align: center;
+}
+
+/* ===== PAGE HERO ===== */
+.page-hero {
+  padding: 88px var(--px) 56px;
+  text-align: center;
+  position: relative;
+}
+
+/* ===== FOOTER ===== */
+.site-footer {
+  background: #2C2A25;
+  color: rgba(255,255,255,0.45);
+  padding: 44px var(--px);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.footer-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.footer-copy { font-size: 11px; letter-spacing: 0.5px; }
+
+.brand {
+  color: var(--gold);
+}
+
+/* ===== LANGUAGE VISIBILITY ===== */
+/* Default: EN shown, FR hidden */
+.fr { display: none !important; }
+.en { display: block; }
+span.en { display: inline; }
+
+/* When body has class lang-fr */
+body.lang-fr .en { display: none !important; }
+body.lang-fr .fr { display: block !important; }
+body.lang-fr span.fr { display: inline !important; }
+body.lang-fr span.en { display: none !important; }
+body.lang-fr a.en  { display: none !important; }
+body.lang-fr a.fr  { display: inline-flex !important; }
+
+/* Inline elements */
+.inline-en, .inline-fr { }
+.inline-fr { display: none; }
+body.lang-fr .inline-en { display: none; }
+body.lang-fr .inline-fr { display: inline; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1100px) {
+  :root { --px: 40px; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 500px; margin: 0 auto; }
+}
+
+@media (max-width: 768px) {
+  :root { --px: 24px; }
+  .topbar { padding: 0 24px; }
+  .topbar-brand { font-size: 11px; letter-spacing: 3px; }
+  .topbar-nav a { padding: 0 10px; font-size: 9px; }
+  .section-title { font-size: 32px; }
+}
