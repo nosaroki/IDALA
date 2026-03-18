@@ -860,6 +860,25 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 /* ─────────────────────────────────────────
    ASTROLOGY
 ───────────────────────────────────────── */
+.astro-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.astro-orb-label {
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-align: center;
+}
+
+@media (max-width: 1024px) {
+  .astro-visual { display: none; }
+}
+
 .astro-hero {
   display: grid;
   grid-template-columns: 1fr 300px;
