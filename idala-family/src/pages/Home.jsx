@@ -8,8 +8,8 @@ import { useLang } from '../components/LangContext';
 import { Helmet } from 'react-helmet-async';
 import Footer from '../components/Footer';  
 
-import logoIdala      from '../assets/logoidala.png';
-// import logoIdalaTrspr      from '../assets/logoidalatrspr.png';
+// import logoIdala      from '../assets/logoidala.png';
+import logoIdalaTrspr      from '../assets/logoidalatrspr.png';
 import dianeRegard    from '../assets/dianeregard.png';
 import yogaPlage      from '../assets/yogaplage.png';
 import yogaMeditDiane from '../assets/yogameditdiane.png';
@@ -90,8 +90,8 @@ function Home() {
 
         <div className="hero-center">
           <div className="circle-logo circle-logo--main">
-             <img src={logoIdala} alt="IDALA" style={{ width: '100%', height: '100%', objectFit: 'contain', transform: 'scale(1.4)' }} />
-            {/* <img src={logoIdalaTrsp} alt="IDALA" style={{ width: '100%', height: '100%', objectFit: 'contain', transform: 'scale(2)' }} /> */}
+             {/* <img src={logoIdala} alt="IDALA" style={{ width: '100%', height: '100%', objectFit: 'contain', transform: 'scale(1.4)' }} /> */}
+            <img src={logoIdalaTrspr} alt="IDALA" style={{ width: '100%', height: '100%', objectFit: 'contain', transform: 'scale(2)' }} />
           </div>
           <div className="hero-brand">THE IDALA FAMILY</div>
           <div className="concept-label">Concept</div>
