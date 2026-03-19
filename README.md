@@ -1,52 +1,16 @@
-# THE IDALA FAMILY — React App
+# React + Vite
 
-## Structure
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-```
-src/
-  App.jsx       ← entire app (all pages, loader, coming soon)
-  styles.css    ← ALL CSS (no inline styles, no Tailwind utilities)
-```
+Currently, two official plugins are available:
 
-## Setup
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-```bash
-npm create vite@latest idala-family -- --template react
-cd idala-family
-npm install react-router-dom
-```
+## React Compiler
 
-Then:
-1. Replace `src/App.jsx` with the provided `App.jsx`
-2. Replace `src/index.css` with `styles.css` (or rename it and update the import in App.jsx)
-3. Delete `src/App.css`
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-```bash
-npm run dev
-```
+## Expanding the ESLint configuration
 
-## Routes
-
-| Path            | Page                  |
-|-----------------|----------------------|
-| `/`             | Home                 |
-| `/practitioners`| Practitioners        |
-| `/spiritual`    | Spiritual Guidance   |
-| `/astrology`    | Birth Chart          |
-| `/about`        | About Diane          |
-| `/coming-soon`  | Coming Soon page     |
-
-## Features
-
-- **Loader**: Lotus SVG + 7 orbiting chakra dots, fades out after ~2.6s
-- **Language**: FR/EN toggle, persisted in localStorage, instant switch
-- **Hamburger nav**: appears at ≤768px, slides down mobile drawer
-- **Birth chart calculator**: real astronomical engine (Jean Meeus)
-  - Requires birth time + city for Rising Sign (geocoded via Nominatim)
-- **Coming Soon**: bilingual, email capture, animated chakra dots + IDALA logo
-
-## Notes
-
-- All CSS lives in `styles.css` — no Tailwind, no CSS modules, no inline styles
-- Replace `Photo` placeholder circles with real `<img>` tags when images are ready
-- Book buttons link to `#` — update hrefs/onClick to your booking system
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
