@@ -1,20 +1,19 @@
 // ─────────────────────────────────────────
-//  HOME
+//  HOME — v3 nouveaux textes
 // ─────────────────────────────────────────
 
 import { useRef } from 'react';
-import { useNavigate,  } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useLang } from '../components/LangContext';
 import { Helmet } from 'react-helmet-async';
-import Footer from '../components/Footer';  
+import Footer from '../components/Footer';
 
-// import logoIdala      from '../assets/logoidala.png';
-import logoIdalaTrspr      from '../assets/logoidalatrspr.png';
+import logoIdalaTrspr from '../assets/logoidalatrspr2.png';
 import dianeRegard    from '../assets/dianeregard.png';
-import yogaPlage      from '../assets/yogaplage.png';
-import yogaMeditDiane from '../assets/yogameditdiane.png';
-import souplesseRocher from '../assets/souplesserocher.png';
-import meditDiane from '../assets/meditationdiane.png';
+import handsHealing   from '../assets/meditationdiane.png';
+import soundHealing   from '../assets/yogameditdiane.png';
+import yogaPose       from '../assets/souplesserocher.png';
+import breathwork     from '../assets/yogaplage.png';
 
 const TESTIMONIALS = [
   { text: '"Working with an IDALA practitioner completely shifted how I approach my daily routine. My body feels stronger and my mind is finally quiet."', author: '— Sarah M., London' },
@@ -26,7 +25,7 @@ const TESTIMONIALS = [
 ];
 
 function Home() {
-  const { lang } = useLang();
+  const { lang }  = useLang();
   const navigate  = useNavigate();
   const trackRef  = useRef(null);
   const durRef    = useRef(44);
@@ -34,108 +33,212 @@ function Home() {
 
   const adjustSpeed = faster => {
     if (!trackRef.current) return;
-    durRef.current = faster ? Math.max(durRef.current*.65, 8) : Math.min(durRef.current*1.4, 120);
+    durRef.current = faster
+      ? Math.max(durRef.current * 0.65, 8)
+      : Math.min(durRef.current * 1.4, 120);
     trackRef.current.style.animationDuration = durRef.current + 's';
   };
 
-  const conceptEN = (
-    <>
-      <p>The Idala Family is a modern digital platform that connects trusted holistic wellness professionals with individuals who want to strengthen their body, sharpen their mind, and grow consciously.</p>
-      <p>It is built for people who understand that well-being is not one-dimensional. Physical strength, nervous system balance, and mental clarity work together. When one improves, the others follow.</p>
-      <p>IDALA is not an alternative to medicine. It supports a healthy lifestyle by integrating movement, regulation, and personal development into everyday life.</p>
-      <div className="divider divider--center"/>
-      <p>At the heart of IDALA is a simple and powerful principle:<br/><strong>the body and the mind are deeply connected.</strong></p>
-      <p>When the body moves and builds resilience, the mind becomes clearer and more stable.<br/>When the mind is regulated and focused, the body performs, adapts, and recovers more effectively.</p>
-      <p>True, sustainable well-being happens when both are strengthened together.</p>
-      <p>The IDALA Family exists to make that connection accessible, structured, and supported within a trusted community.</p>
-    </>
-  );
-
-  const conceptFR = (
-    <>
-      <p>The Idala Family est une plateforme numérique moderne qui connecte des professionnels du bien-être holistique de confiance avec des personnes souhaitant renforcer leur corps, aiguiser leur esprit et évoluer consciemment.</p>
-      <p>Elle est construite pour des personnes qui comprennent que le bien-être n'est pas unidimensionnel. La force physique, l'équilibre du système nerveux et la clarté mentale fonctionnent ensemble. Quand l'un s'améliore, les autres suivent.</p>
-      <p>IDALA n'est pas une alternative à la médecine. Elle soutient un mode de vie sain en intégrant mouvement, régulation et développement personnel dans la vie quotidienne.</p>
-      <div className="divider divider--center"/>
-      <p>Au cœur d'IDALA se trouve un principe simple et puissant :<br/><strong>le corps et l'esprit sont profondément connectés.</strong></p>
-      <p>Quand le corps bouge et développe sa résilience, l'esprit devient plus clair et plus stable.<br/>Quand l'esprit est régulé et concentré, le corps performe, s'adapte et récupère plus efficacement.</p>
-      <p>Un vrai bien-être durable advient quand les deux sont renforcés ensemble.</p>
-      <p>The IDALA Family existe pour rendre cette connexion accessible, structurée et soutenue au sein d'une communauté de confiance.</p>
-    </>
-  );
-
   return (
-    <><Helmet>
-        <title>{lang === 'fr' ? 'The Idala Family — Bien-être Holistique' : 'The Idala Family — Holistic Wellness'}</title>
+    <>
+      <Helmet>
+        <title>{lang === 'fr' ? 'The Idala Family | Bien-être Holistique' : 'The Idala Family | Holistic Wellness'}</title>
         <meta name="description" content={lang === 'fr'
-          ? 'Plateforme de bien-être holistique — yoga, reiki, astrologie, méditation. Fondée par Diane Thomas.'
-          : 'Holistic wellness platform — yoga, reiki, astrology, meditation. Founded by Diane Thomas.'} />
+          ? 'Plateforme de bien-être holistique : yoga, reiki, astrologie, méditation. Fondée par Diane Thomas.'
+          : 'Holistic wellness platform: yoga, reiki, astrology, meditation. Founded by Diane Thomas.'} />
       </Helmet>
-    <div className="page-wrap">
-      <section className="hero">
-        <div className="hero-photos">
-          <div className="photo-blob pb1">
-            <img src={meditDiane} alt="Yoga" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-          </div>
-          <div className="photo-blob pb2">
-            <img src={yogaMeditDiane} alt="Méditation" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-          </div>
-          <div className="photo-blob pb3">
-            <img src={souplesseRocher} alt="Reiki" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-          </div>
-          <div className="photo-blob pb4">
-            <img src={yogaPlage} alt="Bien-être" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-          </div>
-        </div>
 
-        <div className="hero-center">
-          <div className="circle-logo circle-logo--main">
-             {/* <img src={logoIdala} alt="IDALA" style={{ width: '100%', height: '100%', objectFit: 'contain', transform: 'scale(1.4)' }} /> */}
-            <img src={logoIdalaTrspr} alt="IDALA" style={{ width: '100%', height: '100%', objectFit: 'contain', transform: 'scale(2)' }} />
-          </div>
-          <div className="hero-brand">THE IDALA FAMILY</div>
-          <div className="concept-label">Concept</div>
-          <div className="concept-text">{lang==='fr' ? conceptFR : conceptEN}</div>
-          <div className="cta-row">
-            <button className="btn btn--gold" onClick={()=>navigate('/practitioners')}>{lang==='fr'?'Trouver un Praticien':'Find a Practitioner'}</button>
-            <button className="btn btn--outline" onClick={()=>navigate('/spiritual')}>{lang==='fr'?'Guidance Spirituelle':'Spiritual Guidance'}</button>
-            <button className="btn btn--outline" onClick={()=>navigate('/astrology')}>{lang==='fr'?'Thème Astral':'Astrology'}</button>
-          </div>
-        </div>
+      <div className="page-wrap">
 
-        <div className="hero-diane">
-            <img src={dianeRegard} alt="Diane Thomas" style={{ width: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-          <div>
-            <div className="diane-name">Diane Thomas</div>
-            <div className="diane-role">The Mindful Links</div>
-            <p className="diane-blurb">{lang==='fr'?'Fondatrice de The Idala Family — Professeure de Yoga certifiée, Praticienne Reiki & Tarologue.':'Founder of The Idala Family — Certified Yoga Teacher, Reiki Practitioner & Tarot Reader.'}</p>
-            <button className="btn btn--outline btn--sm" onClick={()=>navigate('/about')}>{lang==='fr'?'En savoir plus':'Learn More'}</button>
+        {/* ── SECTION 1 — HERO LOGO ── */}
+        <section className="home-hero">
+          <div className="home-hero__inner">
+            <div className="home-hero__logo-wrap">
+              <img src={logoIdalaTrspr} alt="The Idala Family" className="home-hero__logo" />
+            </div>
+            <h1 className="home-hero__tagline">
+              {lang === 'fr'
+                ? 'Bien-être holistique · Corps & Esprit'
+                : 'Holistic Wellness · Body & Mind'}
+            </h1>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="testimonials-wrap">
-        <div className="testimonials-header">
-          <span className="eyebrow">{lang==='fr'?'Témoignages':'Testimonials'}</span>
-          <h2 className="section-title">{lang==='fr'?'Ce que dit notre communauté':'What Our Community Says'}</h2>
-        </div>
-        <div className="testimonials-track-outer">
-          <div className="testimonials-track" ref={trackRef}>
-            {all.map((t, i) => (
-              <div className="tcard" key={i}>
-                <p className="tcard-text">{t.text}</p>
-                <div className="tcard-author">{t.author}</div>
+        {/* ── SECTION 2 — CONCEPT ── */}
+        <section className="home-concept">
+          <div className="home-concept__inner">
+
+            <div className="home-concept__label-col">
+              <div className="home-concept__vertical-title">
+                {'THE IDALA FAMILY'.split('').map((char, i) => (
+                  <span key={i} className="home-concept__letter">{char === ' ' ? '\u00A0' : char}</span>
+                ))}
               </div>
-            ))}
+              <div className="home-concept__vertical-sub">
+                {'CONCEPT'.split('').map((char, i) => (
+                  <span key={i} className="home-concept__letter">{char}</span>
+                ))}
+              </div>
+            </div>
+
+            <div className="home-concept__text-col">
+              {lang === 'en' ? (
+                <>
+                  <p className="home-concept__body">The Idala Family is a curated platform connecting trusted holistic practitioners with individuals committed to strengthening their body, refining their mind, and evolving with intention.</p>
+                  <p className="home-concept__body">Well-being is not one-dimensional. Physical strength, nervous system balance, and mental clarity are deeply interconnected. When one transforms, everything shifts.</p>
+                  <p className="home-concept__body">We bring these dimensions together into a structured and elevated approach to modern well-being, designed for those seeking depth, alignment, and lasting results.</p>
+                  <div className="home-concept__trust">
+                    <span className="home-concept__trust-icon">✦</span>
+                    <p>Every practitioner on The Idala Family platform is <strong>rigorously verified, confirmed, and selected</strong> through a thorough and supported vetting process — so you can explore with confidence.</p>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="home-concept__body">The Idala Family est une plateforme sélective qui connecte des praticiens holistiques de confiance avec des individus engagés à renforcer leur corps, affiner leur esprit et évoluer avec intention.</p>
+                  <p className="home-concept__body">Le bien-être n'est pas unidimensionnel. La force physique, l'équilibre du système nerveux et la clarté mentale sont profondément interconnectés. Quand l'un se transforme, tout change.</p>
+                  <p className="home-concept__body">Nous réunissons ces dimensions dans une approche structurée et élevée du bien-être moderne, conçue pour ceux qui recherchent profondeur, alignement et résultats durables.</p>
+                  <div className="home-concept__trust">
+                    <span className="home-concept__trust-icon">✦</span>
+                    <p>Chaque praticien de la plateforme The Idala Family est <strong>rigoureusement vérifié, confirmé et sélectionné</strong> via un processus d'évaluation soutenu et exigeant — pour que vous puissiez explorer en toute confiance.</p>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
-        </div>
-        <div className="tcard-controls">
-          <button className="tcard-btn" onClick={()=>adjustSpeed(false)}>←</button>
-          <button className="tcard-btn" onClick={()=>adjustSpeed(true)}>→</button>
-        </div>
-      </section>
-      <Footer/>
-    </div>
+        </section>
+
+        {/* ── SECTION 3 — BODY & MIND PHILOSOPHY ── */}
+        <section className="home-philosophy">
+          <div className="home-philosophy__inner">
+
+            <div className="home-philosophy__text-col">
+              {lang === 'en' ? (
+                <>
+                  <p className="home-concept__body">At the core of IDALA lies a simple truth: the body and the mind cannot be separated.</p>
+                  <p className="home-concept__body">A stronger body creates a clearer, more stable mind. A regulated mind allows the body to perform, adapt, and recover at its highest level. True well-being is built through this alignment.</p>
+                  <p className="home-concept__body">We exist to make this connection accessible through a refined and trusted ecosystem of practices and practitioners.</p>
+                </>
+              ) : (
+                <>
+                  <p className="home-concept__body">Au cœur d'IDALA se trouve une vérité simple : le corps et l'esprit ne peuvent pas être séparés.</p>
+                  <p className="home-concept__body">Un corps plus fort crée un esprit plus clair et plus stable. Un esprit régulé permet au corps de performer, s'adapter et récupérer à son plus haut niveau. Le vrai bien-être se construit à travers cet alignement.</p>
+                  <p className="home-concept__body">Nous existons pour rendre cette connexion accessible à travers un écosystème raffiné et de confiance de pratiques et de praticiens.</p>
+                </>
+              )}
+            </div>
+
+
+            <div className="home-philosophy__label-col">
+              <div className="home-concept__vertical-sub">
+                {'PHILOSOPHY'.split('').map((char, i) => (
+                  <span key={i} className="home-concept__letter">{char}</span>
+                ))}
+              </div>
+              <div className="home-concept__vertical-title">
+                {'BODY & MIND'.split('').map((char, i) => (
+                  <span key={i} className="home-concept__letter">{char === ' ' ? '\u00A0' : char}</span>
+                ))}
+              </div>
+            </div>
+            <div className="home-philosophy__quote">
+              <span className="home-philosophy__quote-mark">"</span>
+                <p className="home-philosophy__quote-text">Mens sana in corpore sano</p>
+              <span className="home-philosophy__quote-mark">"</span>
+            </div>
+
+          </div>
+        </section>
+
+        {/* ── SECTION 4 — GALERIE ── */}
+        <section className="home-gallery">
+          <div className="home-gallery__grid">
+            <div className="home-gallery__item home-gallery__item--tall">
+              <img src={handsHealing} alt="Hands healing" />
+              <span className="home-gallery__caption">{lang === 'fr' ? 'Soin' : 'Healing'}</span>
+            </div>
+            <div className="home-gallery__item">
+              <img src={soundHealing} alt="Sound healing" />
+              <span className="home-gallery__caption">Sound Healing</span>
+            </div>
+            <div className="home-gallery__item">
+              <img src={yogaPose} alt="Yoga" />
+              <span className="home-gallery__caption">Yoga</span>
+            </div>
+            <div className="home-gallery__item home-gallery__item--wide">
+              <img src={breathwork} alt="Breathwork" />
+              <span className="home-gallery__caption">Breathwork</span>
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECTION 5 — DIANE ── */}
+        <section className="home-diane">
+          <div className="home-diane__inner">
+            <div className="home-diane__text">
+              <span className="eyebrow">{lang === 'fr' ? 'La Fondatrice' : 'The Founder'}</span>
+              <h2 className="home-diane__name">Diane Thomas</h2>
+              <div className="divider" />
+              <p className="home-diane__body">
+                {lang === 'fr'
+                  ? "Professeure de Yoga certifiée, Praticienne Reiki & Tarologue. Diane a fondé The Idala Family pour créer un espace où le corps et l'esprit se renforcent ensemble, au sein d'une communauté holistique de confiance."
+                  : 'Certified Yoga Teacher, Reiki Practitioner & Tarot Reader. Diane founded The Idala Family to create a space where body and mind strengthen together, within a trusted holistic community.'}
+              </p>
+              <button className="btn btn--outline" onClick={() => navigate('/about')}>
+                {lang === 'fr' ? 'En savoir plus' : 'Learn More'}
+              </button>
+            </div>
+            <div className="home-diane__photo-wrap">
+              <img src={dianeRegard} alt="Diane Thomas" className="home-diane__photo" />
+              <div className="home-diane__photo-ring" />
+            </div>
+          </div>
+        </section>
+
+        {/* ── SECTION 6 — CTA ── */}
+        <section className="home-cta">
+          <span className="eyebrow" style={{ textAlign: 'center', display: 'block', marginBottom: 16 }}>
+            {lang === 'fr' ? 'Explorez la plateforme' : 'Explore the Platform'}
+          </span>
+          <h2 className="home-cta__title">
+            {lang === 'fr' ? 'Par où souhaitez-vous commencer ?' : 'Where would you like to begin?'}
+          </h2>
+          <div className="home-cta__row">
+            <button className="btn btn--outline home-cta__btn" onClick={() => navigate('/practitioners')}>
+              {lang === 'fr' ? 'Trouver un Praticien' : 'Find a Practitioner'}
+            </button>
+            <button className="btn btn--outline home-cta__btn" onClick={() => navigate('/spiritual')}>
+              {lang === 'fr' ? 'Tarot & Guidance' : 'Reading & Guidance'}
+            </button>
+            <button className="btn btn--outline home-cta__btn" onClick={() => navigate('/astrology')}>
+              {lang === 'fr' ? 'Thème Astral' : 'Birth Chart'}
+            </button>
+          </div>
+        </section>
+
+        {/* ── SECTION 7 — TESTIMONIALS ── */}
+        <section className="testimonials-wrap">
+          <div className="testimonials-header">
+            <span className="eyebrow">{lang === 'fr' ? 'Témoignages' : 'Testimonials'}</span>
+            <h2 className="section-title">{lang === 'fr' ? 'Ce que dit notre communauté' : 'What Our Community Says'}</h2>
+          </div>
+          <div className="testimonials-track-outer">
+            <div className="testimonials-track" ref={trackRef}>
+              {all.map((t, i) => (
+                <div className="tcard" key={i}>
+                  <p className="tcard-text">{t.text}</p>
+                  <div className="tcard-author">{t.author}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="tcard-controls">
+            <button className="tcard-btn" onClick={() => adjustSpeed(false)}>←</button>
+            <button className="tcard-btn" onClick={() => adjustSpeed(true)}>→</button>
+          </div>
+        </section>
+
+        <Footer />
+      </div>
     </>
   );
 }

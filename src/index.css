@@ -1,6 +1,5 @@
 /* ============================================================
-   THE IDALA FAMILY — styles.css  (React v1)
-   ALL styles live here. Components only use class names.
+   THE IDALA FAMILY | styles.css  
    ============================================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Jost:wght@200;300;400;500&display=swap');
@@ -422,10 +421,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   width: clamp(120px, 13vw, 180px);
   height: clamp(120px, 13vw, 180px);
   overflow: hidden;       
-  box-shadow:
-    0 20px 60px rgba(230,180,210,.35), 
-    0 0 0 14px rgba(230,180,210,.10),
-    0 0 0 28px rgba(230,180,210,.05);
+  box-shadow: 0 0 0 10px rgba(230,180,210,.05);
   position: relative;
 }
 .circle-logo--main::before {
@@ -497,144 +493,461 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 
 /* ─────────────────────────────────────────
-   HOME
+   SECTION 1 — HERO LOGO
 ───────────────────────────────────────── */
-.hero {
-  display: grid;
-  grid-template-columns: 240px 1fr 220px;
-  min-height: calc(100vh - var(--topbar-h));
-  position: relative;
-  overflow: hidden;
-}
-.hero::before {
-  content: '';
-  position: absolute;
-  width: 560px; height: 560px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(197,184,240,.10) 0%, transparent 70%);
-  top: -120px; right: -80px;
-  pointer-events: none;
-}
-.hero::after {
-  content: '';
-  position: absolute;
-  width: 360px; height: 360px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(168,212,240,.08) 0%, transparent 70%);
-  bottom: 80px; left: -60px;
-  pointer-events: none;
-}
-
-.hero-photos {
-  padding: 60px 24px 60px var(--px);
+.home-hero {
+  background: linear-gradient(160deg, #ede8f5 0%, #e8f0f7 50%, #eef5ec 100%);
+  padding: clamp(64px, 10vw, 120px) var(--px);
   display: flex;
-  flex-direction: column;
-  gap: 14px;
-  justify-content: center;
-}
-.photo-blob {
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: rgba(255,255,255,.85);
-  font-weight: 300;
-  flex-shrink: 0;
-  box-shadow: var(--shadow-sm);
-}
-.pb1 { width:136px; height:136px; background: linear-gradient(135deg,#b8e8c2,#5aaa72); }
-.pb2 { width:108px; height:108px; background: linear-gradient(135deg,#a8d4f0,#4888c0); align-self:flex-end; }
-.pb3 { width:126px; height:126px; background: linear-gradient(135deg,#ffcfa8,#d88040); }
-.pb4 { width: 92px; height: 92px;  background: linear-gradient(135deg,#e8b8f0,#a040c0); align-self:flex-end; }
-
-.hero-center {
-  padding: 56px 40px;
-  display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(201,169,110,.12);
+}
+
+/* Cercle décoratif en fond */
+.home-hero::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,169,110,.10);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.home-hero::after {
+  content: '';
+  position: absolute;
+  width: 900px; height: 900px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,169,110,.06);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.home-hero__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  position: relative;
   z-index: 1;
 }
-.hero-center .circle-logo--main { margin-bottom: 32px; }
-.hero-brand {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(10px, 1vw, 13px);
-  letter-spacing: clamp(4px, .6vw, 8px);
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 18px;
+
+.home-hero__logo-wrap {
+  width: clamp(160px, 22vw, 260px);
+  height: clamp(160px, 22vw, 260px);
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
 }
-.concept-label {
-  font-size: 10px;
+
+.home-hero__logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.home-hero__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 6vw, 72px);
+  font-weight: 400;
+  letter-spacing: clamp(6px, 1.5vw, 18px);
+  text-transform: uppercase;
+  color: var(--text);
+  line-height: 1;
+  margin-top: 8px;
+}
+
+.home-hero__tagline {
+  font-size: clamp(11px, 1.2vw, 13px);
   letter-spacing: 4px;
   text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 300;
+}
+
+/* ─────────────────────────────────────────
+   SECTION 2 — CONCEPT
+───────────────────────────────────────── */
+.home-concept {
+  background: var(--root-bg);
+  padding: clamp(56px, 8vw, 100px) var(--px);
+  border-bottom: 1px solid rgba(201,169,110,.10);
+}
+
+.home-concept__inner {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: clamp(32px, 5vw, 72px);
+  max-width: 1100px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+/* Colonne gauche — lettres empilées */
+.home-concept__label-col {
+  display: flex;
+  flex-direction: row;
+  gap: 18px;
+  padding-top: 6px;
+  position: sticky;
+  top: 84px;
+  align-items: flex-start;
+}
+
+.home-concept__vertical-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.home-concept__vertical-sub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: center;  
+}
+
+.home-concept__letter {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(11px, 1vw, 14px);
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.home-concept__vertical-sub .home-concept__letter {
+  color: var(--gold);
+  font-size: 13px;    
+  font-weight: 500;
+  letter-spacing: 1px;
+  line-height: 1.4;
+}
+
+/* Colonne droite — texte */
+.home-concept__text-col { padding-top: 4px; }
+
+.home-concept__body {
+  font-size: clamp(15px, 1.6vw, 17px);
+  line-height: 2;
   color: var(--text-light);
   margin-bottom: 18px;
 }
-.concept-text { max-width: 460px; }
-.concept-text p {
-  font-size: clamp(13px, 1.3vw, 14.5px);
-  line-height: 1.95;
-  color: var(--text-light);
-  margin-bottom: 10px;
+
+.home-concept__body strong {
+  color: var(--text);
+  font-weight: 500;
 }
-.concept-text p strong { font-weight: 500; color: var(--text); }
-.cta-row {
+
+/* Encart praticiens vérifiés */
+.home-concept__trust {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
+  gap: 16px;
+  align-items: flex-start;
+  background: linear-gradient(135deg, rgba(197,184,240,.08), rgba(232,184,240,.08));
+  border-left: 3px solid var(--c6);
+  padding: 20px 24px;
   margin-top: 32px;
 }
 
-.hero-diane {
-  padding: 60px var(--px) 60px 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+.home-concept__trust-icon {
+  color: var(--gold);
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
-.diane-circle {
-  width: clamp(120px, 11vw, 160px);
-  height: clamp(120px, 11vw, 160px);
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--c1), var(--c2));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(255,255,255,.85);
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 20px;
-  box-shadow: 0 16px 48px rgba(255,181,181,.22);
+
+.home-concept__trust p {
+  font-size: clamp(13px, 1.3vw, 15px);
+  line-height: 1.85;
+  color: var(--text-light);
+  margin: 0;
 }
-.diane-name {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(18px, 1.8vw, 22px);
-  font-weight: 400;
+
+.home-concept__trust p strong {
   color: var(--text);
-  margin-bottom: 4px;
+  font-weight: 500;
 }
-.diane-role {
+/* ─────────────────────────────────────────
+   SECTION 3 — GALERIE
+───────────────────────────────────────── */
+.home-gallery {
+  background: linear-gradient(135deg, rgba(184,232,194,.15) 0%, rgba(168,212,240,.12) 100%);
+  padding: clamp(48px, 6vw, 80px) var(--px);
+  border-top: 1px solid rgba(201,169,110,.10);
+  border-bottom: 1px solid rgba(201,169,110,.10);
+}
+
+.home-gallery__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto auto;
+  gap: 16px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.home-gallery__item {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.home-gallery__item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  aspect-ratio: 4/3;
+  transition: transform .6s ease;
+}
+
+.home-gallery__item:hover img { transform: scale(1.04); }
+
+.home-gallery__item--tall {
+  grid-row: 1 / 3;
+}
+.home-gallery__item--tall img {
+  aspect-ratio: 3/4;
+  height: 100%;
+}
+
+.home-gallery__item--wide {
+  grid-column: 2 / 4;
+}
+.home-gallery__item--wide img {
+  aspect-ratio: 16/7;
+}
+
+.home-gallery__caption {
+  position: absolute;
+  bottom: 12px;
+  left: 14px;
   font-size: 9px;
   letter-spacing: 3px;
   text-transform: uppercase;
+  color: rgba(255,255,255,.85);
+  background: rgba(44,42,37,.3);
+  padding: 4px 10px;
+  backdrop-filter: blur(4px);
+}
+
+.home-philosophy {
+  background: var(--beige);
+  padding: clamp(56px, 8vw, 100px) var(--px);
+  border-bottom: 1px solid rgba(201,169,110,.10);
+}
+
+.home-philosophy__inner {
+  display: grid;
+  grid-template-columns: 1fr 100px;
+  gap: clamp(32px, 5vw, 72px);
+  max-width: 1100px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.home-philosophy__label-col {
+  display: flex;
+  flex-direction: row;
+  gap: 18px;
+  padding-top: 6px;
+  position: sticky;
+  top: 84px;
+  align-items: flex-start;
+}
+
+.home-philosophy__text-col { padding-top: 4px; }
+
+.home-philosophy__quote {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end; 
+  gap: 6px;
+}
+
+.home-philosophy__quote-mark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 48px;
+  color: var(--gold-light);
+  line-height: .8;
+  flex-shrink: 0;
+}
+
+.home-philosophy__quote-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(18px, 2vw, 24px);
+  font-style: italic;
+  font-weight: 300;
   color: var(--gold);
+  letter-spacing: 1px;
+}
+
+/* ─────────────────────────────────────────
+   SECTION 4 — DIANE
+───────────────────────────────────────── */
+.home-diane {
+  background: var(--beige);
+  padding: clamp(56px, 8vw, 100px) var(--px);
+  border-bottom: 1px solid rgba(201,169,110,.12);
+}
+
+.home-diane__inner {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: clamp(40px, 6vw, 88px);
+  max-width: 1100px;
+  margin: 0 auto;
+  align-items: center;
+}
+
+.home-diane__text { }
+
+.home-diane__name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: 1px;
   margin-bottom: 16px;
+  line-height: 1.1;
 }
-.diane-blurb {
-  font-size: 12.5px;
-  line-height: 1.85;
+
+.home-diane__body {
+  font-size: clamp(15px, 1.6vw, 17px);
+  line-height: 2;
   color: var(--text-light);
-  max-width: 200px;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
+  max-width: 520px;
 }
+
+.home-diane__photo-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-diane__photo {
+  width: clamp(240px, 28vw, 360px);
+  height: clamp(240px, 28vw, 360px);
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+  position: relative;
+  z-index: 1;
+  box-shadow:
+    0 24px 64px rgba(197,184,240,.2),
+    0 8px 24px rgba(0,0,0,.08);
+}
+
+.home-diane__photo-ring {
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,169,110,.2);
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────
+   SECTION 5 — CTA
+───────────────────────────────────────── */
+.home-cta {
+  background: linear-gradient(160deg, #f0ecfa 0%, #f7f0fa 50%, #eceefa 100%);
+  padding: clamp(56px, 8vw, 96px) var(--px);
+  text-align: center;
+  border-bottom: 1px solid rgba(201,169,110,.12);
+}
+
+.home-cta__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(24px, 3.5vw, 42px);
+  font-weight: 300;
+  color: var(--text);
+  margin-bottom: 44px;
+  letter-spacing: .5px;
+}
+
+.home-cta__row {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.home-cta__btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 28px 36px !important;
+  min-width: 180px;
+  font-size: 10px !important;
+  letter-spacing: 3px !important;
+  transition: all .35s ease !important;
+  background: rgba(255,255,255,.7) !important;
+  border: 1px solid rgba(201,169,110,.3) !important;
+}
+
+.home-cta__btn:hover {
+  background: white !important;
+  border-color: var(--gold) !important;
+  transform: translateY(-4px) !important;
+  box-shadow: 0 12px 32px rgba(197,184,240,.2) !important;
+}
+
+.home-cta__btn-icon {
+  font-size: 22px;
+  display: block;
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE HOME v2
+───────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .home-concept__inner {
+    grid-template-columns: 64px 1fr;
+    gap: 28px;
+  }
+  .home-diane__inner {
+    grid-template-columns: 1fr;
+  }
+  .home-diane__photo-wrap {
+    order: -1;
+  }
+  .home-gallery__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .home-gallery__item--tall { grid-row: auto; }
+  .home-gallery__item--tall img { aspect-ratio: 4/3; }
+  .home-gallery__item--wide { grid-column: auto; }
+  .home-gallery__item--wide img { aspect-ratio: 4/3; }
+}
+
+@media (max-width: 768px) {
+  .home-concept__inner {
+    grid-template-columns: 1fr;
+  }
+  .home-concept__label-col {
+    flex-direction: row;
+    position: static;
+    gap: 12px;
+  }
+  .home-gallery__grid { grid-template-columns: 1fr; }
+  .home-gallery__item--wide img,
+  .home-gallery__item--tall img { aspect-ratio: 4/3; height: auto; }
+  .home-cta__btn { min-width: 140px; padding: 22px 24px !important; }
+}
+
+
 
 /* ─────────────────────────────────────────
    TESTIMONIALS
@@ -710,298 +1023,1250 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 .tcard-btn:hover { background: var(--gold); color: white; border-color: var(--gold); }
 
+/* ============================================================
+   PRACTITIONERS 
+   ============================================================ */
+
 /* ─────────────────────────────────────────
-   PRACTITIONERS
+   HERO
 ───────────────────────────────────────── */
-.practitioners-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+.pract-hero {
+  background: linear-gradient(160deg, #f5f0ff 0%, #f0f5ff 50%, #f0fff5 100%);
+  padding: clamp(48px, 7vw, 80px) var(--px);
+  border-bottom: 1px solid rgba(201,169,110,.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40px;
+}
+
+/* Bonhomme centré */
+.pract-chakra-top {
+  display: flex;
+  justify-content: center;
+}
+
+.pract-chakra-figure {
+  display: flex;
+  align-items: center;
   gap: 20px;
-  padding: 56px var(--px) 80px;
-}
-.pcard {
-  background: white;
-  padding: 28px 24px 24px;
-  border-top: 3px solid var(--c4);
-  box-shadow: var(--shadow-sm);
-  display: flex;
-  flex-direction: column;
-  transition: transform var(--transition), box-shadow var(--transition);
-  border-radius: var(--radius);
-}
-.pcard:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
-.pcard--c1 { border-top-color: var(--c1); }
-.pcard--c2 { border-top-color: var(--c2); }
-.pcard--c3 { border-top-color: var(--c3); }
-.pcard--c4 { border-top-color: var(--c4); }
-.pcard--c5 { border-top-color: var(--c5); }
-.pcard--c6 { border-top-color: var(--c6); }
-.pcard--c7 { border-top-color: var(--c7); }
-
-.pcard__icon {
-  width: 44px; height: 44px;
-  border-radius: 50%;
-  background: var(--beige);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  margin-bottom: 16px;
-}
-.pcard__title {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 19px;
-  font-weight: 500;
-  color: var(--text);
-  margin-bottom: 10px;
-}
-.pcard__text {
-  font-size: 13px;
-  line-height: 1.85;
-  color: var(--text-light);
-  flex-grow: 1;
-  margin-bottom: 20px;
 }
 
-/* ─────────────────────────────────────────
-   SPIRITUAL / PRICING
-───────────────────────────────────────── */
-.spiritual-hero {
-  min-height: clamp(280px, 38vw, 380px);
-  background: linear-gradient(135deg, #f8f4ff 0%, #f5f0fa 50%, #f0f4ff 100%);
+.chakra-figure-img {
+  width: 130px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+
+/* Labels gauche — Crown en haut, Root en bas */
+.chakra-labels {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 72px var(--px);
-  position: relative;
-  overflow: hidden;
+  gap: 5px; 
+  height: 165px;
 }
-.spiritual-hero::before {
-  content: '';
-  position: absolute;
-  width: 460px; height: 460px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(197,184,240,.14) 0%, transparent 70%);
-  top: -200px; left: 50%;
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-.sub-logo {
-  width: clamp(90px, 10vw, 118px);
-  height: clamp(90px, 10vw, 118px);
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--c6), var(--c7));
+
+.chakra-label {
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: clamp(24px, 3vw, 34px);
-  margin-bottom: 14px;
-  box-shadow:
-    0 12px 40px rgba(197,184,240,.35),
-    0 0 0 14px rgba(232,184,240,.08),
-    0 0 0 28px rgba(168,212,240,.04);
-  position: relative;
-  z-index: 1;
+  gap: 6px;
 }
-.sub-logo-label {
-  font-size: 9px;
-  letter-spacing: 3px;
+
+/* Ligne fine colorée à la place du rond */
+.chakra-label__line {
+  width: 16px;
+  height: 1.5px;
+  flex-shrink: 0;
+  border-radius: 1px;
+}
+
+.chakra-label__name {
+  font-size: 8px;
+  letter-spacing: 2px;
   text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 28px;
-  z-index: 1;
+  color: var(--text-light);
+  white-space: nowrap;
 }
-.guidance-intro {
+
+/* Texte centré en dessous */
+.pract-hero__text--centered {
+  text-align: center;
   max-width: 680px;
-  margin: 0 auto;
-  text-align: center;
-  padding: 56px var(--px) 0;
 }
-.pricing-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-  padding: 56px var(--px) 80px;
+
+.pract-hero__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: .5px;
+  margin-bottom: 16px;
+  white-space: nowrap;
 }
-.pricing-card {
-  background: white;
-  padding: clamp(24px, 3vw, 40px) clamp(18px, 2.5vw, 32px);
-  text-align: center;
-  box-shadow: var(--shadow-sm);
-  border-bottom: 3px solid var(--c6);
-  transition: transform var(--transition), box-shadow var(--transition);
+
+.pract-hero__body {
+  font-size: clamp(15px, 1.5vw, 17px);
+  line-height: 1.95;
+  color: var(--text-light);
+  margin-bottom: 28px;
+}
+
+.pract-hero__quote {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  border-radius: var(--radius);
+  align-items: baseline;
+  justify-content: center;
+  gap: 6px;
 }
-.pricing-card--c6 { border-bottom-color: var(--c6); }
-.pricing-card--c7 { border-bottom-color: var(--c7); }
-.pricing-card--c5 { border-bottom-color: var(--c5); }
-.pricing-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
-.pricing-duration { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
-.pricing-title { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 400; color: var(--text); margin-bottom: 18px; }
-.pricing-amount {
+
+.pract-hero__quote-mark {
   font-family: 'Cormorant Garamond', serif;
   font-size: 48px;
-  font-weight: 300;
-  color: var(--text);
-  line-height: 1;
-  display: flex;
-  align-items: flex-start;
-  gap: 4px;
-  margin-bottom: 8px;
+  color: var(--gold-light);
+  line-height: .8;
+  flex-shrink: 0;
 }
-.pricing-amount sup { font-size: 20px; margin-top: 10px; }
-.pricing-desc { font-size: 13.5px; line-height: 1.9; color: var(--text-light); margin-bottom: 28px; flex-grow: 1; }
+
+.pract-hero__quote-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(18px, 2vw, 24px);
+  font-style: italic;
+  font-weight: 300;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .chakra-figure-img { width: 70px; }
+  .chakra-labels { gap: 13px; }
+}
+/* ─────────────────────────────────────────
+   GRID
+───────────────────────────────────────── */
+.pract-grid-section {
+  padding: clamp(56px, 7vw, 88px) var(--px);
+  background: var(--root-bg);
+}
+
+.pract-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(20px, 3vw, 32px);
+  max-width: 1100px;
+  margin: 0 auto;
+}
 
 /* ─────────────────────────────────────────
-   ASTROLOGY
+   CARDS RONDES
 ───────────────────────────────────────── */
-.astro-visual {
+.pcard-wrap {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: transform .3s ease, box-shadow .3s ease;
+  will-change: transform;
+}
+
+.pcard-wrap:hover {
+  transform: scale(1.06);
+  box-shadow: 0 16px 48px rgba(0,0,0,.10);
+}
+
+.pcard-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2.5px solid var(--chakra-color, var(--c4));
+  overflow: hidden;
+  transition: opacity .3s ease;
+}
+
+
+/* Par défaut : front visible, back caché */
+.pcard-front { opacity: 1; }
+.pcard-back  { opacity: 0; pointer-events: none; }
+
+/* Au hover : front caché, back visible */
+.pcard-wrap:hover .pcard-front { opacity: 0; pointer-events: none; }
+.pcard-wrap:hover .pcard-back  { opacity: 1; pointer-events: auto; }
+
+
+/* ─── FRONT ─── */
+.pcard-front {
+  background: white;
+  box-shadow: 0 4px 20px rgba(0,0,0,.05);
+  gap: 10px;
+  padding: 20px;
+  text-align: center;
+}
+
+.pcard-front__ring {
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--chakra-color, var(--c4)) 35%, transparent);
+  pointer-events: none;
+}
+
+.pcard-front__icon {
+  width: clamp(28px, 3.5vw, 38px);
+  height: clamp(28px, 3.5vw, 38px);
+  color: color-mix(in srgb, var(--chakra-color, var(--c4)) 100%, #555 40%);
+  filter: saturate(1.2) brightness(.75);
+  flex-shrink: 0;
+}
+
+.pcard-front__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.pcard-front__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(12px, 1.3vw, 15px);
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  line-height: 1.2;
+  padding: 0 10px;
+}
+
+.pcard-front__hint {
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-light);
+  opacity: .55;
+  text-align: center;
+  padding: 0 12px;
+}
+
+/* ─── BACK ─── */
+.pcard-back {
+  background: color-mix(in srgb, var(--chakra-color, var(--c4)) 10%, white);
+  padding: clamp(14px, 2vw, 22px);
+  gap: 8px;
+  text-align: center;
+}
+
+.pcard-back__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(12px, 1.2vw, 14px);
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+  flex-shrink: 0;
+}
+
+.pcard-back__text {
+  font-size: clamp(9px, .9vw, 11px);
+  line-height: 1.65;
+  color: var(--text-light);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  flex-shrink: 1;
+  padding: 0 6px;
+}
+
+/* ─────────────────────────────────────────
+   BOUTON "BOOK A SESSION" — arrondi
+───────────────────────────────────────── */
+.btn--chakra-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Jost', sans-serif;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 100px;   /* pill shape */
+  color: white;
+  transition: filter .2s ease, transform .2s ease;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.btn--chakra-pill:hover {
+  filter: brightness(.88);
+  transform: translateY(-1px);
+}
+
+.btn--chakra-pill--c1 { background: linear-gradient(135deg, #ffb5b5, #e07070); }
+.btn--chakra-pill--c2 { background: linear-gradient(135deg, #ffcfa8, #d88040); }
+.btn--chakra-pill--c3 { background: linear-gradient(135deg, #d4c840, #a08800); color: white; }
+.btn--chakra-pill--c4 { background: linear-gradient(135deg, #b8e8c2, #48a868); }
+.btn--chakra-pill--c5 { background: linear-gradient(135deg, #a8d4f0, #3888c0); }
+.btn--chakra-pill--c6 { background: linear-gradient(135deg, #c5b8f0, #7060c8); }
+.btn--chakra-pill--c7 { background: linear-gradient(135deg, #e8b8f0, #a040c0); }
+
+/* ─────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────── */
+@media (max-width: 1200px) {
+  .pract-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 1024px) {
+  .pract-hero__inner {
+    grid-template-columns: 160px 1fr;
+    gap: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pract-hero__inner {
+    grid-template-columns: 1fr;
+  }
+  .pract-chakra-figure {
+    justify-content: center;
+  }
+  .pract-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 560px) {
+  .pract-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+}
+
+/* ============================================================
+   SPIRITUAL / TAROT 
+   ============================================================ */
+
+/* ─────────────────────────────────────────
+   HERO
+───────────────────────────────────────── */
+.spiritual-hero-v2 {
+  background: linear-gradient(160deg, #f5f0ff 0%, #f0ecfa 50%, #ece8f5 100%);
+  padding: clamp(56px, 8vw, 96px) var(--px);
+  border-bottom: 1px solid rgba(201,169,110,.12);
+}
+
+.spiritual-hero-v2__inner {
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  gap: clamp(40px, 6vw, 80px);
+  max-width: 1100px;
+  margin: 0 auto;
+  align-items: center;
+}
+
+.spiritual-hero-v2__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(30px, 4vw, 52px);
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: .5px;
+  margin-bottom: 16px;
+}
+
+.spiritual-hero-v2__body {
+  font-size: clamp(15px, 1.5vw, 17px);
+  line-height: 2;
+  color: var(--text-light);
+  max-width: 580px;
+}
+
+.spiritual-hero-v2__visual {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
 }
 
-.astro-orb-label {
-  font-size: 10px;
-  letter-spacing: 4px;
+.spiritual-orb {
+  width: clamp(100px, 12vw, 150px);
+  height: clamp(100px, 12vw, 150px);
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c6), var(--c7));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 20px 56px rgba(197,184,240,.3),
+    0 0 0 16px rgba(232,184,240,.08),
+    0 0 0 32px rgba(197,184,240,.04);
+  position: relative;
+}
+
+.spiritual-orb-label {
+  font-size: 9px;
+  letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--gold);
   text-align: center;
 }
 
-@media (max-width: 1024px) {
-  .astro-visual { display: none; }
+/* ─────────────────────────────────────────
+   SECTIONS
+───────────────────────────────────────── */
+.spiritual-section {
+  padding: clamp(56px, 7vw, 88px) var(--px);
+  background: var(--root-bg);
 }
 
-.astro-hero {
-  display: grid;
-  grid-template-columns: 1fr 300px;
-  gap: 56px;
-  align-items: center;
-  padding: 72px var(--px) 48px;
+.spiritual-section__header {
+  text-align: center;
+  margin-bottom: 48px;
 }
-.astro-orb {
-  width: clamp(160px, 16vw, 220px);
-  height: clamp(160px, 16vw, 220px);
+
+.spiritual-section__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(26px, 3.5vw, 42px);
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: .5px;
+}
+
+/* ─────────────────────────────────────────
+   TAROT CARDS
+───────────────────────────────────────── */
+.spiritual-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.spiritual-card {
+  background: white;
+  border-radius: 12px;           /* coins légèrement arrondis */
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  border-bottom: 3px solid var(--c6);
+  display: flex;
+  flex-direction: column;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.spiritual-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+.spiritual-card--c7 { border-bottom-color: var(--c7); }
+.spiritual-card--c5 { border-bottom-color: var(--c5); }
+
+.spiritual-card__image {
+  width: 100%;
+  aspect-ratio: 16 / 7;
+  overflow: hidden;
+}
+
+.spiritual-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .5s ease;
+}
+
+.spiritual-card:hover .spiritual-card__image img {
+  transform: scale(1.04);
+}
+
+.spiritual-card__content {
+  padding: clamp(24px, 3vw, 36px);
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.spiritual-card__duration {
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+.spiritual-card__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(20px, 2.2vw, 26px);
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 12px;
+  line-height: 1.2;
+}
+
+.spiritual-card__price {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 4vw, 52px);
+  font-weight: 300;
+  color: var(--text);
+  line-height: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 3px;
+}
+
+.spiritual-card__price sup {
+  font-size: 18px;
+  margin-top: 8px;
+}
+
+.spiritual-card__desc {
+  font-size: clamp(14px, 1.4vw, 16px);
+  line-height: 1.9;
+  color: var(--text-light);
+  flex-grow: 1;
+  margin-bottom: 24px;
+}
+
+.spiritual-card__btn {
+  padding: 13px 28px;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: white;
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  transition: filter .2s ease, transform .2s ease;
+  align-self: flex-start;
+}
+
+.spiritual-card__btn:hover {
+  filter: brightness(.88);
+  transform: translateY(-2px);
+}
+
+.spiritual-card__btn--c7 { background: linear-gradient(135deg, #e8b8f0, #a040c0); }
+.spiritual-card__btn--c5 { background: linear-gradient(135deg, #a8d4f0, #3888c0); }
+
+/* ─────────────────────────────────────────
+   PSYCHIC SECTION
+───────────────────────────────────────── */
+.spiritual-psychic {
+  background: var(--beige);
+  padding: clamp(56px, 7vw, 88px) var(--px);
+  border-top: 1px solid rgba(201,169,110,.12);
+}
+
+.spiritual-psychic__inner {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: clamp(40px, 6vw, 80px);
+  max-width: 1100px;
+  margin: 0 auto;
+  align-items: center;
+}
+
+.spiritual-psychic__image {
+  border-radius: 12px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  box-shadow: var(--shadow-md);
+}
+
+.spiritual-psychic__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spiritual-psychic__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.15;
+  letter-spacing: .5px;
+  margin-bottom: 16px;
+}
+
+.spiritual-psychic__body {
+  font-size: clamp(15px, 1.5vw, 17px);
+  line-height: 2;
+  color: var(--text-light);
+  margin-bottom: 32px;
+}
+
+.spiritual-psychic__btn {
+  padding: 14px 32px;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: white;
+  background: linear-gradient(135deg, var(--c6), #7060c8);
+  border: none;
+  border-radius: 100px;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  transition: filter .2s ease, transform .2s ease;
+}
+
+.spiritual-psychic__btn:hover {
+  filter: brightness(.88);
+  transform: translateY(-2px);
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .spiritual-hero-v2__inner { grid-template-columns: 1fr; }
+  .spiritual-hero-v2__visual { display: none; }
+  .spiritual-psychic__inner  { grid-template-columns: 1fr; }
+  .spiritual-psychic__image  { max-width: 480px; margin: 0 auto; }
+}
+
+@media (max-width: 768px) {
+  .spiritual-cards { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
+}
+
+/* ============================================================
+   ASTROLOGY
+   ============================================================ */
+
+/* ─────────────────────────────────────────
+   HERO
+───────────────────────────────────────── */
+.astro-hero-v2 {
+  background: linear-gradient(160deg, #f0f4ff 0%, #f5f0ff 50%, #fff0f5 100%);
+  padding: clamp(56px, 8vw, 96px) var(--px);
+  border-bottom: 1px solid rgba(201,169,110,.12);
+}
+
+.astro-hero-v2__inner {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: clamp(40px, 6vw, 80px);
+  max-width: 1100px;
+  margin: 0 auto;
+  align-items: center;
+}
+
+.astro-hero-v2__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(32px, 5vw, 60px);
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.1;
+  letter-spacing: 1px;
+  margin-bottom: 16px;
+}
+
+.astro-hero-v2__body {
+  font-size: clamp(15px, 1.5vw, 17px);
+  line-height: 2;
+  color: var(--text-light);
+  margin-bottom: 16px;
+  max-width: 620px;
+}
+
+.astro-hero-v2__visual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.astro-orb-v2 {
+  width: clamp(120px, 14vw, 180px);
+  height: clamp(120px, 14vw, 180px);
   border-radius: 50%;
   background: linear-gradient(135deg, var(--c3) 0%, var(--c6) 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(36px, 4vw, 56px);
   box-shadow:
-    0 20px 60px rgba(197,184,240,.25),
-    0 0 0 18px rgba(255,240,160,.06),
-    0 0 0 36px rgba(197,184,240,.04);
+    0 20px 56px rgba(197,184,240,.25),
+    0 0 0 16px rgba(255,240,160,.06),
+    0 0 0 32px rgba(197,184,240,.04);
 }
-.benefits-section { padding: 0 var(--px) 64px; }
-.benefits-header  { text-align: center; margin-bottom: 40px; }
-.benefits-grid {
+
+/* ─────────────────────────────────────────
+   BENEFITS — RONDS 
+───────────────────────────────────────── */
+.astro-benefits {
+  background: var(--root-bg);
+  padding: clamp(56px, 7vw, 88px) var(--px);
+  border-bottom: 1px solid rgba(201,169,110,.10);
+}
+
+.astro-benefits__header {
+  text-align: center;
+  margin-bottom: 52px;
+}
+
+.astro-benefits__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(26px, 3.5vw, 42px);
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: .5px;
+}
+
+.astro-benefits__grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: clamp(16px, 2.5vw, 28px);
   max-width: 1000px;
   margin: 0 auto;
 }
-.benefit-card {
-  background: white;
-  padding: 26px;
-  border-left: 3px solid var(--c3);
-  box-shadow: var(--shadow-sm);
-  border-radius: var(--radius);
-}
-.benefit-card--c3 { border-left-color: var(--c3); }
-.benefit-card--c4 { border-left-color: var(--c4); }
-.benefit-card--c5 { border-left-color: var(--c5); }
-.benefit-card--c6 { border-left-color: var(--c6); }
-.benefit-card--c7 { border-left-color: var(--c7); }
-.benefit-card--full {
-  grid-column: 1 / -1;
-  border-left-color: var(--c1);
-  max-width: 680px;
-  margin: 0 auto;
-  width: 100%;
-}
-.benefit-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 500; color: var(--text); margin-bottom: 8px; }
 
-/* Calculator */
-.calculator-section { background: var(--beige); padding: clamp(48px,6vw,72px) var(--px); border-top: 1px solid rgba(201,169,110,.15); }
-.calc-inner { max-width: 700px; margin: 0 auto; }
-.calc-header { text-align: center; margin-bottom: 40px; }
-.calc-form { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; margin-bottom: 20px; }
-.form-group label { display: block; font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
-.form-group input {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid rgba(201,169,110,.3);
-  background: white;
-  font-family: 'Jost', sans-serif;
-  font-size: 13px;
-  color: var(--text);
-  outline: none;
-  transition: border-color var(--transition);
-  -webkit-appearance: none;
+/* Cercle benefit */
+.astro-benefit-circle {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  cursor: default;
+  border-radius: 50%;
 }
-.form-group input:focus { border-color: var(--gold); }
-.calc-note { font-size: 11.5px; color: var(--text-light); text-align: center; margin-bottom: 24px; line-height: 1.7; }
-.calc-cta { text-align: center; }
-.chart-result { margin-top: 40px; }
-.result-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--beige-2); }
-.result-circle { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--c6), var(--c7)); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
-.result-name { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--text); }
-.result-coords { font-size: 11px; color: var(--text-light); }
-.result-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 18px; }
-.result-item { background: white; padding: 16px 14px; border-radius: var(--radius); }
-.result-item--highlight { border-bottom: 2px solid var(--gold-light); }
-.result-label { font-size: 8px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 5px; }
-.result-value { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--text); line-height: 1.2; }
-.result-degree { font-size: 11px; color: var(--text-light); margin-top: 2px; }
-.result-disclaimer { font-size: 11.5px; color: var(--text-light); text-align: center; line-height: 1.8; padding: 18px; background: white; border-radius: var(--radius); }
-.error-msg { color: #c0392b; font-size: 13px; text-align: center; margin-top: 12px; }
+
+.astro-benefit-circle__front,
+.astro-benefit-circle__back {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 2.5px solid var(--benefit-color, var(--c5));
+  overflow: hidden;
+  transition: opacity .3s ease;
+  padding: 16px;
+  text-align: center;
+}
+
+.astro-benefit-circle__front { background: white; gap: 8px; opacity: 1; }
+.astro-benefit-circle__back  { background: color-mix(in srgb, var(--benefit-color, var(--c5)) 10%, white); opacity: 0; }
+
+.astro-benefit-circle:hover .astro-benefit-circle__front { opacity: 0; }
+.astro-benefit-circle:hover .astro-benefit-circle__back  { opacity: 1; }
+
+.astro-benefit-circle__ring {
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--benefit-color, var(--c5)) 35%, transparent);
+  pointer-events: none;
+}
+
+.astro-benefit-circle__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(12px, 1.2vw, 15px);
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.astro-benefit-circle__text {
+  font-size: clamp(9px, .85vw, 11px);
+  line-height: 1.65;
+  color: var(--text-light);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+}
 
 /* ─────────────────────────────────────────
-   ABOUT
+   CALCULATOR SECTION
 ───────────────────────────────────────── */
-.about-hero { display: grid; grid-template-columns: 300px 1fr; gap: 64px; padding: 72px var(--px); align-items: start; }
-.about-photo-col { display: flex; flex-direction: column; align-items: center; gap: 20px; position: sticky; top: 84px; }
-.diane-portrait {
-  width: clamp(200px, 22vw, 280px);
-  height: clamp(200px, 22vw, 280px);
+.astro-calc-section {
+  background: linear-gradient(160deg, #f8f5ff 0%, #f5f8ff 100%);
+  padding: clamp(56px, 7vw, 88px) var(--px);
+  border-top: 1px solid rgba(201,169,110,.12);
+}
+
+.astro-calc-intro {
+  font-size: clamp(14px, 1.4vw, 16px);
+  color: var(--gold);
+  text-align: center;
+  font-style: italic;
+  font-family: 'Cormorant Garamond', serif;
+  margin-top: 12px;
+  letter-spacing: .5px;
+}
+
+/* ─────────────────────────────────────────
+   RESULTS v2
+───────────────────────────────────────── */
+.chart-result-v2 {
+  margin-top: 48px;
+  background: white;
+  border-radius: 12px;
+  padding: clamp(28px, 4vw, 48px);
+  box-shadow: var(--shadow-md);
+}
+
+.chart-result-v2__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--beige-2);
+}
+
+.chart-result-v2__circle {
+  width: 52px; height: 52px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--c1) 0%, var(--c2) 45%, var(--c7) 100%);
+  background: linear-gradient(135deg, var(--c6), var(--c7));
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(255,255,255,.8);
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  box-shadow: 0 24px 64px rgba(255,181,181,.2), 0 0 0 20px rgba(255,181,181,.06), 0 0 0 40px rgba(255,181,181,.03);
+  flex-shrink: 0;
 }
-.about-name { font-family: 'Cormorant Garamond', serif; font-size: clamp(22px, 2.5vw, 28px); font-weight: 400; text-align: center; color: var(--text); }
-.about-role { font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); text-align: center; line-height: 2; }
-.about-text-col { padding-top: 4px; }
-.about-text-col p { font-size: clamp(13px, 1.4vw, 15px); line-height: 2.05; color: var(--text-light); margin-bottom: 16px; }
-.about-text-col p em { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--text); }
 
-.idala-section { background: var(--beige); padding: 72px var(--px); border-top: 1px solid rgba(201,169,110,.15); }
-.idala-section-header { text-align: center; margin-bottom: 52px; }
-.idala-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 960px; margin: 0 auto; }
-.idala-card { background: white; padding: 32px; border-radius: var(--radius); box-shadow: var(--shadow-sm); }
-.idala-card--full { grid-column: 1 / -1; }
-.idala-card-label { font-size: 9px; letter-spacing: 4px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
-.idala-card p { font-size: 14px; line-height: 1.95; color: var(--text-light); margin-bottom: 10px; }
-.idala-card p:last-child { margin-bottom: 0; }
-.idala-card strong { color: var(--text); font-weight: 500; }
+.chart-result-v2__name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(18px, 2vw, 24px);
+  color: var(--gold-dark);
+  font-weight: 400;
+}
 
-.closing-quote { text-align: center; padding: 52px var(--px); border-top: 1px solid rgba(201,169,110,.15); }
-.closing-quote blockquote { font-family: 'Cormorant Garamond', serif; font-size: clamp(18px, 2.2vw, 26px); font-style: italic; font-weight: 300; color: var(--text-light); max-width: 680px; margin: 0 auto; line-height: 1.7; }
+.chart-result-v2__coords {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+.chart-result-v2__big3-label {
+  margin-bottom: 16px;
+}
+
+.chart-result-v2__big3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 8px;
+}
+
+.chart-result-v2__planets {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+
+/* ─── Individual result card ─── */
+.astro-result-card {
+  background: var(--root-bg);
+  border-radius: 10px;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.astro-result-card--highlight {
+  background: var(--beige);
+  border-bottom: 2px solid var(--gold-light);
+}
+
+.astro-result-card--muted {
+  background: var(--root-bg);
+  opacity: .7;
+}
+
+.astro-result-card--planet {
+  background: white;
+  border: 1px solid var(--beige-2);
+}
+
+.astro-result-card__icon {
+  width: 22px; height: 22px;
+  color: var(--gold);
+  flex-shrink: 0;
+}
+
+.astro-result-card__icon svg {
+  width: 100%; height: 100%;
+}
+
+.astro-result-card__label {
+  font-size: 8px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+/* Inside card result */
+.astro-result-card__sign-icon {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(22px, 2.5vw, 30px);
+  color: var(--gold);
+  line-height: 1;
+  width: auto;
+  height: auto;
+  font-variant-emoji: text;
+  -webkit-font-variant-emoji: text;
+}
+
+.astro-result-card__value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(16px, 1.8vw, 20px);
+  color: var(--text-light);
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.astro-result-card__value--small {
+  font-size: 12px;
+  color: var(--gold);
+  font-family: 'Jost', sans-serif;
+}
+
+.astro-result-card__deg {
+  font-size: 10px;
+  color: var(--text);  
+}
+
+.chart-result-v2__disclaimer {
+  font-size: 12px;
+  color: var(--text-light);
+  text-align: center;
+  line-height: 1.8;
+  padding: 18px;
+  background: var(--beige);
+  border-radius: 8px;
+  margin-top: 24px;
+  font-style: italic;
+}
+/* ─────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .astro-hero-v2__inner   { grid-template-columns: 1fr; }
+  .astro-hero-v2__visual  { display: none; }
+  .astro-benefits__grid   { grid-template-columns: repeat(3, 1fr); }
+  .chart-result-v2__planets { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .astro-benefits__grid     { grid-template-columns: repeat(2, 1fr); }
+  .chart-result-v2__big3    { grid-template-columns: 1fr; }
+  .chart-result-v2__planets { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 480px) {
+  .astro-benefits__grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ============================================================
+   ABOUT v2
+   Remplace l'ancienne section ABOUT dans styles.css
+   ============================================================ */
+
+/* ─────────────────────────────────────────
+   SECTION 1 — FOUNDER
+───────────────────────────────────────── */
+.about-founder {
+  background: var(--root-bg);
+  padding: clamp(56px, 8vw, 96px) var(--px);
+  border-bottom: 1px solid rgba(201,169,110,.12);
+}
+
+.about-founder__inner {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: clamp(48px, 6vw, 88px);
+  max-width: 1100px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.about-founder__photo-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 84px;
+}
+
+.about-founder__photo-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about-founder__photo {
+  width: clamp(200px, 22vw, 280px);
+  height: clamp(200px, 22vw, 280px);
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: top;
+  display: block;
+  position: relative;
+  z-index: 1;
+  box-shadow:
+    0 24px 64px rgba(197,184,240,.2),
+    0 8px 24px rgba(0,0,0,.08);
+}
+
+.about-founder__photo-ring {
+  position: absolute;
+  inset: -18px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,169,110,.2);
+  pointer-events: none;
+}
+
+.about-founder__name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(20px, 2.2vw, 26px);
+  font-weight: 400;
+  color: var(--text);
+  text-align: center;
+}
+
+.about-founder__role {
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-align: center;
+  line-height: 1.8;
+}
+
+.about-founder__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(30px, 4vw, 52px);
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.1;
+  letter-spacing: .5px;
+  margin-bottom: 16px;
+}
+
+.about-founder__body {
+  font-size: clamp(15px, 1.5vw, 17px);
+  line-height: 2.05;
+  color: var(--text-light);
+  margin-bottom: 18px;
+}
+
+.about-founder__body em {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: var(--text);
+}
+
+.about-founder__quote {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 32px;
+}
+
+.about-founder__quote-mark {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 48px;
+  color: var(--gold-light);
+  line-height: .8;
+  flex-shrink: 0;
+}
+
+.about-founder__quote-text {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(18px, 2vw, 24px);
+  font-style: italic;
+  font-weight: 300;
+  color: var(--gold);
+  letter-spacing: 1px;
+}
+
+/* ─────────────────────────────────────────
+   SECTION 2 — POURQUOI IDALA
+───────────────────────────────────────── */
+.about-idala {
+  background: linear-gradient(160deg, #f5f0ff 0%, #f0f5ff 50%, #f5fff0 100%);
+  padding: clamp(56px, 8vw, 96px) var(--px);
+  border-top: 1px solid rgba(201,169,110,.12);
+}
+
+.about-idala__header {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.about-idala__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(28px, 4vw, 48px);
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: .5px;
+}
+
+.about-idala__intro {
+  max-width: 820px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+
+/* Layout Ida / Image / Pingala */
+.about-idala__diagram {
+  display: grid;
+  grid-template-columns: 1fr 280px 1fr;
+  gap: clamp(24px, 4vw, 56px);
+  max-width: 1100px;
+  margin: 0 auto 48px;
+  align-items: start;
+}
+
+.about-idala__col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 80px; /* aligne avec l'image */
+}
+
+.about-idala__col--left { text-align: right; }
+.about-idala__col--right { text-align: left; }
+
+.about-idala__channel-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(22px, 2.5vw, 32px);
+  font-weight: 400;
+  color: var(--gold);
+  letter-spacing: 2px;
+}
+
+.about-idala__body {
+  font-size: clamp(14px, 1.4vw, 16px);
+  line-height: 1.95;
+  color: var(--text-light);
+}
+
+.about-idala__body--intro {
+  color: var(--text-light);
+  font-weight: 400;
+}
+
+/* Colonne centrale — image + texte ensemble au dessus */
+.about-idala__image-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.about-idala__together {
+  text-align: center;
+  padding: 0 8px;
+  max-width: 820px;
+  margin: 40px auto 48px;
+  text-align: center;
+}
+
+.about-idala__together .about-idala__body {
+  font-size: clamp(13px, 1.3vw, 15px);
+  color: var(--text-light);
+  font-weight: 400;
+}
+
+.about-idala__img {
+  width: 100%;
+  max-width: 280px;
+  object-fit: contain;
+  opacity: .9;
+}
+
+/* Encart Balance & Community */
+.about-idala__balance {
+  max-width: 820px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 12px;
+  padding: clamp(28px, 4vw, 48px);
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--c6);
+}
+
+.about-idala__balance-label {
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 20px;
+}
+
+.about-idala__balance-body {
+  font-size: clamp(15px, 1.5vw, 17px);
+  line-height: 2;
+  color: var(--text-light);
+  margin-bottom: 14px;
+}
+
+.about-idala__balance-body:last-child { margin-bottom: 0; }
+
+.about-idala__balance-body strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* ─────────────────────────────────────────
+   SECTION 3 — CLOSING
+───────────────────────────────────────── */
+.about-closing {
+  background: var(--beige);
+  padding: clamp(48px, 6vw, 80px) var(--px);
+  text-align: center;
+  border-top: 1px solid rgba(201,169,110,.12);
+}
+
+.about-closing__quote {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(20px, 2.8vw, 34px);
+  font-style: italic;
+  font-weight: 300;
+  color: var(--text-light);
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .about-founder__inner {
+    grid-template-columns: 1fr;
+  }
+  .about-founder__photo-col {
+    position: static;
+  }
+  .about-idala__diagram {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .about-idala__col {
+    padding-top: 0;
+    text-align: center;
+  }
+  .about-idala__col--left,
+  .about-idala__col--right { text-align: center; }
+  .about-idala__image-col {
+    order: -1;
+    margin: 0 auto;
+    max-width: 260px;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-founder__photo { width: 200px; height: 200px; }
+}
 
 /* ─────────────────────────────────────────
    COMING SOON
@@ -1159,7 +2424,27 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   flex-wrap: wrap;
 }
 .footer-brand { font-family: 'Cormorant Garamond', serif; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); }
-.footer-copy { font-size: 11px; }
+.footer-copy { 
+  font-size: 11px;
+  
+}
+
+.footer-instagram {
+  display: flex;
+  align-items: center;
+  justify-content: end ;
+  gap: 8px;
+  color: rgba(255,255,255,.45);
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 2px;
+  transition: color var(--transition);
+  font-family: 'Jost', sans-serif;
+}
+
+.footer-instagram:hover {
+  color: var(--gold);
+}
 
 /* ─────────────────────────────────────────
    RESPONSIVE

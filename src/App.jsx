@@ -24,19 +24,18 @@ function Layout() {
 export default function App() {
   const [lang, setLangState] = useState(() => localStorage.getItem('idala-lang') || 'en');
   const setLang = (l) => { setLangState(l); localStorage.setItem('idala-lang', l); };
-  const [showLoader, setShowLoader] = useState(true);   // ← loader visible au départ
-  const [fading, setFading]         = useState(false);  // ← déclenche le fade-out
+  const [showLoader, setShowLoader] = useState(true);   
+  const [fading, setFading]         = useState(false);  
 
     const handleDone = () => {
-    setFading(true);                                 // commence le fade
-    setTimeout(() => setShowLoader(false), 650);     // retire du DOM après la transition
+    setFading(true);                                 
+    setTimeout(() => setShowLoader(false), 650);     
   };
 
   return (
     <HelmetProvider>
       <LangCtx.Provider value={{ lang, setLang }}>
         <BrowserRouter>
-                {/* Loader overlay — positionné en dehors du router pour couvrir tout */}
           {showLoader && (
             <div className={`loader${fading ? ' fade-out' : ''}`}>
               <Loader onDone={handleDone} />

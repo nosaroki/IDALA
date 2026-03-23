@@ -9,7 +9,7 @@ import { useLang } from '../components/LangContext';  // ← seul changement
 const NAV = [
   { path: '/',              en: 'Home',               fr: 'Accueil'              },
   { path: '/practitioners', en: 'Practitioners',      fr: 'Praticiens'           },
-  { path: '/spiritual',     en: 'Spiritual Guidance', fr: 'Guidance Spirituelle' },
+  { path: '/spiritual',     en: 'Reading & Guidance', fr: 'Tarot & Guidance' },
   { path: '/astrology',     en: 'Birth Chart',        fr: 'Thème Astral'         },
   { path: '/about',         en: 'About',              fr: 'À propos'             },
 ];
