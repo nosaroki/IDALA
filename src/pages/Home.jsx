@@ -11,24 +11,25 @@ import Footer from '../components/Footer';
 
 import trsprlogo from '../assets/trsprlogo.png';
 import dianeRegard    from '../assets/dianeregard.png';
-import handsHealing   from '../assets/meditationdiane.png';
+import meditDiane   from '../assets/meditationdiane.png';
 import soundHealing   from '../assets/soundhealing.jpg';
 import groupsound     from '../assets/groupsound.jpg';
 import groupyoga       from '../assets/groupyoga.jpg';
 import groupmedit      from '../assets/groupmedit.jpg';
 // import yogaPose       from '../assets/souplesserocher.png';
-import breathwork     from '../assets/yogaplage.png';
+// import breathwork     from '../assets/yogaplage.png';
 import meditation from '../assets/meditation.jpg';
 import sointbt from '../assets/sointbt.jpg';
 // practitioners frise
-import jspcute      from '../assets/practitioners/jsp_cute.JPG';
-import marine from '../assets/practitioners/marine.JPG';
+// import marine from '../assets/practitioners/marine.JPG';
 import marine_reiki from '../assets/practitioners/marine_reiki.JPG';
-import odile_medium from '../assets/practitioners/odile_medium.JPG';
-import sylvie_osteo from '../assets/practitioners/sylvie_osteo.JPG';
-import sylvie_soin  from '../assets/practitioners/sylvie_soin.JPG';
+// import sylvie_soin  from '../assets/practitioners/sylvie_soin.JPG';
 // import sylvie_soin2 from '../assets/practitioners/sylvie_soin2.JPG';
-import sylvie_reiki from '../assets/practitioners/sylvie_reiki.JPG';
+import gobowl from '../assets/practitioners/gobowl.JPG';
+import taichilady from '../assets/practitioners/taichilady.jpg';
+import gogong from '../assets/practitioners/gogong.jpg';
+import ladyyoga from '../assets/practitioners/ladyyoga.jpg';
+import meditnature from '../assets/practitioners/meditnature.jpg';
 
 const TESTIMONIALS = [
   {
@@ -124,11 +125,11 @@ function Home() {
                 <>
                    <p className="home-concept__body">The Idala Family is a space dedicated to those who wish to evolve with intention and consistency.</p>
                    <p className="home-concept__body">We bring together practitioners of excellence around a vision of well-being that <strong>unifies body, mind and energy</strong>: strengthening the body, calming the mind and cultivating inner clarity.</p>
-                   <p className="home-concept__body">Well-being is not a sum of practices, but a living balance. <strong>Physical strength, emotional stability and clarity</strong> nourish one another — when one dimension rises, the whole transforms.</p>
+                   <p className="home-concept__body">Well-being is not a sum of practices, but a living balance. <strong>Physical strength, emotional stability and clarity</strong> nourish one another when one dimension rises, the whole transforms.</p>
                    <p className="home-concept__body">We converge these dimensions within a structured and demanding approach to modern well-being, designed for those seeking <strong>meaning, alignment and lasting transformation.</strong></p>
                    <div className="home-concept__trust">
                     <span className="home-concept__trust-icon">✦</span>
-                    <p>Every practitioner on The Idala Family platform is <strong>rigorously verified, confirmed and selected</strong> through a thorough and supported vetting process, so you can explore with confidence.</p>
+                    <p>Every practitioner on The Idala Family platform is <strong>rigorously verified and selected</strong> through a thorough and supported vetting process, so you can explore with confidence.</p>
                   </div>
                 </>
               ) : (
@@ -139,7 +140,7 @@ function Home() {
                   <p className="home-concept__body">Nous faisons converger ces dimensions au sein d’une approche structurée et exigeante du bien‑être moderne pensée pour celles et ceux qui recherchent <strong>sens, alignement et transformation durable.</strong></p>                 
                   <div className="home-concept__trust">
                     <span className="home-concept__trust-icon">✦</span>
-                    <p>Chaque praticien de la plateforme The Idala Family est <strong>rigoureusement vérifié, confirmé et sélectionné</strong> via un processus d'évaluation soutenu et exigeant, pour que vous puissiez explorer en toute confiance.</p>
+                    <p>Chaque praticien de la plateforme The Idala Family est <strong>rigoureusement vérifié et sélectionné</strong> via un processus d'évaluation soutenu et exigeant, pour que vous puissiez explorer en toute confiance.</p>
                   </div>
                 </>
               )}
@@ -152,14 +153,13 @@ function Home() {
           <div className="home-practitioners-strip__track">
             {[...Array(2)].map((_, pass) => (
               <div key={pass} className="home-practitioners-strip__row">
-                <img src={jspcute}  alt="Practitioner" />
-                <img src={marine}  alt="Practitioner" />
-                <img src={handsHealing}      alt="Practitioner" />
-                <img src={odile_medium}    alt="Practitioner" />
-                <img src={sylvie_osteo}  alt="Practitioner" />
-                <img src={sylvie_reiki}  alt="Practitioner" />
-                <img src={sylvie_soin}      alt="Practitioner" />
-                <img src={breathwork}    alt="Practitioner" />
+                <img src={gogong}  alt="Practitioner" />
+                <img src={ladyyoga}    alt="Practitioner" />
+                <img src={taichilady}  alt="Practitioner" />
+                 <img src={meditDiane}      alt="Practitioner" />
+                <img src={gobowl}  alt="Practitioner" />
+                <img src={meditnature}  alt="Practitioner" />
+                {/* <img src={breathwork}    alt="Practitioner" /> */}
               </div>
             ))}
           </div>
@@ -207,15 +207,15 @@ function Home() {
           <div className="home-gallery__grid">
             <div className="home-gallery__item home-gallery__item--tall">
               <img src={sointbt} alt="Healing" />
-              <span className="home-gallery__caption">{lang === 'fr' ? 'Soin' : 'Healing'}</span>
-            </div>
-            <div className="home-gallery__item">
-              <img src={soundHealing} alt="Sound healing" />
-              <span className="home-gallery__caption">Sound Healing</span>
+              <span className="home-gallery__caption">{lang === 'fr' ? 'Soin énergetique' : 'Energetic alignment'}</span>
             </div>
             <div className="home-gallery__item">
               <img src={marine_reiki} alt="Reiki" />
               <span className="home-gallery__caption">Reiki</span>
+            </div>
+               <div className="home-gallery__item">
+              <img src={soundHealing} alt="Sound healing" />
+              <span className="home-gallery__caption">Sound Healing</span>
             </div>
             <div className="home-gallery__item home-gallery__item--wide">
               <img src={meditation} alt="meditation" />
@@ -256,7 +256,7 @@ function Home() {
         </section>
 
         {/* ── SECTION 6 — GALLERY 2 ── */}
-        <section className="home-gallery-2 reveal">
+        <section className="home-gallery-2">
           <div className="home-gallery-2__row">
             <div className="home-gallery-2__item">
               <img src={groupsound} alt="Sound Healing" />
