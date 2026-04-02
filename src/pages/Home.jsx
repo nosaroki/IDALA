@@ -25,7 +25,7 @@ import sointbt from '../assets/sointbt.jpg';
 import marine_reiki from '../assets/practitioners/marine_reiki.JPG';
 // import sylvie_soin  from '../assets/practitioners/sylvie_soin.JPG';
 // import sylvie_soin2 from '../assets/practitioners/sylvie_soin2.JPG';
-import gobowl from '../assets/practitioners/gobowl.JPG';
+import gobowl from '../assets/practitioners/gobowl.jpg';
 import taichilady from '../assets/practitioners/taichilady.jpg';
 import gogong from '../assets/practitioners/gogong.jpg';
 import ladyyoga from '../assets/practitioners/ladyyoga.jpg';
