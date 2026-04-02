@@ -256,7 +256,7 @@ function Home() {
         </section>
 
         {/* ── SECTION 6 — GALLERY 2 ── */}
-        <section className="home-gallery-2">
+        <section className="home-gallery-2 reveal">
           <div className="home-gallery-2__row">
             <div className="home-gallery-2__item">
               <img src={groupsound} alt="Sound Healing" />
