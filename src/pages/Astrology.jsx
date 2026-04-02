@@ -1,14 +1,15 @@
 // ─────────────────────────────────────────
-//  ASTROLOGY v2
+//  ASTROLOGY
 // ─────────────────────────────────────────
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLang } from '../components/LangContext';
 import { Helmet } from 'react-helmet-async';
+import charte    from '../assets/chartecarre.jpg';
 import Footer from '../components/Footer';
 
-// ─── SVG Zodiac Sign Icons ───────────────
+// ─── Zodiac Icons ────────────────────────
 const ZodiacIcons = {
   Aries:       '♈\uFE0E',
   Taurus:      '♉\uFE0E',
@@ -74,68 +75,105 @@ const PP = {
   Mars:    [355.433275, 0.524071084], Jupiter: [34.351519,  0.083086762],
   Saturn:  [50.077444,  0.033459928]
 };
-const pLon = (name, jd) => { const d = jd - 2451545, [L0, r] = PP[name]; return mod360(L0 + r * d); };
+function keplerSolve(M, e) {
+  let E = M;
+  for (let i = 0; i < 50; i++) {
+    const dE = (M - E + e * Math.sin(E)) / (1 - e * Math.cos(E));
+    E += dE;
+    if (Math.abs(dE) < 1e-7) break;
+  }
+  return E;
+}
+
+function planetXYZ(elems, T) {
+  const [L0, L1, a, e0, e1, i0, i1, Om0, Om1, w0, w1] = elems;
+  const L  = mod360(L0 + L1 * T) * D2R;
+  const e  = e0 + e1 * T;
+  const i  = (i0 + i1 * T) * D2R;
+  const Om = (Om0 + Om1 * T) * D2R;
+  const w  = (w0  + w1  * T) * D2R;
+  const M  = mod360((L - w) * 180 / Math.PI) * D2R;
+  const E  = keplerSolve(M, e);
+  const xv = a * (Math.cos(E) - e);
+  const yv = a * Math.sqrt(1 - e * e) * Math.sin(E);
+  const v  = Math.atan2(yv, xv);
+  const r  = Math.sqrt(xv * xv + yv * yv);
+  const u  = v + w - Om;
+  return {
+    x: r * (Math.cos(Om) * Math.cos(u) - Math.sin(Om) * Math.sin(u) * Math.cos(i)),
+    y: r * (Math.sin(Om) * Math.cos(u) + Math.cos(Om) * Math.sin(u) * Math.cos(i)),
+    z: r * Math.sin(u) * Math.sin(i),
+  };
+}
+
+const ELEMS = {
+  Earth:   [100.464457, 36000.7698278, 1.000001018,  0.01670863, -0.000042037, 0,        0,         174.873174, -0.2410908, 102.937348,  0.3225557],
+  Mercury: [252.250906, 149472.6746358, 0.387098310, 0.20563069, -0.000000059, 7.004986, -0.0018215, 48.330893, -0.1254229,  77.456119,  0.1588643],
+  Venus:   [181.979801,  58517.8156760, 0.723329820, 0.00677188, -0.000047766, 3.394662, -0.0008568, 76.679920, -0.2780134, 131.563707,  0.0048646],
+  Mars:    [355.433275,  19140.2993313, 1.523679342, 0.09340062,  0.000090483, 1.849726, -0.0006011, 49.558093, -0.2950250, 336.060234,  0.4439016],
+  Jupiter: [ 34.351519,   3034.9056606, 5.202603209, 0.04849485,  0.000163244, 1.303270, -0.0054966, 100.464441, 0.1767232,  14.331309,  0.2155209],
+  Saturn:  [ 50.077444,   1222.1137943, 9.554909192, 0.05550825, -0.000346641, 2.488878,  0.0006218, 113.665524, -0.2566722,  93.057136,  0.5665415],
+};
+
+const pLon = (name, jd) => {
+  const T     = (jd - 2451545) / 36525;
+  const earth = planetXYZ(ELEMS.Earth, T);
+  const p     = planetXYZ(ELEMS[name], T);
+  return mod360(Math.atan2(p.y - earth.y, p.x - earth.x) * 180 / Math.PI);
+};
 const calcAsc = (jd, lat, lon) => {
   const T = (jd - 2451545) / 36525;
-  
-  // Temps sidéral de Greenwich en degrés
   let GMST = 280.46061837 + 360.98564736629 * (jd - 2451545) + 0.000387933 * T * T - T * T * T / 38710000;
   GMST = mod360(GMST);
-  
-  // Temps sidéral local
   const LST = mod360(GMST + lon);
-  
-  // Obliquité de l'écliptique
   const eps = (23.439292 - 0.013004 * T) * D2R;
-  
   const LSTr = LST * D2R;
   const latr = lat * D2R;
-  
-  // Ascendant via la formule de Meeus
   const ascRad = Math.atan2(
     Math.cos(LSTr),
     -(Math.sin(LSTr) * Math.cos(eps) + Math.tan(latr) * Math.sin(eps))
   );
-  
   return mod360(ascRad * (180 / Math.PI));
 };
-const geocode = async place => {
-  try {
-    const r = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(place)}&format=json&limit=1`, { headers: { 'Accept-Language': 'en' } });
-    const d = await r.json();
-    if (d.length) return { lat: +d[0].lat, lon: +d[0].lon, display: d[0].display_name.split(',').slice(0, 2).join(',') };
-  } catch { /* empty */ }
-  return null;
-};
+
 const S_EN = ['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'];
 const S_FR = ['Bélier','Taureau','Gémeaux','Cancer','Lion','Vierge','Balance','Scorpion','Sagittaire','Capricorne','Verseau','Poissons'];
-const S_GL = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
 const signFrom = lon => {
   const i = Math.floor(mod360(lon) / 30), deg = Math.floor(mod360(lon) % 30), min = Math.floor((mod360(lon) % 1) * 60);
-  return { en: S_EN[i], fr: S_FR[i], g: S_GL[i], deg: `${deg}° ${min}'`, icon: ZodiacIcons[S_EN[i]] };
+  return { en: S_EN[i], fr: S_FR[i], deg: `${deg}° ${min}'`, icon: ZodiacIcons[S_EN[i]] };
 };
 
 // ─── Benefits ────────────────────────────
 const BENEFITS = [
-  { en: 'Self-Awareness',       fr: 'Connaissance de Soi',       chakra: 'c3',
-    de: 'Gain clearer insight into your personality, motivations, and natural tendencies.',
-    df: 'Obtenez une vision plus claire de votre personnalité, de vos motivations et de vos tendances naturelles.' },
-  { en: 'Emotional Insight',    fr: 'Perspicacité Émotionnelle',  chakra: 'c4',
-    de: 'Understand how you process emotions and respond to stress, change, and relationships.',
-    df: 'Comprenez comment vous traitez les émotions et répondez au stress, au changement et aux relations.' },
-  { en: 'Relationship Clarity', fr: 'Clarté Relationnelle',       chakra: 'c5',
-    de: 'Explore compatibility patterns and communication dynamics with others.',
-    df: 'Explorez les schémas de compatibilité et les dynamiques de communication avec les autres.' },
-  { en: 'Direction & Strengths',fr: 'Direction & Forces',         chakra: 'c6',
-    de: 'Recognize your talents, ambitions, and areas for growth and development.',
-    df: 'Reconnaissez vos talents, vos ambitions et vos domaines de croissance et de développement.' },
-  { en: 'Life Perspective',     fr: 'Perspective de Vie',         chakra: 'c7',
-    de: 'Identify recurring themes and cycles that shape your personal evolution.',
-    df: 'Identifiez les thèmes récurrents et les cycles qui façonnent votre évolution personnelle.' },
+  {
+    fr: 'Connaissance de soi', en: 'Self-Knowledge', chakra: 'c1',
+    df: 'Mieux comprendre votre personnalité, vos motivations et vos modes de fonctionnement naturels.',
+    de: 'Better understand your personality, your motivations and your natural ways of functioning.',
+  },
+  {
+    fr: 'Clarté émotionnelle', en: 'Emotional Clarity', chakra: 'c2',
+    df: 'Identifier votre façon de vivre les émotions, le stress, le changement et les relations.',
+    de: 'Identify how you experience emotions, stress, change and relationships.',
+  },
+  {
+    fr: 'Relations', en: 'Relationships', chakra: 'c3',
+    df: 'Éclairer vos dynamiques de lien, vos besoins relationnels et vos modes de communication.',
+    de: 'Illuminate your relational dynamics, your connection needs and your communication patterns.',
+  },
+  {
+    fr: 'Direction & Potentiel', en: 'Direction & Potential', chakra: 'c4',
+    df: 'Repérer vos talents, vos aspirations et vos axes de développement.',
+    de: 'Identify your talents, your aspirations and your areas for development.',
+  },
+  {
+    fr: 'Perspective de vie', en: 'Life Perspective', chakra: 'c5',
+    df: 'Donner du sens aux cycles, aux thèmes récurrents et aux étapes clés de votre parcours.',
+    de: 'Make sense of the cycles, recurring themes and key stages of your journey.',
+  },
 ];
 
 const CHAKRA_COLORS = {
-  c3: '#e8c840', c4: '#B8E8C2', c5: '#A8D4F0', c6: '#C5B8F0', c7: '#E8B8F0',
+  c1: '#FF6B6B', c2: '#FF9A3C', c3: '#FFD600', c4: '#3DCC70', c5: '#3AA8E0'
 };
 
 // ─── Main Component ──────────────────────
@@ -144,10 +182,44 @@ function Astrology() {
   const navigate   = useNavigate();
   const [dob, setDob] = useState('');
   const [tob, setTob] = useState('');
-  const [pob, setPob] = useState('');
+
+  // ── Lieu avec autocomplete ──
+  const [pob, setPob]                     = useState('');
+  const [pobSuggestions, setPobSuggestions] = useState([]);
+  const [pobSelected, setPobSelected]       = useState(null);
+  const debounceRef                         = useRef(null);
+
   const [result, setResult]   = useState(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr]         = useState(false);
+
+  // Recherche avec debounce 300ms
+  const searchPlaces = (query) => {
+    setPob(query);
+    setPobSelected(null);
+    clearTimeout(debounceRef.current);
+    if (query.length < 3) { setPobSuggestions([]); return; }
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const r = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&addressdetails=1`,
+          { headers: { 'Accept-Language': 'en' } }
+        );
+        const data = await r.json();
+        setPobSuggestions(data.map(d => ({
+          label: d.display_name.split(',').slice(0, 3).join(','),
+          lat: +d.lat,
+          lon: +d.lon,
+        })));
+      } catch { setPobSuggestions([]); }
+    }, 300);
+  };
+
+  const selectPlace = (s) => {
+    setPob(s.label);
+    setPobSelected(s);
+    setPobSuggestions([]);
+  };
 
   const calc = async () => {
     setErr(false); setResult(null);
@@ -166,29 +238,26 @@ function Astrology() {
       { lEN: 'Saturn',  lFR: 'Saturne',  icon: PlanetIcons.Saturn,  s: signFrom(pLon('Saturn',  jd)) },
     ];
     let asc = null, coord = '';
-    if (tob && pob) {
+    if (tob && pobSelected) {
       setLoading(true);
-      const geo = await geocode(pob);
+      asc   = signFrom(calcAsc(jd, pobSelected.lat, pobSelected.lon));
+      coord = `${pobSelected.label.split(',').slice(0, 2).join(',')} · ${Math.abs(pobSelected.lat).toFixed(2)}°${pobSelected.lat >= 0 ? 'N' : 'S'} ${Math.abs(pobSelected.lon).toFixed(2)}°${pobSelected.lon >= 0 ? 'E' : 'W'}`;
       setLoading(false);
-      if (geo) {
-        asc   = signFrom(calcAsc(jd, geo.lat, geo.lon));
-        coord = `${geo.display} · ${Math.abs(geo.lat).toFixed(2)}°${geo.lat >= 0 ? 'N' : 'S'} ${Math.abs(geo.lon).toFixed(2)}°${geo.lon >= 0 ? 'E' : 'W'}`;
-      }
     }
     const MEN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const MFR = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
     setResult({ sun, moon, asc, coord, planets, tob,
       name: lang === 'fr'
-        ? `Thème Natal — ${MFR[m-1]} ${d}, ${y}`
-        : `Birth Chart — ${MEN[m-1]} ${d}, ${y}` });
+        ? `Thème Astral · ${MFR[m-1]} ${d}, ${y}`
+        : `Birth Chart · ${MEN[m-1]} ${d}, ${y}` });
   };
 
   return (
     <>
       <Helmet>
-        <title>{lang === 'fr' ? 'Thème Natal & Astrologie | The Idala Family' : 'Birth Chart & Astrology | The Idala Family'}</title>
+        <title>{lang === 'fr' ? 'Thème Astral & Astrologie | The Idala Family' : 'Birth Chart & Astrology | The Idala Family'}</title>
         <meta name="description" content={lang === 'fr'
-          ? 'Calculez votre thème natal gratuitement et découvrez votre signe solaire, lunaire et ascendant. Réservez une interprétation complète avec Diane Thomas.'
+          ? 'Calculez votre thème astral gratuitement et découvrez votre signe solaire, lunaire et ascendant. Réservez une interprétation complète avec Diane Thomas.'
           : 'Calculate your birth chart for free and discover your sun, moon and rising signs. Book a full interpretation session with Diane Thomas.'} />
       </Helmet>
 
@@ -198,50 +267,42 @@ function Astrology() {
         <section className="astro-hero-v2">
           <div className="astro-hero-v2__inner">
             <div className="astro-hero-v2__text">
-              <span className="eyebrow">
-                {lang === 'fr' ? 'Thème Natal & Connaissance de Soi' : 'Birth Chart & Self-Understanding'}
-              </span>
               <h1 className="astro-hero-v2__title">
                 {lang === 'fr' ? 'Astrologie' : 'Astrology'}
               </h1>
               <div className="divider" />
-              {lang === 'en' ? (
+              {lang === 'fr' ? (
                 <>
-                  <p className="astro-hero-v2__body">Astrology is a symbolic system of self-understanding based on the position of the planets at the exact moment of your birth. Using your date, time, and place of birth, a personalized birth chart is calculated, offering a detailed map of your inner landscape. This chart highlights core personality traits, emotional patterns, strengths, challenges, and key life themes.</p>
-                  <p className="astro-hero-v2__body">It provides a structured framework to better understand how you think, feel, relate, and evolve over time.</p>
+                  <p className="astro-hero-v2__body">L'astrologie part d'une idée simple : au moment de votre naissance, le ciel adopte une configuration unique. À partir de votre date, heure et lieu de naissance, un thème astral personnalisé est établi, offrant une cartographie symbolique de votre monde intérieur.</p>
+                  <p className="astro-hero-v2__body">Ce thème met en lumière vos tendances de personnalité, vos réflexes émotionnels,<br /> vos ressources, vos zones de tension et les grands questionnements qui jalonnent<br /> votre vie. <br />Il ne dicte pas ce qui va vous arriver ; il éclaire plutôt votre manière de traverser<br /> les expériences.</p>
+                  <p className="astro-hero-v2__body">Approchée avec rigueur, l'astrologie devient un cadre structuré pour mieux vous observer : votre façon de penser, de ressentir, de vous relier aux autres, de décider<br /> et d'évoluer au fil du temps.</p>
+                  <p className="astro-hero-v2__body">Un outil d'introspection au service de l'alignement, de la clarté et de choix<br /> plus conscients.</p>
                 </>
               ) : (
                 <>
-                  <p className="astro-hero-v2__body">L'astrologie est un système symbolique de connaissance de soi basé sur la position des planètes au moment exact de votre naissance. À partir de votre date, heure et lieu de naissance, un thème natal personnalisé est calculé, offrant une carte détaillée de votre paysage intérieur. Ce thème met en lumière les traits de personnalité essentiels, les schémas émotionnels, les forces, les défis et les thèmes de vie clés.</p>
-                  <p className="astro-hero-v2__body">Il offre un cadre structuré pour mieux comprendre comment vous pensez, ressentez, vous reliez et évoluez dans le temps.</p>
+                  <p className="astro-hero-v2__body">Astrology starts from a simple idea: at the moment of your birth, the sky adopts a unique configuration. From your date, time and place of birth, a personalised birth chart is drawn up, offering a symbolic map of your inner world.</p>
+                  <p className="astro-hero-v2__body">This chart illuminates your personality tendencies, emotional reflexes, resources, areas of tension and the key questions that run through your life. It does not dictate<br /> what will happen to you; rather, it sheds light on how you move through experiences.</p>
+                  <p className="astro-hero-v2__body">Approached with rigour, astrology becomes a structured framework for better<br /> self-observation: the way you think, feel, connect with others, make decisions<br /> and evolve over time.</p>
+                  <p className="astro-hero-v2__body">A tool for introspection in service of alignment, clarity and more conscious choices.</p>
                 </>
               )}
             </div>
             <div className="astro-hero-v2__visual">
               <div className="astro-orb-v2">
-                <svg viewBox="0 0 80 80" fill="none" stroke="white" strokeWidth="1" strokeLinecap="round" opacity=".8" style={{ width: 64, height: 64 }}>
-                  <circle cx="40" cy="40" r="30"/>
-                  <circle cx="40" cy="40" r="20"/>
-                  <circle cx="40" cy="40" r="8"/>
-                  <line x1="40" y1="6" x2="40" y2="14"/>
-                  <line x1="40" y1="66" x2="40" y2="74"/>
-                  <line x1="6" y1="40" x2="14" y2="40"/>
-                  <line x1="66" y1="40" x2="74" y2="40"/>
-                  <line x1="15" y1="15" x2="21" y2="21"/>
-                  <line x1="59" y1="59" x2="65" y2="65"/>
-                  <line x1="65" y1="15" x2="59" y2="21"/>
-                  <line x1="21" y1="59" x2="15" y2="65"/>
-                </svg>
+              <img src={charte} alt="charte astrale" className="astrology-charte" />
               </div>
             </div>
           </div>
         </section>
 
-        {/* ── SECTION 2 — BENEFITS (ronds) ── */}
+        {/* ── SECTION 2 — BENEFITS ── */}
         <section className="astro-benefits">
           <div className="astro-benefits__header">
-            <h2 className="eyebrow" style={{ textAlign: 'center' }}>
-              {lang === 'fr' ? 'Bénéfices de l\'Astrologie' : 'Benefits of Astrology'}
+            <span className="eyebrow" style={{ textAlign: 'center' }}>
+              {lang === 'fr' ? 'Bénéfices' : 'Benefits'}
+            </span>
+            <h2 className="astro-benefits__title">
+              {lang === 'fr' ? "Qu'est-ce que l\u2019Astrologie peut vous apporter ?" : 'What can Astrology do for you?'}
             </h2>
           </div>
           <div className="astro-benefits__grid">
@@ -271,9 +332,8 @@ function Astrology() {
         <section className="astro-calc-section">
           <div className="calc-inner">
             <div className="calc-header">
-              <span className="eyebrow">{lang === 'fr' ? 'Découvrez votre Thème' : 'Discover Your Chart'}</span>
               <h2 className="section-title">
-                {lang === 'fr' ? 'Calculateur de Thème Natal' : 'Birth Chart Calculator'}
+                {lang === 'fr' ? 'Découvrez votre Thème Astral' : 'Discover your Birth Chart'}
               </h2>
               <div className="divider divider--center" />
               <p className="astro-calc-intro">
@@ -284,42 +344,72 @@ function Astrology() {
             </div>
 
             <div className="calc-form">
+
+              {/* Date */}
               <div className="form-group">
                 <label>{lang === 'fr' ? 'Date de Naissance' : 'Date of Birth'}</label>
-                <input type="date" value={dob} onChange={e => setDob(e.target.value)} />
+                <input type="date" value={dob} onChange={e => setDob(e.target.value)} onKeyDown={e => e.key === 'Enter' && dob && tob && pobSelected && calc()}
+ />
               </div>
+
+              {/* Heure */}
               <div className="form-group">
                 <label>{lang === 'fr' ? 'Heure de Naissance' : 'Time of Birth'}</label>
-                <input type="time" value={tob} onChange={e => setTob(e.target.value)} />
+                <input type="time" value={tob} onChange={e => setTob(e.target.value)} onKeyDown={e => e.key === 'Enter' && dob && tob && pobSelected && calc()} />
               </div>
-              <div className="form-group">
+
+              {/* Lieu avec autocomplete */}
+              <div className="form-group" style={{ position: 'relative' }}>
                 <label>{lang === 'fr' ? 'Lieu de Naissance' : 'Place of Birth'}</label>
-                <input type="text" value={pob} onChange={e => setPob(e.target.value)} placeholder="e.g. Paris, France" />
+                <input
+                  type="text"
+                  value={pob}
+                  onChange={e => searchPlaces(e.target.value)} 
+                  onKeyDown={e => e.key === 'Enter' && dob && tob && pobSelected && calc()}
+                  placeholder={lang === 'fr' ? 'ex. Paris, France' : 'e.g. Paris, France'}
+                  autoComplete="off"
+                />
+                {pobSuggestions.length > 0 && (
+                  <ul className="pob-suggestions">
+                    {pobSuggestions.map((s, i) => (
+                      <li key={i} className="pob-suggestion" onClick={() => selectPlace(s)}>
+                        {s.label}
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
+
             </div>
 
+            {/* Note si lieu tapé mais pas sélectionné */}
+            {pob && !pobSelected && tob && (
+              <p className="calc-note">
+                {lang === 'fr'
+                  ? 'Sélectionnez une ville dans la liste pour calculer votre Ascendant.'
+                  : 'Select a city from the list to calculate your Rising Sign.'}
+              </p>
+            )}
+
             <div className="calc-cta">
-              <button className="btn btn--gold" onClick={calc} disabled={loading}>
+              <button className="btn btn--violet-mid" onClick={calc} disabled={loading}>
                 {loading ? '…' : (lang === 'fr' ? 'Calculer mon Thème' : 'Calculate My Chart')}
               </button>
             </div>
 
             {err && (
               <p className="error-msg">
-                {lang === 'fr' ? 'Veuillez entrer votre date de naissance pour continuer.' : 'Please enter your date of birth to continue.'}
+                {lang === 'fr'
+                  ? 'Veuillez entrer votre date de naissance pour continuer.'
+                  : 'Please enter your date of birth to continue.'}
               </p>
             )}
 
-            {/* ── Results ── */}
             {result && (
               <div className="chart-result-v2">
                 <div className="chart-result-v2__header">
                   <div className="chart-result-v2__circle">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.2" style={{ width: 28, height: 28 }}>
-                      <circle cx="12" cy="12" r="9"/>
-                      <circle cx="12" cy="12" r="5"/>
-                      <circle cx="12" cy="12" r="1.5" fill="white"/>
-                    </svg>
+                    <img src={charte} alt="charte astrale" />
                   </div>
                   <div>
                     <div className="chart-result-v2__name">{result.name}</div>
@@ -327,7 +417,6 @@ function Astrology() {
                   </div>
                 </div>
 
-                {/* Big 3 */}
                 <div className="chart-result-v2__big3-label">
                   <span className="eyebrow">{lang === 'fr' ? 'Les 3 Principaux' : 'The Big Three'}</span>
                 </div>
@@ -367,7 +456,6 @@ function Astrology() {
                   </div>
                 </div>
 
-                {/* Planets */}
                 <div className="chart-result-v2__big3-label" style={{ marginTop: 24 }}>
                   <span className="eyebrow">{lang === 'fr' ? 'Planètes Personnelles' : 'Personal Planets'}</span>
                 </div>
@@ -384,21 +472,21 @@ function Astrology() {
                 </div>
 
                 <div className="chart-result-v2__disclaimer">
-                   {lang === 'fr' ? (
-                      <>
-                        Lecture indicative basée sur des calculs astronomiques.<br />
-                        Pour une interprétation complète et personnalisée, réservez une séance.
-                      </>
-                    ) : (
-                      <>
-                        Indicative reading based on astronomical calculations.<br />
-                        For a complete, personalised interpretation, book a full session.
-                      </>
-                    )}
+                  {lang === 'fr' ? (
+                    <>
+                      Lecture indicative basée sur des calculs astronomiques.<br />
+                      Pour une interprétation complète et personnalisée, réservez une séance.
+                    </>
+                  ) : (
+                    <>
+                      Indicative reading based on astronomical calculations.<br />
+                      For a complete, personalised interpretation, book a full session.
+                    </>
+                  )}
                 </div>
 
                 <div style={{ textAlign: 'center', marginTop: 24 }}>
-                  <button className="btn btn--outline" onClick={() => navigate('/spiritual')}>
+                  <button className="btn btn--outline" onClick={() => navigate('/practitioners')}>
                     {lang === 'fr' ? 'Réserver une Séance' : 'Book a Session'}
                   </button>
                 </div>

@@ -3,13 +3,14 @@
 // ─────────────────────────────────────────
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
-import { useLang } from '../components/LangContext';  // ← seul changement
+import { useLang } from '../components/LangContext'; 
+import trsprlogo from '../assets/trsprlogo.png';
 
 
 const NAV = [
   { path: '/',              en: 'Home',               fr: 'Accueil'              },
   { path: '/practitioners', en: 'Practitioners',      fr: 'Praticiens'           },
-  { path: '/spiritual',     en: 'Reading & Guidance', fr: 'Tarot & Guidance' },
+  // { path: '/spiritual',     en: 'Reading & Guidance', fr: 'Tarot & Guidance' },
   { path: '/astrology',     en: 'Birth Chart',        fr: 'Thème Astral'         },
   { path: '/about',         en: 'About',              fr: 'À propos'             },
 ];
@@ -26,6 +27,7 @@ function TopBar() {
     <>
       <header className="topbar">
         <div className="topbar__brand" onClick={() => go('/')} style={{cursor: 'pointer'}}>
+           <img src={trsprlogo} alt="Idala logo" className="topbar__logo" />
            THE IDALA FAMILY
         </div>
         <nav className="topbar__nav">
@@ -37,8 +39,8 @@ function TopBar() {
             </button>
           ))}
           <div className="lang-toggle">
-            <button className={`lang-btn${lang==='en'?' active':''}`} onClick={()=>setLang('en')}>EN</button>
             <button className={`lang-btn${lang==='fr'?' active':''}`} onClick={()=>setLang('fr')}>FR</button>
+            <button className={`lang-btn${lang==='en'?' active':''}`} onClick={()=>setLang('en')}>EN</button>
           </div>
         </nav>
         <button className={`hamburger${open?' open':''}`} onClick={()=>setOpen(o=>!o)} aria-label="Menu">

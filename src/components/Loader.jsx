@@ -43,9 +43,9 @@ function Loader({ onDone }) {
           <ellipse cx="50" cy="38" rx="6"  ry="16" fill="var(--c2)" opacity=".55" transform="rotate(55 50 60)" />
           <ellipse cx="50" cy="38" rx="5"  ry="14" fill="var(--c4)" opacity=".38" transform="rotate(-80 50 62)" />
           <ellipse cx="50" cy="38" rx="5"  ry="14" fill="var(--c4)" opacity=".38" transform="rotate(80 50 62)" />
-          <circle cx="50" cy="56" r="8" fill="var(--gold)" opacity=".88" />
+          <circle cx="50" cy="56" r="8" fill="var(--violet-mid)" opacity=".88" />
           <circle cx="50" cy="56" r="4" fill="white"      opacity=".92" />
-          <line x1="20" y1="68" x2="80" y2="68" stroke="var(--gold-light)" strokeWidth="1" opacity=".5" />
+          <line x1="20" y1="68" x2="80" y2="68" stroke="var(--violet-light)" strokeWidth="1" opacity=".5" />
           <line x1="50" y1="68" x2="50" y2="80" stroke="var(--c4)"         strokeWidth="2" opacity=".45" />
         </svg>
       </div>

@@ -3,10 +3,11 @@ import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { LangCtx } from './components/LangContext';
 import TopBar      from './components/TopBar';        
 import Loader      from './components/Loader';
+import ScrollToTop from './components/ScrollToTop';
 import ComingSoon  from './pages/ComingSoon';
 import Home        from './pages/Home';
 import Practitioners from './pages/Practitioners';
-import Spiritual   from './pages/Spiritual';
+// import Spiritual   from './pages/Spiritual';
 import Astrology   from './pages/Astrology';
 import About       from './pages/About';
 import { HelmetProvider } from 'react-helmet-async';
@@ -36,6 +37,7 @@ export default function App() {
     <HelmetProvider>
       <LangCtx.Provider value={{ lang, setLang }}>
         <BrowserRouter>
+          <ScrollToTop />
           {showLoader && (
             <div className={`loader${fading ? ' fade-out' : ''}`}>
               <Loader onDone={handleDone} />
@@ -47,7 +49,7 @@ export default function App() {
             <Route element={<Layout />}>
               <Route path="/"              element={<Home />} />
               <Route path="/practitioners" element={<Practitioners />} />
-              <Route path="/spiritual"     element={<Spiritual />} />
+              {/* <Route path="/spiritual"     element={<Spiritual />} /> */}
               <Route path="/astrology"     element={<Astrology />} />
               <Route path="/about"         element={<About />} />
             </Route>

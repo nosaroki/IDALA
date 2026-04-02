@@ -22,8 +22,8 @@ function ComingSoon() {
       <div className="divider divider--center coming-soon__divider"/>
       <p className="coming-soon__subtitle">
         {lang==='fr'
-          ?"Nous construisons quelque chose de beau.\nUne plateforme de bien-être holistique conçue pour connecter, aligner et élever."
-          :"We are building something beautiful.\nA holistic wellness platform designed to connect, align and elevate."}
+          ?"Nous construisons quelque chose de beau.\nUne plateforme de bien-être conçue pour connecter, aligner et élever."
+          :"We are building something beautiful.\nA wellness platform designed to connect, align and elevate."}
       </p>
 
       <div className="coming-soon__chakra-row">
@@ -37,7 +37,7 @@ function ComingSoon() {
         <button className={`lang-btn${lang==='fr'?' active':''}`} onClick={()=>setLang('fr')}>FR</button>
       </div>
 
-      <div className="coming-soon__credit">© 2026 The Idala Family — The Mindful Links</div>
+      <div className="coming-soon__credit">© 2026 The Idala Family</div>
     </div>
   );
 }

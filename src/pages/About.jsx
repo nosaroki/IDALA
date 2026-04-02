@@ -1,13 +1,13 @@
 // ─────────────────────────────────────────
-//  ABOUT v2
+//  ABOUT 
 // ─────────────────────────────────────────
 
 import { useNavigate } from 'react-router-dom';
 import { useLang } from '../components/LangContext';
 import { Helmet } from 'react-helmet-async';
 import Footer from '../components/Footer';
-import dianeRegard  from '../assets/dianeregard.png';
-import idaPingala   from '../assets/idapingala.png';
+import dianeRegard from '../assets/dianeregard.png';
+import idaPingala  from '../assets/idapingala.png';
 
 function About() {
   const { lang }   = useLang();
@@ -18,13 +18,13 @@ function About() {
       <Helmet>
         <title>{lang === 'fr' ? 'À propos de Diane Thomas | The Idala Family' : 'About Diane Thomas | The Idala Family'}</title>
         <meta name="description" content={lang === 'fr'
-          ? 'Découvrez Diane Thomas, fondatrice de The Idala Family. Professeure de yoga certifiée, praticienne reiki et tarologue avec une formation en neurosciences.'
-          : 'Meet Diane Thomas, founder of The Idala Family. Certified yoga teacher, reiki practitioner and tarot reader with a background in neuroscience.'} />
+          ? 'Découvrez Diane Thomas, fondatrice de The Idala Family. Professeure de yoga et Maître Reiki avec une formation en neurosciences.'
+          : 'Meet Diane Thomas, founder of The Idala Family. Yoga teacher and Reiki Master with a background in neuroscience.'} />
       </Helmet>
 
       <div className="page-wrap">
 
-        {/* ── SECTION 1 — HERO FOUNDER ── */}
+        {/* ── SECTION 1 — FONDATRICE ── */}
         <section className="about-founder">
           <div className="about-founder__inner">
 
@@ -46,96 +46,117 @@ function About() {
               </h1>
               <div className="divider" />
 
-              {lang === 'en' ? (
+              {lang === 'fr' ? (
                 <>
-                  <p className="about-founder__body">Diane Thomas is dedicated to supporting physical and mental well-being through a structured and integrative approach that strengthens both body and mind.</p>
-                  <p className="about-founder__body">She holds a Master's degree in Entrepreneurship and Innovation from the University of Southern California (USC), bringing a strong foundation in building purpose-driven initiatives.</p>
-                  <p className="about-founder__body">She has worked in neuroscience-based coaching, applying principles focused on mental fitness, emotional resilience, and the ability to shift from stress-driven patterns to more positive and empowered states of mind.</p>
-                  <p className="about-founder__body">Certified in Hatha and Vinyasa Yoga and a Reiki Master, Diane combines scientific understanding with holistic practices. Through yoga and energy work, she supports individuals in creating alignment, self-awareness, and lasting balance.</p>
-                  <p className="about-founder__body">Guided by <em>mens sana in corpore sano</em>, she founded The Idala Family, a platform connecting individuals with trusted practitioners in holistic and integrative wellness.</p>
-                  <p className="about-founder__body">Her mission is simple: to strengthen the body, clarify the mind, and support long-term well-being.</p>
+                  <p className="about-founder__body">Diane Thomas œuvre pour <strong>l'harmonie du corps et de l'esprit</strong> à travers une approche structurée et intégrative qui allie force physique, stabilité émotionnelle et clarté mentale.</p>
+                  <p className="about-founder__body">Son parcours de <strong>coaching en neurosciences</strong> lui a permis de développer une compréhension fine du mental, de la résilience émotionnelle et des mécanismes de transformation durable.</p>
+                  <p className="about-founder__body"><br /><strong>Professeure de Yoga</strong> Hatha et Vinyasa et <strong>Maître Reiki</strong>, elle tisse un lien entre connaissance scientifique et équilibre intérieur, guidant chacun vers une présence plus consciente et un bien-être profond.</p>
+                  <p className="about-founder__body">Diplômée en Entrepreneuriat & Innovation de l'University of Southern California (USC), elle apporte une vision stratégique et pérenne à tout ce qu'elle entreprend, incarnant l'union du sens et de la structure.</p>
+                  <p className="about-founder__body">Guidée par la devise <strong>mens sana in corpore sano</strong>, elle crée The Idala Family : un espace de confiance où le corps et l'esprit évoluent ensemble, dans la recherche d'un bien-être durable et éclairé.</p>
+                 
                 </>
               ) : (
                 <>
-                  <p className="about-founder__body">Diane Thomas se consacre au soutien du bien-être physique et mental à travers une approche structurée et intégrative qui renforce à la fois le corps et l'esprit.</p>
-                  <p className="about-founder__body">Elle est titulaire d'un Master en Entrepreneuriat et Innovation de l'Université de Californie du Sud (USC), apportant une solide base dans la construction d'initiatives à vocation.</p>
-                  <p className="about-founder__body">Elle a travaillé dans le coaching basé sur les neurosciences, appliquant des principes axés sur la forme mentale, la résilience émotionnelle et la capacité à passer de schémas axés sur le stress vers des états d'esprit plus positifs et responsabilisants.</p>
-                  <p className="about-founder__body">Certifiée en Yoga Hatha et Vinyasa et Maître Reiki, Diane combine compréhension scientifique et pratiques holistiques. Par le yoga et le travail énergétique, elle aide les individus à créer alignement, conscience de soi et équilibre durable.</p>
-                  <p className="about-founder__body">Guidée par <em>mens sana in corpore sano</em>, elle a fondé The Idala Family, une plateforme connectant les individus avec des praticiens de confiance en bien-être holistique et intégratif.</p>
-                  <p className="about-founder__body">Sa mission est simple : renforcer le corps, clarifier l'esprit et soutenir le bien-être à long terme.</p>
+                  <p className="about-founder__body">Diane Thomas works towards harmony of body and mind through a structured and integrative approach that combines physical strength, emotional stability and mental clarity.</p>
+                  <p className="about-founder__body">Her background in neuroscience-based coaching has given her a deep understanding of the mind, emotional resilience and the mechanisms of lasting transformation.</p>
+                  <p className="about-founder__body">A Hatha and Vinyasa Yoga Teacher and Reiki Master, she weaves a connection between scientific knowledge and inner balance, guiding each person towards more conscious presence and profound well-being.</p>
+                  <p className="about-founder__body">A graduate in Entrepreneurship & Innovation from the University of Southern California (USC), she brings strategic and lasting vision to everything she undertakes, embodying the union of meaning and structure.</p>
+                  <p className="about-founder__body">Guided by the motto <em>mens sana in corpore sano</em>, she created The Idala Family : a trusted space where body and mind evolve together in the pursuit of lasting and enlightened well-being.</p>
                 </>
               )}
+              <p className="about-founder__body" style={{ marginTop: 24 }}>
+                <strong>{lang === 'fr' ? 'Sa mission :' : 'Her mission:'}
+                {lang === 'fr'
+                  ? ' renforcer le corps, clarifier l\'esprit et nourrir un équilibre durable.'
+                  : ' strengthen the body, clarify the mind and nurture lasting balance.'}</strong>
+              </p>
             </div>
 
           </div>
         </section>
 
-      {/* ── SECTION 2 — POURQUOI IDALA ── */}
-      <section className="about-idala">
-        <div className="about-idala__header">
-          <span className="eyebrow">{lang === 'fr' ? 'Le Nom Derrière la Vision' : 'The Name Behind the Vision'}</span>
-          <h2 className="about-idala__title">{lang === 'fr' ? 'Pourquoi IDALA ?' : 'Why IDALA?'}</h2>
-        </div>
-
-        {/* Phrase d'intro — pleine largeur AU DESSUS de la grille */}
-        <div className="about-idala__intro">
-          {lang === 'en'
-            ? <p className="about-idala__body about-idala__body--intro">The name IDALA is inspired by Ida and Pingala : the two primary energy channels in yogic philosophy that represent balance within the human system.</p>
-            : <p className="about-idala__body about-idala__body--intro">Le nom IDALA s'inspire d'Ida et Pingala : les deux principaux canaux énergétiques de la philosophie yogique qui représentent l'équilibre au sein du système humain.</p>
-          }
-        </div>
-
-        {/* Grille 3 colonnes — Ida | Image | Pingala */}
-        <div className="about-idala__diagram">
-
-          <div className="about-idala__col about-idala__col--left">
-            <div className="about-idala__channel-label">Ida</div>
-            <p className="about-idala__body">
-              {lang === 'en'
-                ? 'Ida is associated with the feminine principle: intuition, calm, receptivity, and inner awareness.'
-                : 'Ida est associé au principe féminin : intuition, calme, réceptivité et conscience intérieure.'}
-            </p>
+        {/* ── SECTION 2 — POURQUOI IDALA ── */}
+        <section className="about-idala">
+          <div className="about-idala__header">
+            <span className="eyebrow">{lang === 'fr' ? 'Le Nom Derrière la Vision' : 'The Name Behind the Vision'}</span>
+            <h2 className="about-idala__title">{lang === 'fr' ? 'Pourquoi IDALA ?' : 'Why IDALA?'}</h2>
           </div>
 
-          <div className="about-idala__image-col">
-            <img src={idaPingala} alt="Ida & Pingala — energy channels" className="about-idala__img" />
+          {/* Phrase d'intro pleine largeur */}
+          <div className="about-idala__intro">
+            {lang === 'fr'
+              ? <p className="about-idala__body about-idala__body--intro">Le nom IDALA s'inspire d'Ida et Pingala : les deux principaux canaux énergétiques de la philosophie yogique qui représentent l'équilibre au sein du système humain.</p>
+              : <p className="about-idala__body about-idala__body--intro">The name IDALA is inspired by Ida and Pingala, the two primary energy channels in yogic philosophy that represent balance within the human system.</p>
+            }
           </div>
 
-          <div className="about-idala__col about-idala__col--right">
-            <div className="about-idala__channel-label">Pingala</div>
-            <p className="about-idala__body">
-              {lang === 'en'
-                ? 'Pingala represents the masculine principle: action, strength, structure, and outward expression.'
-                : 'Pingala représente le principe masculin : action, force, structure et expression extérieure.'}
-            </p>
+          {/* Grille 3 colonnes — Ida | Image | Pingala */}
+          <div className="about-idala__diagram">
+
+            <div className="about-idala__col about-idala__col--left">
+              <div className="about-idala__channel-label about-idala__channel-label--ida">Ida</div>
+              <p className="about-idala__body">
+                {lang === 'fr' ? (
+                  <>Ida est associé au principe féminin :<br />intuition, calme, réceptivité et profondeur intérieure.</>
+                ) : (
+                  <>Ida is associated with the feminine principle:<br />intuition, calm, receptivity and inner depth.</>
+                )}
+              </p>
+            </div>
+
+            <div className="about-idala__image-col">
+              <img src={idaPingala} alt="Ida & Pingala : energy channels" className="about-idala__img" />
+            </div>
+
+            <div className="about-idala__col about-idala__col--right">
+              <div className="about-idala__channel-label about-idala__channel-label--pingala">Pingala</div>
+              <p className="about-idala__body">
+                {lang === 'fr' ? (
+                  <>Pingala incarne le principe masculin :<br />action, force, structure et expression vers l'extérieur.</>
+                ) : (
+                  <>Pingala embodies the masculine principle:<br />action, strength, structure and outward expression.</>
+                )}
+              </p>
+            </div>
+
           </div>
 
-        </div>
+          {/* Phrase "Together" pleine largeur */}
+          <div className="about-idala__together">
+            {lang === 'fr'
+              ? <p className="about-idala__body">Ensemble, ces deux polarités symbolisent l'harmonie des opposés : douceur et force, intuition et logique, repos et mouvement. Lorsqu'elles sont équilibrées, l'énergie peut circuler dans Sushumna, le canal central et le corps comme l'esprit accèdent à un état d'alignement plus profond.</p>
+              : <p className="about-idala__body">Together, these two polarities symbolize the harmony of opposites: softness and strength, intuition and logic, rest and movement. When they are balanced, energy can flow through Sushumna, the central channel and both body and mind access a deeper state of alignment.</p>
+            }
+          </div>
 
-        {/* Phrase "Together" — pleine largeur EN DESSOUS de la grille */}
-        <div className="about-idala__together">
-          {lang === 'en'
-            ? <p className="about-idala__body">Together, they symbolize harmony between opposites : softness and strength, intuition and logic, rest and movement. When these two forces are balanced, the body and mind function in alignment.</p>
-            : <p className="about-idala__body">Ensemble, ils symbolisent l'harmonie entre les opposés : douceur et force, intuition et logique, repos et mouvement. Quand ces deux forces sont équilibrées, le corps et l'esprit fonctionnent en alignement.</p>
-          }
-        </div>
+          {/* Encart Sushumna */}
+          {/* <div className="about-idala__sushumna">
+            <div className="about-idala__sushumna-inner">
+              <div className="about-idala__sushumna-label">Sushumna</div>
+              <p className="about-idala__sushumna-text">
+                {lang === 'fr'
+                  ? 'Le canal central, le lien entre Ida et Pingala. Lorsque les deux énergies s\'équilibrent, Sushumna s\'éveille et ouvre la voie à l\'alignement profond.'
+                  : 'The central channel, the link between Ida and Pingala. When both energies find balance, Sushumna awakens and opens the path to deep alignment.'}
+              </p>
+            </div>
+          </div> */}
 
           {/* Encart Équilibre & Communauté */}
           <div className="about-idala__balance">
             <div className="about-idala__balance-label">
               {lang === 'fr' ? 'Équilibre & Communauté' : 'Balance & Community'}
             </div>
-            {lang === 'en' ? (
+            {lang === 'fr' ? (
               <>
-                <p className="about-idala__balance-body">IDALA reflects this integration. It represents equilibrium between physical discipline and inner awareness, science and spirituality, structure and flow.</p>
-                <p className="about-idala__balance-body">The word <strong>"Family"</strong> embodies the deeper vision: a connected community built on trust, shared values, and collective growth. It is a space where professionals and individuals come together — not just for services, but for support, collaboration, and evolution.</p>
-                <p className="about-idala__balance-body">IDALA is balance in motion, strengthened by community.</p>
+                <p className="about-idala__balance-body">IDALA s'inscrit dans cette dynamique d'intégration. Le nom porte l'idée d'un équilibre vivant entre discipline physique et conscience intérieure, science et spiritualité, structure et fluidité.</p>
+                <p className="about-idala__balance-body">Le mot <strong>"Family"</strong> exprime une vision centrale : celle d'une communauté de confiance, fondée sur des valeurs partagées et une croissance collective. IDALA est pensé comme un espace où praticiens et individus se retrouvent non seulement pour un service, mais pour le soutien, l'échange et l'évolution.</p>
+                <p className="about-idala__balance-body"><strong>IDALA, c'est l'équilibre en mouvement, porté et renforcé par la force du collectif.</strong></p>
               </>
             ) : (
               <>
-                <p className="about-idala__balance-body">IDALA reflète cette intégration. Il représente l'équilibre entre discipline physique et conscience intérieure, science et spiritualité, structure et fluidité.</p>
-                <p className="about-idala__balance-body">Le mot <strong>« Family »</strong> incarne la vision profonde : une communauté connectée construite sur la confiance, des valeurs partagées et une croissance collective. C'est un espace où professionnels et individus se réunissent — non seulement pour des services, mais pour le soutien, la collaboration et l'évolution.</p>
-                <p className="about-idala__balance-body">IDALA est l'équilibre en mouvement, renforcé par la communauté.</p>
+                <p className="about-idala__balance-body">IDALA is rooted in this dynamic of integration. The name carries the idea of a living balance between physical discipline and inner awareness, science and spirituality, structure and flow.</p>
+                <p className="about-idala__balance-body">The word <strong>"Family"</strong> expresses a central vision: that of a trusted community, built on shared values and collective growth. IDALA is conceived as a space where practitioners and individuals come together not just for a service, but for support, exchange and evolution.</p>
+                <p className="about-idala__balance-body"><strong>IDALA is balance in motion, carried and strengthened by the power of the collective.</strong></p>
               </>
             )}
           </div>
@@ -147,9 +168,8 @@ function About() {
           <blockquote className="about-closing__quote">
             {lang === 'fr' ? '« Mens sana in corpore sano »' : '"Mens sana in corpore sano"'}
           </blockquote>
-          <div className="divider divider--center" style={{ marginTop: 28 }} />
           <div style={{ marginTop: 24 }}>
-            <button className="btn btn--gold" onClick={() => navigate('/practitioners')}>
+            <button className="btn btn--violet-mid" onClick={() => navigate('/practitioners')}>
               {lang === 'fr' ? 'Explorer la Communauté' : 'Explore the Community'}
             </button>
           </div>
