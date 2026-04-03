@@ -431,7 +431,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .home-gallery__caption { position: absolute; bottom: 12px; left: 14px; font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,.85); background: rgba(44,42,37,.3); padding: 4px 10px; backdrop-filter: blur(4px); }
 
 /* ─────────────────────────────────────────
-   HOME — DIANE
+   HOME — DIANE THOMAS
 ───────────────────────────────────────── */
 .home-diane { background: var(--pale); padding: clamp(56px,8vw,100px) var(--px); border-bottom: 1px solid rgba(155,110,191,.12); }
 .home-diane__inner { display: grid; grid-template-columns: 1fr 380px; gap: clamp(40px,6vw,88px); max-width: 1100px; margin: 0 auto; align-items: center; }
@@ -746,7 +746,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .about-idala { background: linear-gradient(160deg, #f5f0ff 0%, #f0f5ff 50%, #f5fff0 100%); padding: clamp(56px,8vw,96px) var(--px); border-top: 1px solid rgba(155,110,191,.12); }
 .about-idala__header { text-align: center; margin-bottom: 56px; }
 .about-idala__title { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px,4vw,48px); font-weight: 400; color: var(--text); letter-spacing: .5px; }
-.about-idala__intro { max-width: 820px; margin: 0 auto 40px; text-align: center; }
+.about-idala__intro { max-width: 820px; margin: 0 auto 40px; text-align: center; margin-bottom: -15px; }
 .about-idala__diagram { display: grid; grid-template-columns: 1fr 280px 1fr; max-width: 1100px; margin: 0 auto; align-items: start; }
 .about-idala__col { display: flex; flex-direction: column; gap: 16px; padding-top: 80px; }
 .about-idala__col--left { text-align: right; }
@@ -755,7 +755,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .about-idala__body { font-size: clamp(14px,1.4vw,16px); line-height: 1.95; color: var(--text-light); }
 .about-idala__body--intro { color: var(--text-light); font-weight: 400; }
 .about-idala__image-col { display: flex; flex-direction: column; align-items: center; gap: 20px; }
-.about-idala__together { text-align: center; padding: 0 8px; max-width: 820px; margin: 0 auto 48px; }
+.about-idala__together { text-align: center; padding: 0 8px; max-width: 820px; margin: 0 auto 48px; margin-top: -60px;}
 .about-idala__together .about-idala__body { font-size: clamp(13px,1.3vw,15px); color: var(--text-light); font-weight: 400; }
 .about-idala__img { width: 100%; max-width: 280px; object-fit: contain; }
 .about-idala__sushumna { max-width: 820px; margin: 0 auto 32px; }
@@ -865,6 +865,9 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   .chart-result-v2__big3 { grid-template-columns: 1fr; }
   .chart-result-v2__planets { grid-template-columns: repeat(2,1fr); }
   .about-founder__photo { width: 200px; height: 200px; }
+  .about-idala__col--left {text-align: center; margin-top: -4em; }
+  .about-idala__col--right {text-align: center; margin-top: 1em; }
+  .about-idala__together { margin-top: 2em ;}
   .footer-bottom { text-align: center; }
 }
 
