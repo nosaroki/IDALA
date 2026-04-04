@@ -37,8 +37,8 @@ function NotFound() {
           <div className="divider divider--center" />
           <p className="not-found__body">
             {lang === 'fr'
-              ? "Cette page n'existe pas ou a été déplacée. Revenez à l'accueil et continuez votre exploration."
-              : "This page doesn't exist or has been moved. Head back home and continue your journey."}
+              ? <>Cette page n'existe pas ou a été déplacée.<br /> Revenez à l'accueil et continuez votre exploration.</>
+              : <>This page doesn't exist or has been moved. <br /> Head back home and continue your journey.</>}
           </p>
           <div className="not-found__actions">
             <button className="btn btn--violet-mid" onClick={() => navigate('/')}>
