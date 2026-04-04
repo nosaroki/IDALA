@@ -1,3 +1,4 @@
+/* eslint-env node */
 import express from 'express'
 import { fileURLToPath } from 'url'
 import path from 'path'
@@ -11,4 +12,4 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'))
 })
 
-app.listen(3000)
+app.listen(process.env.PORT || 3000)
