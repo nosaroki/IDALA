@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { HashRouter, Routes, Route, Outlet } from 'react-router-dom';
 import { LangCtx } from './components/LangContext';
 import TopBar      from './components/TopBar';        
 import Loader      from './components/Loader';
@@ -37,7 +37,7 @@ export default function App() {
   return (
     <HelmetProvider>
       <LangCtx.Provider value={{ lang, setLang }}>
-        <BrowserRouter>
+        <HashRouter>
           <ScrollToTop />
           {showLoader && (
             <div className={`loader${fading ? ' fade-out' : ''}`}>
@@ -56,7 +56,7 @@ export default function App() {
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
-        </BrowserRouter>
+        </HashRouter>
       </LangCtx.Provider>
     </HelmetProvider>
   );
