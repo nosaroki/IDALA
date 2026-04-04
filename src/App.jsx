@@ -10,6 +10,7 @@ import Practitioners from './pages/Practitioners';
 // import Spiritual   from './pages/Spiritual';
 import Astrology   from './pages/Astrology';
 import About       from './pages/About';
+import NotFound    from './pages/NotFound';
 import { HelmetProvider } from 'react-helmet-async';
 import './styles.css';
 
@@ -52,6 +53,7 @@ export default function App() {
               {/* <Route path="/spiritual"     element={<Spiritual />} /> */}
               <Route path="/astrology"     element={<Astrology />} />
               <Route path="/about"         element={<About />} />
+              <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>
         </BrowserRouter>

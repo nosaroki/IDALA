@@ -816,6 +816,100 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .footer-copy { font-size: 11px; color: rgba(255,255,255,.35); line-height: 1.6; }
 
 /* ─────────────────────────────────────────
+   404 NOT FOUND
+───────────────────────────────────────── */
+.not-found {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px var(--px);
+  position: relative;
+  overflow: hidden;
+  background: var(--root-bg);
+}
+
+.not-found__ring {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+.not-found__ring--1 {
+  width: 600px; height: 600px;
+  border: 1px solid rgba(155,110,191,.10);
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+}
+.not-found__ring--2 {
+  width: 900px; height: 900px;
+  border: 1px solid rgba(155,110,191,.06);
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+}
+
+.not-found__chakra-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 40px;
+  position: relative;
+  z-index: 1;
+}
+.not-found__dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  animation: dot-pulse 2.4s ease-in-out infinite;
+}
+.not-found__dot--c1 { background: var(--c1); animation-delay: 0s; }
+.not-found__dot--c2 { background: var(--c2); animation-delay: .2s; }
+.not-found__dot--c3 { background: var(--c3); animation-delay: .4s; }
+.not-found__dot--c4 { background: var(--c4); animation-delay: .6s; }
+.not-found__dot--c5 { background: var(--c5); animation-delay: .8s; }
+.not-found__dot--c6 { background: var(--c6); animation-delay: 1.0s; }
+.not-found__dot--c7 { background: var(--c7); animation-delay: 1.2s; }
+
+.not-found__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 560px;
+}
+
+.not-found__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(36px, 6vw, 64px);
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: 1px;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+
+.not-found__body {
+  font-size: clamp(15px, 1.5vw, 17px);
+  line-height: 2;
+  color: var(--text-light);
+  margin-bottom: 40px;
+}
+
+.not-found__actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+.not-found__quote {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(14px, 1.4vw, 18px);
+  font-style: italic;
+  color: var(--violet-mid);
+  letter-spacing: 1px;
+}
+
+/* ─────────────────────────────────────────
    RESPONSIVE — GLOBAL
 ───────────────────────────────────────── */
 @media (max-width: 1200px) {
