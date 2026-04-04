@@ -221,36 +221,55 @@ function Astrology() {
     setPobSuggestions([]);
   };
 
-  const calc = async () => {
-    setErr(false); setResult(null);
-    if (!dob) { setErr(true); return; }
-    const [y, m, d] = dob.split('-').map(Number);
-    let h = 12;
-    if (tob) { const [hh, mm] = tob.split(':').map(Number); h = hh + mm / 60; }
-    const jd   = toJD(y, m, d, h);
-    const sun  = signFrom(sunLon(jd));
-    const moon = signFrom(moonLon(jd));
-    const planets = [
-      { lEN: 'Mercury', lFR: 'Mercure', icon: PlanetIcons.Mercury, s: signFrom(pLon('Mercury', jd)) },
-      { lEN: 'Venus',   lFR: 'Vénus',   icon: PlanetIcons.Venus,   s: signFrom(pLon('Venus',   jd)) },
-      { lEN: 'Mars',    lFR: 'Mars',     icon: PlanetIcons.Mars,    s: signFrom(pLon('Mars',    jd)) },
-      { lEN: 'Jupiter', lFR: 'Jupiter',  icon: PlanetIcons.Jupiter, s: signFrom(pLon('Jupiter', jd)) },
-      { lEN: 'Saturn',  lFR: 'Saturne',  icon: PlanetIcons.Saturn,  s: signFrom(pLon('Saturn',  jd)) },
-    ];
-    let asc = null, coord = '';
-    if (tob && pobSelected) {
-      setLoading(true);
-      asc   = signFrom(calcAsc(jd, pobSelected.lat, pobSelected.lon));
-      coord = `${pobSelected.label.split(',').slice(0, 2).join(',')} · ${Math.abs(pobSelected.lat).toFixed(2)}°${pobSelected.lat >= 0 ? 'N' : 'S'} ${Math.abs(pobSelected.lon).toFixed(2)}°${pobSelected.lon >= 0 ? 'E' : 'W'}`;
-      setLoading(false);
+const calc = async () => {
+  setErr(false); setResult(null);
+  if (!dob) { setErr(true); return; }
+  const [y, m, d] = dob.split('-').map(Number);
+  let h = 12;
+  if (tob) { const [hh, mm] = tob.split(':').map(Number); h = hh + mm / 60; }
+
+  let jd;
+
+  if (tob && pobSelected) {
+    setLoading(true);
+    try {
+      const timestamp = Math.floor(new Date(`${dob}T${tob}:00`).getTime() / 1000);
+      const tzRes = await fetch(
+        `https://api.timezonedb.com/v2.1/get-time-zone?key=4JQYMDPFJU3E&format=json&by=position&lat=${pobSelected.lat}&lng=${pobSelected.lon}&time=${timestamp}`
+      );
+      const tzData = await tzRes.json();
+      const offsetHours = tzData.gmtOffset / 3600;
+      const hUTC = h - offsetHours;
+      jd = toJD(y, m, d, hUTC);
+    } catch {
+      jd = toJD(y, m, d, h);
     }
-    const MEN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-    const MFR = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
-    setResult({ sun, moon, asc, coord, planets, tob,
-      name: lang === 'fr'
-        ? `Thème Astral · ${MFR[m-1]} ${d}, ${y}`
-        : `Birth Chart · ${MEN[m-1]} ${d}, ${y}` });
-  };
+    setLoading(false);
+  } else {
+    jd = toJD(y, m, d, h);
+  }
+
+  const sun  = signFrom(sunLon(jd));
+  const moon = signFrom(moonLon(jd));
+  const planets = [
+    { lEN: 'Mercury', lFR: 'Mercure', icon: PlanetIcons.Mercury, s: signFrom(pLon('Mercury', jd)) },
+    { lEN: 'Venus',   lFR: 'Vénus',   icon: PlanetIcons.Venus,   s: signFrom(pLon('Venus',   jd)) },
+    { lEN: 'Mars',    lFR: 'Mars',     icon: PlanetIcons.Mars,    s: signFrom(pLon('Mars',    jd)) },
+    { lEN: 'Jupiter', lFR: 'Jupiter',  icon: PlanetIcons.Jupiter, s: signFrom(pLon('Jupiter', jd)) },
+    { lEN: 'Saturn',  lFR: 'Saturne',  icon: PlanetIcons.Saturn,  s: signFrom(pLon('Saturn',  jd)) },
+  ];
+  let asc = null, coord = '';
+  if (pobSelected) {
+    asc   = signFrom(calcAsc(jd, pobSelected.lat, pobSelected.lon));
+    coord = `${pobSelected.label.split(',').slice(0,2).join(',')} · ${Math.abs(pobSelected.lat).toFixed(2)}°${pobSelected.lat >= 0 ? 'N' : 'S'} ${Math.abs(pobSelected.lon).toFixed(2)}°${pobSelected.lon >= 0 ? 'E' : 'W'}`;
+  }
+  const MEN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MFR = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  setResult({ sun, moon, asc, coord, planets, tob,
+    name: lang === 'fr'
+      ? `Thème Astral · ${MFR[m-1]} ${d}, ${y}`
+      : `Birth Chart · ${MEN[m-1]} ${d}, ${y}` });
+};
 
   return (
     <>

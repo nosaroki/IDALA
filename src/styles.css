@@ -840,11 +840,14 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   .chart-result-v2__planets  { grid-template-columns: repeat(3,1fr); }
   .about-founder__inner      { grid-template-columns: 1fr; }
   .about-founder__photo-col  { position: static; }
-  .about-idala__diagram      { grid-template-columns: 1fr; text-align: center; }
+  .about-idala__diagram  { grid-template-columns: 1fr; text-align: center; gap: 8px; }
   .about-idala__col          { padding-top: 0; text-align: center; }
   .about-idala__col--left,
   .about-idala__col--right   { text-align: center; }
-  .about-idala__image-col    { order: -1; margin: 0 auto; max-width: 260px; }
+  .about-idala__col--left {margin-top: -4em;}
+  .about-idala__image-col    { order: -1; margin: 0 auto; max-width: 260px; gap: 0; }
+  .about-idala__intro        { margin-bottom: 16px; }
+  .about-idala__together     { margin-top: 8px; margin-bottom: 24px; }
   .calc-form                 { grid-template-columns: 1fr 1fr; }
 }
 
@@ -865,9 +868,9 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   .chart-result-v2__big3 { grid-template-columns: 1fr; }
   .chart-result-v2__planets { grid-template-columns: repeat(2,1fr); }
   .about-founder__photo { width: 200px; height: 200px; }
-  .about-idala__col--left {text-align: center; margin-top: -4em; }
-  .about-idala__col--right {text-align: center; margin-top: 1em; }
-  .about-idala__together { margin-top: 2em ;}
+  .about-idala__col--left {text-align: center;}
+  .about-idala__col--right {text-align: center; }
+  .about-idala__together { margin-top: 16px; margin-bottom: 32px; }
   .footer-bottom { text-align: center; }
 }
 
