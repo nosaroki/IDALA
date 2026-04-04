@@ -8,14 +8,15 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "node server.js"
+    "start": "npx serve -s dist"
   },
   "dependencies": {
     "express": "^5.2.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-helmet-async": "^3.0.0",
-    "react-router-dom": "^7.13.1"
+    "react-router-dom": "^7.13.1",
+    "serve": "^14.2.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
