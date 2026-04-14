@@ -4,13 +4,24 @@ import { LangCtx } from './components/LangContext';
 import TopBar      from './components/TopBar';        
 import Loader      from './components/Loader';
 import ScrollToTop from './components/ScrollToTop';
-import ComingSoon  from './pages/ComingSoon';
+// import ComingSoon  from './pages/ComingSoon';
 import Home        from './pages/Home';
 import Practitioners from './pages/Practitioners';
 // import Spiritual   from './pages/Spiritual';
+import Retreats   from './pages/Retreats'
+import Corporate  from './pages/Corporate'
 import Astrology   from './pages/Astrology';
 import About       from './pages/About';
 import NotFound    from './pages/NotFound';
+import JoinUs from './pages/JoinUs'
+import RequireAuth from './components/RequireAuth';
+import Login from './pages/admin/Login';
+import PractitionersList from './pages/admin/PractitionersList';
+import Practices from './pages/admin/Practices';
+import PracticePage from './pages/practices/[slug]';
+import PractitionerPage from './pages/practices/PractitionerPage'
+import Candidatures from './pages/admin/Candidatures'
+
 import { HelmetProvider } from 'react-helmet-async';
 import './styles.css';
 
@@ -45,14 +56,28 @@ export default function App() {
             </div>
           )}
           <Routes>
-            <Route path="/coming-soon" element={<ComingSoon />} />
+            {/* <Route path="/coming-soon" element={<ComingSoon />} /> */}
+              <Route path="/admin/login" element={<Login />} />
+
+            {/* Routes admin protégées */}
+            <Route element={<RequireAuth />}>
+              <Route path="/admin/praticiens" element={<PractitionersList />} />
+              <Route path="/admin/pratiques"  element={<Practices />} />
+              <Route path="/admin/candidatures"  element={<Candidatures />} />
+            </Route>
+
 
             <Route element={<Layout />}>
               <Route path="/"              element={<Home />} />
               <Route path="/practitioners" element={<Practitioners />} />
+              <Route path="/practices/:slug" element={<PracticePage />} />
+              <Route path="/practices/:practiceSlug/:practitionerSlug" element={<PractitionerPage />} />
+              <Route path="/retreats"   element={<Retreats />} />
+              <Route path="/corporate"  element={<Corporate />} />
               {/* <Route path="/spiritual"     element={<Spiritual />} /> */}
               <Route path="/astrology"     element={<Astrology />} />
               <Route path="/about"         element={<About />} />
+              <Route path="/join" element={<JoinUs />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

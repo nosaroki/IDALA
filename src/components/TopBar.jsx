@@ -10,10 +10,13 @@ import trsprlogo from '../assets/trsprlogo.png';
 const NAV = [
   { path: '/',              en: 'Home',               fr: 'Accueil'              },
   { path: '/practitioners', en: 'Practitioners',      fr: 'Praticiens'           },
+  { path: '/retreats',      en: 'Retreats',           fr: 'Retraites'            },
+  { path: '/corporate',     en: 'Corporate',          fr: 'Entreprises'          },
   // { path: '/spiritual',     en: 'Reading & Guidance', fr: 'Tarot & Guidance' },
   { path: '/astrology',     en: 'Birth Chart',        fr: 'Thème Astral'         },
   { path: '/about',         en: 'About',              fr: 'À propos'             },
 ];
+
 
 function TopBar() {
   const { lang, setLang } = useLang();

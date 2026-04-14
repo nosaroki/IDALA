@@ -285,6 +285,12 @@ function Home() {
             <button className="btn btn--outline home-cta__btn" onClick={() => navigate('/practitioners')}>
               {lang === 'fr' ? 'Trouver un Praticien' : 'Find a Practitioner'}
             </button>
+            <button className="btn btn--outline home-cta__btn" onClick={() => navigate('/retreats')}>
+              {lang === 'fr' ? 'Retraites' : 'Retreats'}
+            </button>
+            <button className="btn btn--outline home-cta__btn" onClick={() => navigate('/corporate')}>
+              {lang === 'fr' ? 'Bien-être en entreprise' : 'Corporate Wellbeing'}
+            </button>
             {/* <button className="btn btn--outline home-cta__btn" onClick={() => navigate('/spiritual')}>
               {lang === 'fr' ? 'Tarot & Guidance' : 'Reading & Guidance'}
             </button> */}

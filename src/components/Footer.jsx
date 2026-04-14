@@ -3,6 +3,7 @@
 // ─────────────────────────────────────────
 
 import { useLang } from '../components/LangContext';
+import { useNavigate } from 'react-router-dom';
 
 const InstagramIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -13,15 +14,17 @@ const InstagramIcon = () => (
 );
 
 function Footer() {
-  const { lang } = useLang();
+  const { lang }   = useLang();
+  const navigate   = useNavigate();
+
   return (
     <footer className="site-footer">
 
       {/* Ligne 1 — brand gauche, instagram droite */}
       <div className="footer-top">
         <div className="footer-brand">THE IDALA FAMILY</div>
-        <a
-          href="https://www.instagram.com/the.idala.family/"
+        
+          <a href="https://www.instagram.com/the.idala.family/"
           target="_blank"
           rel="noreferrer"
           className="footer-instagram"
@@ -32,9 +35,22 @@ function Footer() {
           </span>
           <InstagramIcon />
         </a>
+        <div className="footer-links">
+        <button onClick={() => navigate('/join')} className="footer-link">
+          {lang === 'fr' ? 'Rejoindre The Idala Family · Devenir praticien' : 'Be part of the Idala Family · Become a practitioner'}
+        </button>
       </div>
+      </div>
+      
 
-      {/* Ligne 2 — copyright à droite */}
+      {/* Ligne 2 — liens */}
+      {/* <div className="footer-links">
+        <button onClick={() => navigate('/join')} className="footer-link">
+          {lang === 'fr' ? 'Rejoindre The Idala Family · Devenir praticien' : 'Be part of the Idala Family · Become a practitioner'}
+        </button>
+      </div> */}
+
+      {/* Ligne 3 — copyright */}
       <div className="footer-bottom">
         <div className="footer-copy">
           {lang === 'fr' ? (
