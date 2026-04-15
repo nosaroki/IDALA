@@ -39,7 +39,7 @@ export default function PractitionerPage() {
   useEffect(() => {
     async function fetchData() {
       const { data, error } = await supabase
-        .from('praticiens')
+        .from('praticiens_public')
         .select('*, pratiques(*)')
         .eq('slug', practitionerSlug)
         .single()
@@ -89,8 +89,15 @@ export default function PractitionerPage() {
               <h1 className="pract-profile__name">
                 {praticien.prenom} {praticien.nom}
               </h1>
-              {praticien.localisation && (
-                <p className="pract-profile__location">{praticien.localisation}</p>
+              {(praticien.ville || praticien.localisation) && (
+                <p className="pract-profile__location">
+                  {praticien.ville
+                    ? [praticien.ville, praticien.region, praticien.pays].filter(Boolean).join(', ')
+                    : praticien.localisation}
+                </p>
+              )}
+              {praticien.langues && (
+                <p className="pract-profile__langues">{praticien.langues}</p>
               )}
               <ModeTags mode={praticien.mode_exercice} lang={lang} />
             </div>
@@ -101,11 +108,19 @@ export default function PractitionerPage() {
 
           {/* Bloc bas : bios + bouton sur toute la largeur */}
           <div className="pract-profile__content">
-            {praticien.bio && (
-              <p className="pract-profile__bio pract-profile__bio--intro">{praticien.bio}</p>
+            {(praticien.bio_fr || praticien.bio_en || praticien.bio) && (
+              <p className="pract-profile__bio pract-profile__bio--intro">
+                {lang === 'fr'
+                  ? (praticien.bio_fr || praticien.bio)
+                  : (praticien.bio_en || praticien.bio)}
+              </p>
             )}
-            {praticien.bio_complete && (
-              <p className="pract-profile__bio">{praticien.bio_complete}</p>
+            {(praticien.bio_complete_fr || praticien.bio_complete_en || praticien.bio_complete) && (
+              <p className="pract-profile__bio">
+                {lang === 'fr'
+                  ? (praticien.bio_complete_fr || praticien.bio_complete)
+                  : (praticien.bio_complete_en || praticien.bio_complete)}
+              </p>
             )}
             {praticien.lien_reservation ? (
               

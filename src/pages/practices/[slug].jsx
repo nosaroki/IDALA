@@ -51,7 +51,7 @@ export default function PracticePage() {
       }
 
       const { data: praticiensData } = await supabase
-        .from('praticiens')
+        .from('praticiens_public')
         .select('*')
         .eq('pratique_id', pratiqueData.id)
         .eq('actif', true)

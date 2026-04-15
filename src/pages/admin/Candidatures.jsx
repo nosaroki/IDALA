@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { useNavigate } from 'react-router-dom'
+import Toast from '../../components/Toast'
 
 const STATUTS = [
   { value: 'en_attente', labelFr: 'En attente', color: '#FF9A3C' },
@@ -14,6 +15,7 @@ export default function Candidatures() {
   const [loading, setLoading]           = useState(true)
   const [filter, setFilter]             = useState('all')
   const navigate                        = useNavigate()
+  const [toast, setToast] = useState(null)
 
   async function fetchCandidatures() {
     const { data } = await supabase
@@ -29,11 +31,36 @@ export default function Candidatures() {
     load()
   }, [])
 
-  async function handleStatut(id, statut) {
-    await supabase.from('candidatures').update({ statut }).eq('id', id)
-    setCandidatures(prev => prev.map(c => c.id === id ? { ...c, statut } : c))
-    if (selected?.id === id) setSelected(prev => ({ ...prev, statut }))
+async function handleStatut(id, statut) {
+  await supabase.from('candidatures').update({ statut }).eq('id', id)
+  setCandidatures(prev => prev.map(c => c.id === id ? { ...c, statut } : c))
+  if (selected?.id === id) setSelected(prev => ({ ...prev, statut }))
+
+  // Envoyer l'email d'onboarding si validé et pas encore envoyé
+  if (statut === 'validé' && !selected?.onboarding_sent) {
+    const { data: { session } } = await supabase.auth.getSession()
+    const { error } = await supabase.functions.invoke('send-onboarding', {
+      headers: {
+        Authorization: `Bearer ${session?.access_token}`
+      },
+      body: {
+        candidature_id: selected.id,
+        prenom: selected.prenom,
+        nom: selected.nom,
+        email: selected.email,
+      }
+    })
+      if (!error) {
+        setCandidatures(prev => prev.map(c =>
+          c.id === id ? { ...c, onboarding_sent: true } : c
+        ))
+        if (selected?.id === id) setSelected(prev => ({ ...prev, onboarding_sent: true }))
+        setToast({ message: 'Email onboarding envoyé', type: 'success' })
+      } else {
+        setToast({ message: 'Erreur lors de l\'envoi', type: 'error' })
+      }
   }
+}
 
   async function handleDelete(id) {
     if (!confirm('Supprimer cette candidature ?')) return
@@ -203,6 +230,13 @@ export default function Candidatures() {
         )}
 
       </div>
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   )
 }

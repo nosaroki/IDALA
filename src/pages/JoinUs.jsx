@@ -37,12 +37,12 @@ const emptyForm = {
   ville: '', pays: '', langues: '',
   specialites: [],
   public_cible: [],
-  certifications: '', experience: '', motivation: '',
-  type_seance: '',
+  certifications: '', experience: '', bio_fr: '',
+  bio_en: '', type_seance: '',
   description_seance: '', duree_seance: '', prix: '',
   mode_exercice: '',
   instagram: '', site_web: '',
-  photos: [],
+  photos: [], main_photo: '',
 }
 
 export default function JoinUs() {
@@ -80,7 +80,11 @@ export default function JoinUs() {
         urls.push(urlData.publicUrl)
       }
     }
-    setForm(f => ({ ...f, photos: [...f.photos, ...urls] }))
+    setForm(f => ({
+      ...f,
+      photos: [...f.photos, ...urls],
+      main_photo: f.main_photo || urls[0] || ''
+    }))
     setUploading(false)
   }
 
@@ -101,7 +105,9 @@ export default function JoinUs() {
       public_cible:       form.public_cible.join(', '),
       certifications:     form.certifications,
       experience:         form.experience,
-      motivation:         form.motivation,
+      motivation: form.bio_fr,
+      bio_fr: form.bio_fr,
+      bio_en: form.bio_en,
       type_seance:        form.type_seance,
       description_seance: form.description_seance,
       duree_seance:       form.duree_seance,
@@ -109,7 +115,8 @@ export default function JoinUs() {
       mode_exercice:      form.mode_exercice,
       instagram:          form.instagram,
       site_web:           form.site_web,
-      photos_urls:        form.photos,
+      photos_urls: form.photos,
+      main_photo: form.main_photo,
     })
 
     if (error) {
@@ -153,19 +160,36 @@ export default function JoinUs() {
       <div className="join-page">
 
         {/* Hero */}
-        <section className="join-hero">
-          <p className="join-hero__eyebrow">
-            {lang === 'fr' ? 'Praticiens' : 'Practitioners'}
-          </p>
-          <h1 className="join-hero__title">
-            {lang === 'fr' ? 'Rejoindre la Famille' : 'Join the Family'}
-          </h1>
-          <p className="join-hero__intro">
-            {lang === 'fr'
-              ? 'The Idala Family met à disposition le calendrier de réservation ainsi que le lien de paiement. Nous nous occupons de tout pour vous.'
-              : 'The Idala Family provides the booking calendar and payment link. We take care of everything for you.'}
-          </p>
-        </section>
+          <section className="join-hero">
+            <p className="join-hero__eyebrow">
+              {lang === 'fr' ? 'Praticiens' : 'Practitioners'}
+            </p>
+            <h1 className="join-hero__title">
+              {lang === 'fr' ? 'Rejoindre la Famille' : 'Join the Family'}
+            </h1>
+            <div className="join-hero__body">
+              <p>
+                {lang === 'fr'
+                  ? <>Rejoignez IDALA, une communauté de praticiens engagés autour d'une même vision : favoriser le bien-être durable et <strong>l'harmonie entre le corps et l'esprit</strong>.</>
+                  : <>Join IDALA, a community of practitioners united around a shared vision: fostering lasting well-being and <strong>harmony between body and mind</strong>.</>}
+              </p>
+              <p>
+                {lang === 'fr'
+                  ? <>Que vous proposiez des séances individuelles, des ateliers collectifs ou des interventions en entreprise, <br />IDALA vous aide à développer votre visibilité, élargir votre clientèle et <strong>valoriser votre pratique</strong>.</>
+                  : <>Whether you offer individual sessions, group workshops or corporate programmes, <br />IDALA helps you grow your visibility, expand your client base and <strong>showcase your practice</strong>.</>}
+              </p>
+              <p>
+                {lang === 'fr'
+                  ? <>Nous croyons que chaque praticien a le <strong>pouvoir</strong> d'accompagner, d'inspirer et de créer un impact positif durable, avec bienveillance et authenticité.</>
+                  : <>We believe every practitioner has the <strong>power</strong> to support, inspire and create lasting positive impact, with kindness and authenticity.</>}
+              </p>
+              <p>
+                {lang === 'fr'
+                  ? <>En rejoignant IDALA, vous intégrez un réseau humain porté par une conviction forte :<strong> "mens sana in corpore sano"</strong>, un esprit sain dans un corps sain.</>
+                  : <>By joining IDALA, you become part of a human network built around a strong conviction: <strong>"mens sana in corpore sano"</strong>, a healthy mind in a healthy body.</>}
+              </p>
+            </div>
+          </section>
 
         <form onSubmit={handleSubmit} className="join-form">
 
@@ -274,10 +298,16 @@ export default function JoinUs() {
             </div>
 
             <div className="join-field">
-              <label>{lang === 'fr' ? 'Biographie *' : 'Biography *'}</label>
-              <textarea required rows={6} value={form.motivation}
-                placeholder={lang === 'fr' ? '5 à 10 lignes' : '5 to 10 lines'}
-                onChange={e => setForm({ ...form, motivation: e.target.value })} />
+              <label>{lang === 'fr' ? 'Biographie FR *' : 'Biography FR *'}</label>
+              <textarea required rows={5} value={form.bio_fr || ''}
+                placeholder={lang === 'fr' ? '5 à 10 lignes en français' : '5 to 10 lines in French'}
+                onChange={e => setForm({ ...form, bio_fr: e.target.value })} />
+            </div>
+            <div className="join-field">
+              <label>{lang === 'fr' ? 'Biographie EN *' : 'Biography EN *'}</label>
+              <textarea required rows={5} value={form.bio_en || ''}
+                placeholder={lang === 'fr' ? '5 à 10 lignes en anglais' : '5 to 10 lines in English'}
+                onChange={e => setForm({ ...form, bio_en: e.target.value })} />
             </div>
           </div>
 
@@ -382,18 +412,43 @@ export default function JoinUs() {
                   ? 'Photos * (portrait + en situation, minimum 2)'
                   : 'Photos * (portrait + in action, minimum 2)'}
               </label>
-              <input type="file" accept="image/*" multiple onChange={handlePhotos} />
-              {uploading && (
-                <p className="join-hint">
-                  {lang === 'fr' ? 'Upload en cours...' : 'Uploading...'}
-                </p>
-              )}
+              <input
+                id="photo-upload"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handlePhotos}
+                style={{ display: 'none' }}
+              />
+              <label htmlFor="photo-upload" className="join-file-btn">
+                {uploading
+                  ? (lang === 'fr' ? 'Upload en cours...' : 'Uploading...')
+                  : (lang === 'fr' ? 'Choisir des photos' : 'Choose photos')}
+              </label>
               {form.photos.length > 0 && (
-                <div className="join-photos-preview">
-                  {form.photos.map((url, i) => (
-                    <img key={i} src={url} alt={`photo ${i + 1}`} />
-                  ))}
-                </div>
+                <>
+                  <p className="join-hint">
+                    {lang === 'fr'
+                      ? 'Cliquez sur une photo pour la définir comme photo de profil principale'
+                      : 'Click on a photo to set it as your main profile picture'}
+                  </p>
+                  <div className="join-photos-select">
+                    {form.photos.map((url, i) => (
+                      <div
+                        key={i}
+                        className={`join-photo-item ${form.main_photo === url ? 'join-photo-item--selected' : ''}`}
+                        onClick={() => setForm(f => ({ ...f, main_photo: url }))}
+                      >
+                        <img src={url} alt={`photo ${i + 1}`} />
+                        {form.main_photo === url && (
+                          <div className="join-photo-item__badge">
+                            {lang === 'fr' ? 'Principal' : 'Main'}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
           </div>

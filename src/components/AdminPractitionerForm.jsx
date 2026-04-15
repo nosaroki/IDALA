@@ -2,10 +2,14 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
 export default function AdminPractitionerForm({ initial, pratiques, onSave, onCancel }) {
-  const emptyForm = {
+
+const emptyForm = {
   prenom: '', nom: '', localisation: '',
-  lien_reservation: '', pratique_id: '', actif: true, photo_url: '',
-  bio: '', slug: ''
+  lien_reservation: '', pratique_id: '', actif: true,
+  photo_url: '', bio: '', slug: '',
+  bio_complete: '', mode_exercice: 'in-person',
+  iban: '', langues: '', ville: '', region: '', pays: '',
+  bio_fr: '', bio_en: '', bio_complete_fr: '', bio_complete_en: ''
 }
 const [form, setForm]           = useState(initial || emptyForm)
 const [uploading, setUploading] = useState(false)
@@ -61,10 +65,27 @@ useEffect(() => {
         </label>
       </div>
       <div className="admin-form__row">
-        <label>Localisation
-          <input value={form.localisation}
-            onChange={e => setForm({ ...form, localisation: e.target.value })} />
+        <div className="admin-form__row">
+        <label>Ville
+          <input value={form.ville || ''}
+            onChange={e => setForm({ ...form, ville: e.target.value })} />
         </label>
+        <label>Région
+          <input value={form.region || ''}
+            onChange={e => setForm({ ...form, region: e.target.value })} />
+        </label>
+      </div>
+      <div className="admin-form__row">
+        <label>Pays
+          <input value={form.pays || ''}
+            onChange={e => setForm({ ...form, pays: e.target.value })} />
+        </label>
+        <label>Langues parlées
+          <input value={form.langues || ''}
+            placeholder="ex: Français, Anglais"
+            onChange={e => setForm({ ...form, langues: e.target.value })} />
+        </label>
+      </div>
         <label>Pratique *
           <select required value={form.pratique_id}
             onChange={e => setForm({ ...form, pratique_id: e.target.value })}>
@@ -79,22 +100,37 @@ useEffect(() => {
         <input value={form.lien_reservation}
           onChange={e => setForm({ ...form, lien_reservation: e.target.value })} />
       </label>
-      <label>Bio courte
-        <textarea
-          value={form.bio || ''}
-          rows={3}
-          placeholder="Présentation courte du praticien (2-3 phrases max)"
-          onChange={e => setForm({ ...form, bio: e.target.value })}
-        />
+      <label>IBAN
+      <input
+        value={form.iban || ''}
+        placeholder="FR76..."
+        onChange={e => setForm({ ...form, iban: e.target.value })}
+      />
+    </label>
+      <div className="admin-form__row">
+      <label>Bio courte FR
+        <textarea rows={3} value={form.bio_fr || ''}
+          placeholder="Présentation courte en français"
+          onChange={e => setForm({ ...form, bio_fr: e.target.value })} />
       </label>
-      <label>Bio complète
-        <textarea
-          value={form.bio_complete || ''}
-          rows={6}
-          placeholder="Présentation détaillée, parcours, approche, spécialités..."
-          onChange={e => setForm({ ...form, bio_complete: e.target.value })}
-        />
+      <label>Bio courte EN
+        <textarea rows={3} value={form.bio_en || ''}
+          placeholder="Short presentation in English"
+          onChange={e => setForm({ ...form, bio_en: e.target.value })} />
       </label>
+    </div>
+    <div className="admin-form__row">
+      <label>Bio complète FR
+        <textarea rows={6} value={form.bio_complete_fr || ''}
+          placeholder="Présentation détaillée en français"
+          onChange={e => setForm({ ...form, bio_complete_fr: e.target.value })} />
+      </label>
+      <label>Bio complète EN
+        <textarea rows={6} value={form.bio_complete_en || ''}
+          placeholder="Detailed presentation in English"
+          onChange={e => setForm({ ...form, bio_complete_en: e.target.value })} />
+      </label>
+    </div>
       <label>Mode d'exercice
         <select
           value={form.mode_exercice || 'in-person'}

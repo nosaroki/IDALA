@@ -57,8 +57,8 @@ export default function Corporate() {
           </p>
           <h1 className="corporate-hero__title">
             {lang === 'fr'
-              ? 'Bien-être & Neurosciences en entreprise'
-              : 'Wellbeing & Neuroscience at work'}
+              ? 'Bien-être en entreprise'
+              : 'Wellbeing at work'}
           </h1>
           <p className="corporate-hero__catch">
             {lang === 'fr'

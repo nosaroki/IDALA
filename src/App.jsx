@@ -21,6 +21,7 @@ import Practices from './pages/admin/Practices';
 import PracticePage from './pages/practices/[slug]';
 import PractitionerPage from './pages/practices/PractitionerPage'
 import Candidatures from './pages/admin/Candidatures'
+import Onboarding from './pages/Onboarding'
 
 import { HelmetProvider } from 'react-helmet-async';
 import './styles.css';
@@ -64,6 +65,7 @@ export default function App() {
               <Route path="/admin/praticiens" element={<PractitionersList />} />
               <Route path="/admin/pratiques"  element={<Practices />} />
               <Route path="/admin/candidatures"  element={<Candidatures />} />
+              <Route path="/onboarding"  element={<Onboarding />} />
             </Route>
 
 
