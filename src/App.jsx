@@ -65,9 +65,10 @@ export default function App() {
               <Route path="/admin/praticiens" element={<PractitionersList />} />
               <Route path="/admin/pratiques"  element={<Practices />} />
               <Route path="/admin/candidatures"  element={<Candidatures />} />
-              <Route path="/onboarding"  element={<Onboarding />} />
             </Route>
 
+            {/* Route onboarding publique */}
+               <Route path="/onboarding/:token" element={<Onboarding />} />
 
             <Route element={<Layout />}>
               <Route path="/"              element={<Home />} />
