@@ -9,7 +9,8 @@ const emptyForm = {
   photo_url: '', bio: '', slug: '',
   bio_complete: '', mode_exercice: 'in-person',
   iban: '', langues: '', ville: '', region: '', pays: '',
-  bio_fr: '', bio_en: '', bio_complete_fr: '', bio_complete_en: ''
+  bio_fr: '', bio_en: '', bio_complete_fr: '', bio_complete_en: '',
+  prix: '', duree_seance: ''
 }
 const [form, setForm]           = useState(initial || emptyForm)
 const [uploading, setUploading] = useState(false)
@@ -100,6 +101,24 @@ useEffect(() => {
         <input value={form.lien_reservation}
           onChange={e => setForm({ ...form, lien_reservation: e.target.value })} />
       </label>
+      <div className="admin-form__row">
+        <label>Prix (€)
+          <input
+            type="number"
+            min="0"
+            value={form.prix || ''}
+            placeholder="ex: 80"
+            onChange={e => setForm({ ...form, prix: e.target.value })}
+          />
+        </label>
+        <label>Durée de la séance
+          <input
+            value={form.duree_seance || ''}
+            placeholder="ex: 1h, 1h30"
+            onChange={e => setForm({ ...form, duree_seance: e.target.value })}
+          />
+        </label>
+      </div>
       <label>IBAN
       <input
         value={form.iban || ''}

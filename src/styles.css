@@ -243,6 +243,95 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .mobile-drawer__lang { display: flex; gap: 8px; margin-top: 14px; }
 .page-wrap { padding-top: var(--topbar-h); }
 
+.topbar__dropdown {
+  position: relative;
+}
+
+.topbar__dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border: 1px solid var(--pale);
+  border-radius: 10px;
+  box-shadow: var(--shadow-md);
+  padding: 0.5rem 0;
+  min-width: 180px;
+  z-index: 100;
+  margin-top: 0.5rem;
+}
+
+.topbar__dropdown-menu {
+  margin-top: 0;
+  padding-top: 0.75rem;
+}
+
+.topbar__dropdown::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 0.75rem;
+}
+
+.topbar__dropdown-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.6rem 1.25rem;
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  font-weight: 300;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+
+.topbar__dropdown-item:hover,
+.topbar__dropdown-item.active {
+  background: var(--pale);
+  color: var(--violet-mid);
+}
+
+.topbar__join-btn {
+  font-family: 'Jost', sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 9px 18px;
+  background: transparent;
+  color: var(--violet-mid);
+  border: 1px solid var(--violet-light);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+  margin-right: 0.5rem;
+}
+
+.topbar__join-btn:hover {
+  border-color: var(--violet-mid);
+  background: rgba(155, 110, 191, 0.06);
+  transform: translateY(-1px);
+}
+
+.mobile-drawer__section {
+  font-family: 'Jost', sans-serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--violet-mid);
+  padding: 0.5rem 1.5rem 0.25rem;
+  margin: 0;
+}
+
 /* ─────────────────────────────────────────
    BUTTONS
 ───────────────────────────────────────── */
@@ -259,10 +348,10 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .btn--sm { padding: 9px 18px; font-size: 9px; letter-spacing: 2.5px; }
 .btn--chakra-pill {
   display: inline-flex; align-items: center; justify-content: center;
-  font-family: 'Jost', sans-serif; font-size: 8px; letter-spacing: 1.5px;
-  text-transform: uppercase; padding: 8px 16px; border: none; cursor: pointer;
+  font-family: 'Jost', sans-serif; font-size: clamp(7px, 0.8vw, 8px); letter-spacing: 1.5px;
+  text-transform: uppercase; padding: clamp(6px, 0.8vw, 8px) clamp(8px, 1.2vw, 16px); border: none; cursor: pointer;
   border-radius: 100px; color: white; transition: filter .2s ease, transform .2s ease;
-  flex-shrink: 0; white-space: nowrap;
+  flex-shrink: 1; white-space: nowrap; max-width: 90%;
 }
 .btn--chakra-pill:hover { filter: brightness(.88); transform: translateY(-1px); }
 .btn--chakra-pill--c1 { background: linear-gradient(135deg, #FF6B6B, #cc3333); }
@@ -527,7 +616,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .pcard-wrap:hover { box-shadow: 0 16px 48px rgba(0,0,0,.10); }
 .pcard-face { position: absolute; inset: 0; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; border: 2.5px solid var(--chakra-color, var(--c4)); overflow: hidden; transition: opacity .3s ease; }
 .pcard-front { opacity: 1; background: white; box-shadow: 0 4px 20px rgba(0,0,0,.05); gap: 10px; padding: 20px; text-align: center; }
-.pcard-back  { opacity: 0; pointer-events: none; background: color-mix(in srgb, var(--chakra-color, var(--c4)) 10%, white); padding: clamp(14px,2vw,22px); gap: 8px; text-align: center; }
+.pcard-back  { opacity: 0; pointer-events: none; background: color-mix(in srgb, var(--chakra-color, var(--c4)) 10%, white); padding: clamp(14px,2vw,22px); gap: 8px; text-align: center; overflow: hidden;}
 .pcard-wrap:hover .pcard-front { opacity: 0; pointer-events: none; }
 .pcard-wrap:hover .pcard-back  { opacity: 1; pointer-events: auto; }
 .pcard-front__ring { position: absolute; inset: 7px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--chakra-color, var(--c4)) 35%, transparent); pointer-events: none; }
@@ -537,6 +626,28 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .pcard-front__hint { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-light); opacity: .55; text-align: center; padding: 0 12px; }
 .pcard-back__title { font-family: 'Cormorant Garamond', serif; font-size: clamp(12px,1.2vw,14px); font-weight: 600; color: var(--text); line-height: 1.2; flex-shrink: 0; }
 .pcard-back__text { font-size: clamp(9px,.9vw,11px); line-height: 1.65; color: var(--text-light); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; flex-shrink: 1; padding: 0 6px; }
+
+@media (max-width: 1024px) and (min-width: 769px) {
+  .pcard-back {
+    padding: 10px;
+    gap: 5px;
+  }
+  
+  .pcard-back__text {
+    -webkit-line-clamp: 4;
+    font-size: 9px;
+  }
+  
+  .pcard-back__title {
+    font-size: 12px;
+  }
+  
+  .btn--chakra-pill {
+    font-size: 7px;
+    padding: 6px 10px;
+    letter-spacing: 1px;
+  }
+}
 
 /* ── Filtres ── */
 .pract-filter-section {
@@ -618,14 +729,24 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+  overflow: hidden;
+  max-width: 1440px;
+  margin: 0 auto;
+  border-radius: 0 0 12px 12px;
 }
 
 .practice-page__banner-overlay {
   text-align: center;
   padding: 3rem var(--px);
-  background: rgba(240, 234, 250, 0.6);
-  backdrop-filter: blur(4px);
-  border-radius: 2px;
+  background: rgba(240, 234, 250, 0.55);
+  backdrop-filter: blur(6px);
+  width: 100%;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .practice-page__title {
@@ -911,6 +1032,16 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   font-style: italic;
 }
 
+.pract-card__session-info,
+.pract-profile__session-info {
+  font-family: 'Jost', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 1.5px;
+  color: var(--violet-mid);
+  margin: 0;
+}
+
 /* ── Practice page list override ───────────────── */
 .practice-page__list {
   display: flex;
@@ -1048,7 +1179,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .retreats-hero {
   text-align: center;
   padding: calc(var(--topbar-h) + 3rem) var(--px) 3rem;
-  max-width: 935px;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
@@ -1081,7 +1212,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 .retreats-hero__intro {
   font-family: 'Jost', sans-serif;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 300;
   color: var(--text-light);
   line-height: 1.8;
@@ -1095,9 +1226,9 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 .retreats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 2rem;
-  max-width: 1100px;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -1106,8 +1237,8 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 1rem;
-  padding: 2rem 1.5rem;
+  gap: 0.75rem;
+  padding: 1.5rem 1rem;
   background: var(--root-bg2);
   border-radius: 12px;
   border: 1px solid var(--pale);
@@ -1120,8 +1251,8 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 
 .retreat-card__circle {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   border: 2px solid var(--retreat-color);
   display: flex;
@@ -1221,7 +1352,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 .corporate-intro p {
   font-family: 'Jost', sans-serif;
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 300;
   color: var(--text-light);
   line-height: 1.8;
@@ -1234,18 +1365,18 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 
 .corporate-programmes__list {
-  max-width: 760px;
+  max-width: 1200px;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem;
 }
 
 .corporate-programme {
   display: flex;
-  gap: 1.5rem;
-  align-items: flex-start;
-  padding: 1.5rem;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.5rem 1rem;
   background: var(--root-bg2);
   border: 1px solid var(--pale);
   border-radius: 12px;
@@ -1258,17 +1389,15 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 .corporate-programme__number {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 300;
   color: var(--violet-light);
-  flex-shrink: 0;
   line-height: 1;
-  width: 40px;
 }
 
 .corporate-programme__content h3 {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 400;
   color: var(--violet-bg);
   margin: 0 0 0.4rem;
@@ -1276,11 +1405,19 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 .corporate-programme__content p {
   font-family: 'Jost', sans-serif;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 300;
   color: var(--text-light);
-  line-height: 1.7;
+  line-height: 1.6;
   margin: 0;
+}
+
+@media (max-width: 900px) {
+  .corporate-programmes__list { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .corporate-programmes__list { grid-template-columns: repeat(2, 1fr); }
 }
 
 .corporate-cta {
@@ -1299,7 +1436,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   font-weight: 400;
   color: var(--violet-bg);
   margin: 0;
-  max-width: 685px;
+  max-width: 1050px;
 }
 
 /* ─────────────────────────────────────────
@@ -1556,6 +1693,111 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   .join-row { grid-template-columns: 1fr; }
 }
 
+.join-loc-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid var(--violet-light);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  z-index: 100;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: var(--shadow-md);
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.join-loc-suggestion {
+  padding: 10px 14px;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text);
+  cursor: pointer;
+  border-bottom: 1px solid var(--pale);
+  transition: background var(--transition);
+}
+
+.join-loc-suggestion:last-child { border-bottom: none; }
+.join-loc-suggestion:hover { background: var(--pale); color: var(--violet-mid); }
+
+.join-lang-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: white;
+  border: 1px solid var(--violet-light);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text);
+  transition: border-color var(--transition);
+  min-height: 46px;
+}
+
+.join-lang-trigger:hover {
+  border-color: var(--violet-mid);
+}
+
+.join-lang-arrow {
+  font-size: 10px;
+  color: var(--violet-mid);
+  flex-shrink: 0;
+}
+
+.join-lang-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid var(--violet-light);
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  z-index: 100;
+  box-shadow: var(--shadow-md);
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.join-lang-option {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 10px 14px;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text);
+  cursor: pointer;
+  transition: background var(--transition);
+  border-bottom: 1px solid var(--pale);
+}
+
+.join-lang-option:last-child { border-bottom: none; }
+
+.join-lang-option:hover {
+  background: var(--pale);
+}
+
+.join-lang-option--selected {
+  background: var(--pale);
+  color: var(--violet-mid);
+}
+
+.join-lang-check {
+  margin-left: auto;
+  color: var(--violet-mid);
+  font-size: 12px;
+}
+
 .join-field {
   display: flex;
   flex-direction: column;
@@ -1770,6 +2012,31 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .join-file-btn:hover {
   border-color: var(--violet-mid);
   background: rgba(155, 110, 191, 0.06);
+}
+
+.join-contact {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.join-contact p {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text-light);
+}
+
+.join-contact__link {
+  font-weight: 500;
+  color: var(--violet-mid);
+  text-decoration: none;
+  border-bottom: 1px solid var(--violet-light);
+  transition: color var(--transition), border-color var(--transition);
+}
+
+.join-contact__link:hover {
+  color: var(--violet-dark);
+  border-color: var(--violet-mid);
 }
 
 /* ─────────────────────────────────────────
@@ -2713,7 +2980,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 /* ─────────────────────────────────────────
    HERO
 ───────────────────────────────────────── */
-/* .spiritual-hero-v2 {
+.spiritual-hero-v2 {
   background: linear-gradient(160deg, #f5f0ff 0%, #f0ecfa 50%, #ece8f5 100%);
   padding: clamp(56px, 8vw, 96px) var(--px);
   border-bottom: 1px solid rgba(201,169,110,.12);
@@ -2773,12 +3040,12 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   text-transform: uppercase;
   color: var(--violet-mid);
   text-align: center;
-} */
+} 
 
 /* ─────────────────────────────────────────
    SECTIONS
 ───────────────────────────────────────── */
-/* .spiritual-section {
+.spiritual-section {
   padding: clamp(56px, 7vw, 88px) var(--px);
   background: var(--root-bg);
 }
@@ -2794,12 +3061,12 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   font-weight: 400;
   color: var(--text);
   letter-spacing: .5px;
-} */
+}
 
 /* ─────────────────────────────────────────
    CARDS
 ───────────────────────────────────────── */
-/* .spiritual-cards {
+.spiritual-cards {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 28px;
@@ -2911,12 +3178,12 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 
 .spiritual-card__btn--c7 { background: linear-gradient(135deg, #e8b8f0, #a040c0); }
-.spiritual-card__btn--c5 { background: linear-gradient(135deg, #a8d4f0, #3888c0); } */
+.spiritual-card__btn--c5 { background: linear-gradient(135deg, #a8d4f0, #3888c0); }
 
 /* ─────────────────────────────────────────
    PSYCHIC SECTION
 ───────────────────────────────────────── */
-/* .spiritual-psychic {
+.spiritual-psychic {
   background: var(--pale);
   padding: clamp(56px, 7vw, 88px) var(--px);
   border-top: 1px solid rgba(201,169,110,.12);
@@ -2978,12 +3245,12 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .spiritual-psychic__btn:hover {
   filter: brightness(.88);
   transform: translateY(-2px);
-} */
+}
 
 /* ─────────────────────────────────────────
    RESPONSIVE
 ───────────────────────────────────────── */
-/* @media (max-width: 1024px) {
+@media (max-width: 1024px) {
   .spiritual-hero-v2__inner { grid-template-columns: 1fr; }
   .spiritual-hero-v2__visual { display: none; }
   .spiritual-psychic__inner  { grid-template-columns: 1fr; }
@@ -2992,5 +3259,5 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 @media (max-width: 768px) {
   .spiritual-cards { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
-} */
+}
 

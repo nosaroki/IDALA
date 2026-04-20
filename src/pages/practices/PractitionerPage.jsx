@@ -55,12 +55,31 @@ export default function PractitionerPage() {
 
   if (loading) return <div className="practice-page__loader">...</div>
 
-  const practiceName = pratique?.nom
+ const PRACTS_MAP = {
+  'yoga':                { fr: 'Yoga',                  en: 'Yoga' },
+  'osteopathy':          { fr: 'Ostéopathie',           en: 'Osteopathy' },
+  'therapeutic-massage': { fr: 'Massage Thérapeutique', en: 'Therapeutic Massage' },
+  'acupuncture':         { fr: 'Acupuncture',           en: 'Acupuncture' },
+  'tai-chi':             { fr: 'Tai Chi',               en: 'Tai Chi' },
+  'qi-gong':             { fr: 'Qi Gong',               en: 'Qi Gong' },
+  'meditation':          { fr: 'Méditation',            en: 'Meditation' },
+  'breathwork':          { fr: 'Breathwork',            en: 'Breathwork' },
+  'coaching':            { fr: 'Coaching',              en: 'Coaching' },
+  'hypnotherapy':        { fr: 'Hypnothérapie',         en: 'Hypnotherapy' },
+  'reiki':               { fr: 'Reiki',                 en: 'Reiki' },
+  'sound-healing':       { fr: 'Sound Healing',         en: 'Sound Healing' },
+  'naturopathy':         { fr: 'Naturopathie',          en: 'Naturopathy' },
+}
+
+const pratiqueSlug = pratique?.slug
+const practiceName = lang === 'fr'
+  ? (PRACTS_MAP[pratiqueSlug]?.fr || pratique?.nom)
+  : (PRACTS_MAP[pratiqueSlug]?.en || pratique?.nom)
 
   return (
     <>
       <Helmet>
-        <title>{praticien.prenom} {praticien.nom} — {practiceName} — The Idala Family</title>
+        <title>{praticien.prenom} {praticien.nom?.charAt(0)}. — {practiceName} — The Idala Family</title>
         <meta name="description"
           content={praticien.bio || `Book a session with ${praticien.prenom} ${praticien.nom}, ${practiceName} practitioner at The Idala Family.`} />
       </Helmet>
@@ -87,7 +106,7 @@ export default function PractitionerPage() {
             <div className="pract-profile__info">
               <p className="pract-profile__practice">{practiceName}</p>
               <h1 className="pract-profile__name">
-                {praticien.prenom} {praticien.nom}
+                {praticien.prenom} {praticien.nom?.charAt(0)}.
               </h1>
               {(praticien.ville || praticien.localisation) && (
                 <p className="pract-profile__location">
@@ -96,6 +115,13 @@ export default function PractitionerPage() {
                     : praticien.localisation}
                 </p>
               )}
+              {(praticien.prix || praticien.duree_seance) && (
+                  <p className="pract-profile__session-info">
+                    {praticien.duree_seance && <span>{praticien.duree_seance}</span>}
+                    {praticien.duree_seance && praticien.prix && <span> · </span>}
+                    {praticien.prix && <span>{praticien.prix} €</span>}
+                  </p>
+                )}
               {praticien.langues && (
                 <p className="pract-profile__langues">{praticien.langues}</p>
               )}

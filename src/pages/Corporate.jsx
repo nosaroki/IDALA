@@ -105,12 +105,15 @@ export default function Corporate() {
         <section className="corporate-cta">
           <p className="corporate-cta__text">
             {lang === 'fr'
-              ? <>Écrivez-nous pour co-construire le dispositif <br />le plus adapté à votre culture, vos équipes et vos objectifs.</>
+              ? <>Construisons ensemble le dispositif le plus adapté à votre culture, vos équipes et vos objectifs.</>
               : <>Write to us to co-create the most relevant experience for your teams.</>
               }
           </p>
           <a href="mailto:contact@theidalafamily.com" className="btn btn--violet-mid">
-            contact@theidalafamily.com
+            {lang === 'fr'
+              ? <>Contactez-nous</>
+              : <>Contact us</>
+              }
           </a>
         </section>
 

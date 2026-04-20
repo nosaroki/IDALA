@@ -201,18 +201,17 @@ function Astrology() {
     if (query.length < 3) { setPobSuggestions([]); return; }
     debounceRef.current = setTimeout(async () => {
       try {
-        const r = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=5&addressdetails=1`,
-          { headers: { 'Accept-Language': 'en' } }
-        );
-        const data = await r.json();
-        setPobSuggestions(data.map(d => ({
-          label: d.display_name.split(',').slice(0, 3).join(','),
-          lat: +d.lat,
-          lon: +d.lon,
-        })));
-      } catch { setPobSuggestions([]); }
-    }, 300);
+        const res = await fetch(
+          `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(query)}&type=city&format=json&apiKey=${import.meta.env.VITE_GEOAPIFY_KEY}`
+        )
+        const data = await res.json()
+        setPobSuggestions((data.results || []).map(r => ({
+          label: [r.city || r.name, r.state, r.country].filter(Boolean).join(', '),
+          lat: r.lat,
+          lon: r.lon,
+        })))
+      } catch { setPobSuggestions([]) }
+    }, 300)
   };
 
   const selectPlace = (s) => {

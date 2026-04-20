@@ -153,12 +153,12 @@ function Home() {
           <div className="home-practitioners-strip__track">
             {[...Array(2)].map((_, pass) => (
               <div key={pass} className="home-practitioners-strip__row">
-                <img src={gogong}  alt="Practitioner" />
-                <img src={ladyyoga}    alt="Practitioner" />
-                <img src={taichilady}  alt="Practitioner" />
-                 <img src={meditDiane}      alt="Practitioner" />
-                <img src={gobowl}  alt="Practitioner" />
-                <img src={meditnature}  alt="Practitioner" />
+                <img src={gogong} alt="Qi Gong" onClick={() => navigate('/practices/qi-gong')} style={{ cursor: 'pointer' }} />
+                <img src={ladyyoga} alt="Yoga" onClick={() => navigate('/practices/yoga')} style={{ cursor: 'pointer' }} />
+                <img src={taichilady} alt="Tai Chi" onClick={() => navigate('/practices/tai-chi')} style={{ cursor: 'pointer' }} />
+                <img src={meditDiane} alt="Meditation" onClick={() => navigate('/practices/meditation')} style={{ cursor: 'pointer' }} />
+                <img src={gobowl} alt="Sound Healing" onClick={() => navigate('/practices/sound-healing')} style={{ cursor: 'pointer' }} />
+                <img src={meditnature} alt="Meditation" onClick={() => navigate('/practices/meditation')} style={{ cursor: 'pointer' }} />
                 {/* <img src={breathwork}    alt="Practitioner" /> */}
               </div>
             ))}
@@ -203,34 +203,26 @@ function Home() {
         </section>
 
         {/* ── SECTION 4 — GALERIE ── */}
-        <section className="home-gallery reveal" ref={refGallery}>
-          <div className="home-gallery__grid">
-            <div className="home-gallery__item home-gallery__item--tall">
-              <img src={sointbt} alt="Healing" />
-              <span className="home-gallery__caption">{lang === 'fr' ? 'Soin énergetique' : 'Energetic alignment'}</span>
+          <section className="home-gallery reveal" ref={refGallery}>
+            <div className="home-gallery__grid">
+              <div className="home-gallery__item home-gallery__item--tall" onClick={() => navigate('/practices/reiki')} style={{ cursor: 'pointer' }}>
+                <img src={sointbt} alt="Healing" />
+                <span className="home-gallery__caption">{lang === 'fr' ? 'Soin énergetique' : 'Energetic alignment'}</span>
+              </div>
+              <div className="home-gallery__item" onClick={() => navigate('/practices/reiki')} style={{ cursor: 'pointer' }}>
+                <img src={marine_reiki} alt="Reiki" />
+                <span className="home-gallery__caption">Reiki</span>
+              </div>
+              <div className="home-gallery__item" onClick={() => navigate('/practices/sound-healing')} style={{ cursor: 'pointer' }}>
+                <img src={soundHealing} alt="Sound healing" />
+                <span className="home-gallery__caption">Sound Healing</span>
+              </div>
+              <div className="home-gallery__item home-gallery__item--wide" onClick={() => navigate('/practices/meditation')} style={{ cursor: 'pointer' }}>
+                <img src={meditation} alt="meditation" />
+                <span className="home-gallery__caption">Meditation</span>
+              </div>
             </div>
-            <div className="home-gallery__item">
-              <img src={marine_reiki} alt="Reiki" />
-              <span className="home-gallery__caption">Reiki</span>
-            </div>
-               <div className="home-gallery__item">
-              <img src={soundHealing} alt="Sound healing" />
-              <span className="home-gallery__caption">Sound Healing</span>
-            </div>
-            <div className="home-gallery__item home-gallery__item--wide">
-              <img src={meditation} alt="meditation" />
-              <span className="home-gallery__caption">Meditation</span>
-            </div>
-            {/* <div className="home-gallery__item">
-              <img src={marine_reiki} alt="Reiki" />
-              <span className="home-gallery__caption">Reiki</span>
-            </div>
-            <div className="home-gallery__item home-gallery__item--wide">
-              <img src={meditation} alt="meditation" />
-              <span className="home-gallery__caption">Meditation</span>
-            </div> */}
-          </div>
-        </section>
+          </section>
 
         {/* ── SECTION 5 — DIANE ── */}
         <section className="home-diane reveal" ref={refDiane}>
@@ -258,15 +250,15 @@ function Home() {
         {/* ── SECTION 6 — GALLERY 2 ── */}
         <section className="home-gallery-2">
           <div className="home-gallery-2__row">
-            <div className="home-gallery-2__item">
+            <div className="home-gallery-2__item" onClick={() => navigate('/practices/sound-healing')} style={{ cursor: 'pointer' }}>
               <img src={groupsound} alt="Sound Healing" />
               <span className="home-gallery__caption">Sound Healing</span>
             </div>
-            <div className="home-gallery-2__item">
-              <img src={groupyoga} alt="Osteo"/>
+            <div className="home-gallery-2__item" onClick={() => navigate('/practices/yoga')} style={{ cursor: 'pointer' }}>
+              <img src={groupyoga} alt="Yoga" />
               <span className="home-gallery__caption">Yoga</span>
             </div>
-            <div className="home-gallery-2__item">
+            <div className="home-gallery-2__item" onClick={() => navigate('/practices/meditation')} style={{ cursor: 'pointer' }}>
               <img src={groupmedit} alt="Meditation" />
               <span className="home-gallery__caption">Meditation</span>
             </div>

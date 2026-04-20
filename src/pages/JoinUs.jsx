@@ -1,7 +1,24 @@
-import { useState, useContext } from 'react'
+import { useState, useContext, useRef, useEffect  } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabaseClient'
 import { LangCtx } from '../components/LangContext'
+
+const LANGUAGES = [
+  { code: 'fr', label: 'Français', flag: '🇫🇷' },
+  { code: 'en', label: 'English', flag: '🇬🇧' },
+  { code: 'es', label: 'Español', flag: '🇪🇸' },
+  { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
+  { code: 'it', label: 'Italiano', flag: '🇮🇹' },
+  { code: 'pt', label: 'Português', flag: '🇵🇹' },
+  { code: 'ar', label: 'العربية', flag: '🇸🇦' },
+  { code: 'zh', label: '中文', flag: '🇨🇳' },
+  { code: 'ja', label: '日本語', flag: '🇯🇵' },
+  { code: 'ru', label: 'Русский', flag: '🇷🇺' },
+  { code: 'nl', label: 'Nederlands', flag: '🇳🇱' },
+  { code: 'pl', label: 'Polski', flag: '🇵🇱' },
+  { code: 'tr', label: 'Türkçe', flag: '🇹🇷' },
+  { code: 'hi', label: 'हिन्दी', flag: '🇮🇳' },
+]
 
 const PRATIQUES = [
   { fr: 'Yoga',                  en: 'Yoga',                value: 'yoga' },
@@ -34,7 +51,7 @@ const TYPE_SEANCE = [
 
 const emptyForm = {
   prenom: '', nom: '', email: '', telephone: '',
-  ville: '', pays: '', langues: '',
+  ville: '', pays: '', langues: '', langues_list: [],
   specialites: [],
   public_cible: [],
   certifications: '', experience: '', bio_fr: '',
@@ -52,6 +69,19 @@ export default function JoinUs() {
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [locSuggestions, setLocSuggestions] = useState([])
+  const [locLoading, setLocLoading] = useState(false)
+  const [langDropOpen, setLangDropOpen] = useState(false)
+  const langDropRef = useRef(null)
+      useEffect(() => {
+        function handleClickOutside(e) {
+          if (langDropRef.current && !langDropRef.current.contains(e.target)) {
+            setLangDropOpen(false)
+          }
+        }
+        document.addEventListener('mousedown', handleClickOutside)
+        return () => document.removeEventListener('mousedown', handleClickOutside)
+      }, [])
 
   function toggleCheckbox(field, value) {
     setForm(f => ({
@@ -61,6 +91,28 @@ export default function JoinUs() {
         : [...f[field], value]
     }))
   }
+
+  async function handleLocSearch(value) {
+  setForm(f => ({ ...f, ville: value }))
+  if (value.length < 3) { setLocSuggestions([]); return }
+  setLocLoading(true)
+  const res = await fetch(
+    `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(value)}&type=city&format=json&apiKey=${import.meta.env.VITE_GEOAPIFY_KEY}`
+  )
+  const data = await res.json()
+  setLocSuggestions(data.results || [])
+  setLocLoading(false)
+}
+
+function selectLocation(result) {
+  setForm(f => ({
+    ...f,
+    ville: result.city || result.name || '',
+    region: result.state || result.county || '',
+    pays: result.country || '',
+  }))
+  setLocSuggestions([])
+}
 
   async function handlePhotos(e) {
     const files = Array.from(e.target.files)
@@ -88,8 +140,45 @@ export default function JoinUs() {
     setUploading(false)
   }
 
+      function validate() {
+      // Téléphone : minimum 8 chiffres, pas de suite 0123456789
+      const phoneClean = form.telephone.replace(/[\s\-+()]/g, '')
+      const isSequential = '0123456789'.includes(phoneClean)
+      if (!/^\d{8,15}$/.test(phoneClean) || isSequential) {
+        return lang === 'fr' ? 'Numéro de téléphone invalide.' : 'Invalid phone number.'
+      }
+
+      // Email
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+        return lang === 'fr' ? 'Adresse email invalide.' : 'Invalid email address.'
+      }
+
+      // IBAN (format basique : 2 lettres + 2 chiffres + jusqu'à 30 caractères alphanumériques)
+      const ibanClean = form.iban.replace(/\s/g, '').toUpperCase()
+      if (ibanClean && !/^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/.test(ibanClean)) {
+        return lang === 'fr' ? 'Format IBAN invalide.' : 'Invalid IBAN format.'
+      }
+
+      // Spécialités : au moins une cochée
+      if (form.specialites.length === 0) {
+        return lang === 'fr' ? 'Veuillez sélectionner au moins une spécialité.' : 'Please select at least one specialty.'
+      }
+
+      // Photos : minimum 2
+      if (form.photos.length < 2) {
+        return lang === 'fr' ? 'Veuillez uploader au moins 2 photos.' : 'Please upload at least 2 photos.'
+      }
+
+      return null
+    }
+
   async function handleSubmit(e) {
     e.preventDefault()
+      const validationError = validate()
+    if (validationError) {
+      setError(validationError)
+      return
+    }
     setLoading(true)
     setError(null)
 
@@ -226,23 +315,74 @@ export default function JoinUs() {
             </div>
 
             <div className="join-row">
+             <div className="join-field" style={{ position: 'relative' }}>
+              <label>{lang === 'fr' ? 'Ville *' : 'City *'}</label>
+              <input
+                required
+                value={form.ville}
+                placeholder={lang === 'fr' ? 'Rechercher une ville...' : 'Search for a city...'}
+                onChange={e => handleLocSearch(e.target.value)}
+                autoComplete="off"
+              />
+              {locLoading && <p className="join-hint">...</p>}
+              {locSuggestions.length > 0 && (
+                <ul className="join-loc-suggestions">
+                  {locSuggestions.map((r, i) => (
+                    <li key={i} onClick={() => selectLocation(r)} className="join-loc-suggestion">
+                      {r.city || r.name}{r.state ? `, ${r.state}` : ''}{r.country ? `, ${r.country}` : ''}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div className="join-row">
               <div className="join-field">
-                <label>{lang === 'fr' ? 'Ville *' : 'City *'}</label>
-                <input required value={form.ville}
-                  onChange={e => setForm({ ...form, ville: e.target.value })} />
+                <label>{lang === 'fr' ? 'Région' : 'Region'}</label>
+                <input value={form.region} readOnly placeholder={lang === 'fr' ? 'Rempli automatiquement' : 'Auto-filled'} />
               </div>
               <div className="join-field">
                 <label>{lang === 'fr' ? 'Pays *' : 'Country *'}</label>
-                <input required value={form.pays}
-                  onChange={e => setForm({ ...form, pays: e.target.value })} />
+                <input value={form.pays} readOnly placeholder={lang === 'fr' ? 'Rempli automatiquement' : 'Auto-filled'} />
               </div>
             </div>
+            </div>
 
-            <div className="join-field">
+            <div className="join-field" style={{ position: 'relative' }} ref={langDropRef}>
               <label>{lang === 'fr' ? 'Langues parlées *' : 'Languages spoken *'}</label>
-              <input required value={form.langues}
-                placeholder={lang === 'fr' ? 'ex: Français, Anglais' : 'e.g. French, English'}
-                onChange={e => setForm({ ...form, langues: e.target.value })} />
+              <div
+                className="join-lang-trigger"
+                onClick={() => setLangDropOpen(o => !o)}
+              >
+                {form.langues_list?.length > 0
+                  ? form.langues_list.map(c => LANGUAGES.find(l => l.code === c)?.flag).join(' ')
+                    + ' ' + form.langues_list.map(c => LANGUAGES.find(l => l.code === c)?.label).join(', ')
+                  : (lang === 'fr' ? 'Sélectionner les langues...' : 'Select languages...')}
+                <span className="join-lang-arrow">▾</span>
+              </div>
+              {langDropOpen && (
+                <div className="join-lang-dropdown">
+                  {LANGUAGES.map(l => (
+                    <label key={l.code} className={`join-lang-option ${form.langues_list?.includes(l.code) ? 'join-lang-option--selected' : ''}`}>
+                      <input
+                        type="checkbox"
+                        style={{ display: 'none' }}
+                        checked={form.langues_list?.includes(l.code) || false}
+                        onChange={() => {
+                          const current = form.langues_list || []
+                          const updated = current.includes(l.code)
+                            ? current.filter(c => c !== l.code)
+                            : [...current, l.code]
+                          const labels = updated.map(c => LANGUAGES.find(ll => ll.code === c)?.label).filter(Boolean)
+                          setForm(f => ({ ...f, langues_list: updated, langues: labels.join(', ') }))
+                        }}
+                      />
+                      <span>{l.flag}</span>
+                      <span>{l.label}</span>
+                      {form.langues_list?.includes(l.code) && <span className="join-lang-check">✓</span>}
+                    </label>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -461,6 +601,16 @@ export default function JoinUs() {
                 ? (lang === 'fr' ? 'Envoi en cours...' : 'Sending...')
                 : (lang === 'fr' ? 'Envoyer ma candidature' : 'Submit my application')}
             </button>
+          </div>
+
+          <div className="join-contact">
+            <p>
+              {lang === 'fr' ? (
+                <>Vous avez des questions ? <a href="mailto:contact@theidalafamily.com" className="join-contact__link">Contactez-nous</a></>
+              ) : (
+                <>Any questions? <a href="mailto:contact@theidalafamily.com" className="join-contact__link">Contact us</a></>
+              )}
+            </p>
           </div>
 
         </form>

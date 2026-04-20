@@ -7,7 +7,7 @@ import ScrollToTop from './components/ScrollToTop';
 // import ComingSoon  from './pages/ComingSoon';
 import Home        from './pages/Home';
 import Practitioners from './pages/Practitioners';
-// import Spiritual   from './pages/Spiritual';
+import Spiritual   from './pages/Spiritual';
 import Retreats   from './pages/Retreats'
 import Corporate  from './pages/Corporate'
 import Astrology   from './pages/Astrology';
@@ -77,7 +77,7 @@ export default function App() {
               <Route path="/practices/:practiceSlug/:practitionerSlug" element={<PractitionerPage />} />
               <Route path="/retreats"   element={<Retreats />} />
               <Route path="/corporate"  element={<Corporate />} />
-              {/* <Route path="/spiritual"     element={<Spiritual />} /> */}
+              <Route path="/spiritual"     element={<Spiritual />} />
               <Route path="/astrology"     element={<Astrology />} />
               <Route path="/about"         element={<About />} />
               <Route path="/join" element={<JoinUs />} />

@@ -45,7 +45,7 @@ export default function PractitionerCard({ praticien, practiceSlug }) {
       <div className="pract-card__body">
         <div className="pract-card__top">
           <h3 className="pract-card__name">
-            {praticien.prenom} {praticien.nom}
+            {praticien.prenom} {praticien.nom?.charAt(0)}.
           </h3>
           <ModeTags mode={praticien.mode_exercice} lang={lang} />
           {(praticien.ville || praticien.localisation) && (
@@ -54,6 +54,13 @@ export default function PractitionerCard({ praticien, practiceSlug }) {
               {praticien.ville
                 ? [praticien.ville, praticien.pays].filter(Boolean).join(', ')
                 : praticien.localisation}
+            </p>
+          )}
+          {(praticien.prix || praticien.duree_seance) && (
+            <p className="pract-card__session-info">
+              {praticien.duree_seance && <span>{praticien.duree_seance}</span>}
+              {praticien.duree_seance && praticien.prix && <span> · </span>}
+              {praticien.prix && <span>{praticien.prix} €</span>}
             </p>
           )}
           {praticien.langues && (
