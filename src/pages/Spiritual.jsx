@@ -1,63 +1,20 @@
-// ─────────────────────────────────────────
-//  SPIRITUAL / TAROT & INTUITIVE GUIDANCE 
-// ─────────────────────────────────────────
-
 import { useLang } from '../components/LangContext';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
-
-// ── remplacer par vraies photos ──────────────────────────
-// import tarotImg   from '../assets/tarot.jpg';
-// import psychicImg from '../assets/psychic.jpg';
-// Pour l'instant on utilise tes images existantes comme placeholder
-import tarotImg   from '../assets/yogameditdiane.png';
-import psychicImg from '../assets/meditationdiane.png';
-// ────────────────────────────────────────────────────────────────────
-
-const TAROT_SESSIONS = [
-  {
-    duration: '30',
-    chakra: 'c7',
-    amount: { fr: 40, en: 40 },
-    currency: { fr: '€', en: '€' },
-    en: {
-      title: '30-Minute Tarot Reading',
-      desc: 'Focused guidance on one specific question or situation, relationship, career, decision, or challenge. A clear and direct reading designed to bring immediate clarity and direction.',
-    },
-    fr: {
-      title: 'Lecture de Tarot 30 Minutes',
-      desc: 'Guidance ciblée sur une question ou situation précise, relation, carrière, décision ou défi. Une lecture claire et directe conçue pour apporter une clarté et une direction immédiates.',
-    },
-  },
-  {
-    duration: '60',
-    chakra: 'c5',
-    amount: { fr: 80, en: 80 },
-    currency: { fr: '€', en: '€' },
-    en: {
-      title: '60-Minute Tarot Reading',
-      desc: 'A deeper reading covering several aspects of your life, offering broader perspective and short-term direction. Includes pattern analysis and forward guidance across multiple life areas.',
-    },
-    fr: {
-      title: 'Lecture de Tarot 60 Minutes',
-      desc: "Une lecture approfondie couvrant plusieurs aspects de votre vie, offrant une perspective plus large et une direction à court terme. Inclut une analyse des patterns et une guidance vers l'avenir.",
-    },
-  },
-];
+import tarotOrb from '../assets/tarot.jpg'
+// import tarotImg from '../assets/yogameditdiane.png';
+// import psychicImg from '../assets/meditationdiane.png';
 
 function Spiritual() {
   const { lang } = useLang();
-  // eslint-disable-next-line no-unused-vars
-  const navigate = useNavigate();
 
   return (
     <>
       <Helmet>
-        <title>{lang === 'fr' ? 'Tarot & Guidance Intuitive | The Idala Family' : 'Tarot & Intuitive Guidance | The Idala Family'}</title>
+        <title>{lang === 'fr' ? 'Guidance Intuitive | The Idala Family' : 'Intuitive Guidance | The Idala Family'}</title>
         <meta name="description" content={lang === 'fr'
-          ? 'Réservez une séance de lecture tarot ou psychique avec Diane Thomas. Lectures ciblées ou approfondies pour apporter clarté, direction et alignement énergétique.'
-          : 'Book a tarot or psychic reading session with Diane Thomas. Focused or in-depth readings to bring clarity, direction and energetic alignment.'} />
+          ? 'Lecture tarot et guidance intuitive avec Diane Thomas. Lectures ciblées 30 min ou complètes 60 min pour clarifier votre situation et avancer avec confiance.'
+          : 'Tarot reading and intuitive guidance with Diane Thomas. Focused 30 min or full 60 min readings to clarify your situation and move forward with confidence.'} />
       </Helmet>
 
       <div className="page-wrap">
@@ -70,89 +27,154 @@ function Spiritual() {
                 {lang === 'fr' ? 'Guidance Intuitive' : 'Intuitive Guidance'}
               </span>
               <h1 className="spiritual-hero-v2__title">
-                {lang === 'fr' ? 'Tarot & Guidance Intuitive' : 'Tarot & Intuitive Guidance'}
+                {lang === 'fr' ? 'Guidance' : 'Guidance'}
               </h1>
               <div className="divider" />
-              <p className="spiritual-hero-v2__body">
-                {lang === 'fr'
-                  ? "Le tarot est une forme de guidance intuitive qui utilise des cartes symboliques pour apporter clarté, perspective et alignement énergétique. Chaque lecture est conçue pour vous aider à comprendre votre situation actuelle, explorer les chemins possibles et avancer avec plus de confiance."
-                  : 'Tarot is a form of intuitive guidance that uses symbolic cards to bring clarity, perspective and energetic alignment. Each reading is designed to help you understand your current situation, explore possible paths and move forward with more confidence.'}
-              </p>
+              {lang === 'fr' ? (
+                <>
+                  <p className="spiritual-hero-v2__body">
+                    La guidance est une lecture intuitive basée sur le tarot et les oracles, utilisée comme un outil d'analyse, de clarification et de prise de recul.
+                  </p>
+                  <p className="spiritual-hero-v2__body">
+                    Elle permet d'éclairer une situation, de mieux comprendre les dynamiques en cours et d'identifier les évolutions possibles. Les cartes offrent une lecture du présent tout en mettant en lumière les tendances à venir.
+                  </p>
+                  <p className="spiritual-hero-v2__body">
+                    L'objectif est de vous aider à prendre du recul, à y voir plus clair et à avancer avec davantage de confiance et de justesse dans vos décisions.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="spiritual-hero-v2__body">
+                    Guidance is an intuitive reading based on tarot and oracles, used as a tool for analysis, clarification and perspective.
+                  </p>
+                  <p className="spiritual-hero-v2__body">
+                    It helps illuminate a situation, better understand current dynamics and identify possible developments. The cards offer a reading of the present while highlighting emerging trends.
+                  </p>
+                  <p className="spiritual-hero-v2__body">
+                    The goal is to help you step back, gain clarity and move forward with greater confidence and discernment in your decisions.
+                  </p>
+                </>
+              )}
             </div>
             <div className="spiritual-hero-v2__visual">
-              <div className="spiritual-orb">
-                {/* Icône SVG carte de tarot */}
-                <svg viewBox="0 0 60 80" fill="none" stroke="white" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" style={{ width: 48, height: 64, opacity: .85 }}>
-                  <rect x="4" y="2" width="52" height="76" rx="4"/>
-                  <path d="M30 15 L36 28 L50 30 L40 40 L43 54 L30 47 L17 54 L20 40 L10 30 L24 28 Z"/>
-                  <circle cx="30" cy="65" r="3" fill="white" stroke="none" opacity=".6"/>
-                </svg>
+              <div className="spiritual-orb spiritual-orb--photo">
+                <img src={tarotOrb} alt="Tarot" />
               </div>
               <span className="spiritual-orb-label">IDALA Tarot &amp; Oracle</span>
             </div>
           </div>
         </section>
 
-        {/* ── Tarot Readings ── */}
+        {/* ── Sessions ── */}
         <section className="spiritual-section">
           <div className="spiritual-section__header">
-            <span className="eyebrow" style={{ textAlign: 'center' }}>Tarot</span>
-            <h2 className="spiritual-section__title">
-              {lang === 'fr' ? 'Lectures de Tarot' : 'Tarot Readings'}
-            </h2>
+            <span className="eyebrow" style={{ textAlign: 'center' }}>
+              {lang === 'fr' ? 'Séances' : 'Sessions'}
+            </span>
           </div>
 
           <div className="spiritual-cards">
-            {TAROT_SESSIONS.map(s => {
-              const copy = lang === 'fr' ? s.fr : s.en;
-              const sym  = s.currency[lang];
-              const amt  = s.amount[lang];
-              return (
-                <div key={s.duration} className={`spiritual-card spiritual-card--${s.chakra}`}>
-                  <div className="spiritual-card__image">
-                    <img src={tarotImg} alt={copy.title} />
-                  </div>
-                  <div className="spiritual-card__content">
-                    <div className="spiritual-card__duration">{s.duration} min</div>
-                    <h3 className="spiritual-card__title">{copy.title}</h3>
-                    <div className="spiritual-card__price">
-                      <sup>{sym}</sup>{amt}
-                    </div>
-                    <div className="divider" style={{ margin: '16px 0' }} />
-                    <p className="spiritual-card__desc">{copy.desc}</p>
-                    <button className={`btn spiritual-card__btn spiritual-card__btn--${s.chakra}`}>
-                      {lang === 'fr' ? 'Réserver une Séance' : 'Book a Session'}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
 
-        {/* ── Psychic Session ── */}
-        <section className="spiritual-psychic">
-          <div className="spiritual-psychic__inner">
-            <div className="spiritual-psychic__image">
-              <img src={psychicImg} alt="Psychic Session" />
+            {/* Lecture ciblée 30 min */}
+            <div className="spiritual-card spiritual-card--c7">
+              {/* <div className="spiritual-card__image">
+                <img src={tarotImg} alt={lang === 'fr' ? 'Lecture ciblée' : 'Focused reading'} />
+              </div> */}
+              <div className="spiritual-card__content">
+                <div className="spiritual-card__duration">30 min</div>
+                <h3 className="spiritual-card__title">
+                  {lang === 'fr' ? 'Lecture ciblée' : 'Focused reading'}
+                </h3>
+                <div className="spiritual-card__price">
+                  <sup>€</sup>50
+                </div>
+                <div className="divider" style={{ margin: '16px 0' }} />
+                <p className="spiritual-card__desc">
+                  {lang === 'fr'
+                    ? 'Une séance courte, précise et centrée sur une problématique spécifique : relation, choix personnel, situation professionnelle, prise de décision ou blocage actuel.'
+                    : 'A short, precise session focused on a specific issue: relationship, personal choice, professional situation, decision-making or current block.'}
+                </p>
+                <ul className="spiritual-card__list">
+                  {lang === 'fr' ? (
+                    <>
+                      <li>Clarifier une situation précise</li>
+                      <li>Comprendre les éléments en jeu</li>
+                      <li>Identifier les tendances à court terme</li>
+                      <li>Obtenir des pistes concrètes et immédiates</li>
+                    </>
+                  ) : (
+                    <>
+                      <li>Clarify a specific situation</li>
+                      <li>Understand the elements at play</li>
+                      <li>Identify short-term trends</li>
+                      <li>Get concrete and immediate guidance</li>
+                    </>
+                  )}
+                </ul>
+                <p className="spiritual-card__format-note">
+                  {lang === 'fr'
+                    ? 'Idéal pour une réponse rapide, claire et orientée sur un sujet précis.'
+                    : 'Ideal for a quick, clear answer focused on a specific topic.'}
+                </p>
+                <div className="spiritual-card__cta">
+                  <span className="pract-card__coming-soon">
+                    {lang === 'fr' ? 'Bientôt disponible' : 'Coming soon'}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="spiritual-psychic__content">
-              <span className="eyebrow">
-                {lang === 'fr' ? 'Guidance Psychique' : 'Psychic Guidance'}
-              </span>
-              <h2 className="spiritual-psychic__title">
-                {lang === 'fr' ? 'Séance Psychique' : 'Psychic Session'}
-              </h2>
-              <div className="divider" />
-              <p className="spiritual-psychic__body">
-                {lang === 'fr'
-                  ? "Une séance psychique est une consultation intuitive qui offre insight, clarté et une perspective plus élevée sur votre vie. Le praticien se connecte à votre énergie pour explorer des thèmes tels que les relations, la carrière, la direction personnelle et les dynamiques émotionnelles, vous aidant à comprendre les patterns sous-jacents et vos prochaines étapes."
-                  : 'A psychic session is an intuitive consultation that offers insight, clarity and a higher perspective on your life. The practitioner tunes into your energy to explore themes such as relationships, career, personal direction and emotional dynamics, helping you understand underlying patterns and your next steps.'}
-              </p>
-              <button className="btn spiritual-psychic__btn">
-                {lang === 'fr' ? 'Réserver une Séance' : 'Book a Session'}
-              </button>
+
+            {/* Lecture complète 60 min */}
+            <div className="spiritual-card spiritual-card--c5">
+              {/* <div className="spiritual-card__image">
+                <img src={psychicImg} alt={lang === 'fr' ? 'Lecture complète' : 'Full reading'} />
+              </div> */}
+              <div className="spiritual-card__content">
+                <div className="spiritual-card__duration">60 min</div>
+                <h3 className="spiritual-card__title">
+                  {lang === 'fr' ? 'Lecture complète' : 'Full reading'}
+                </h3>
+                <div className="spiritual-card__price">
+                  <sup>€</sup>100
+                </div>
+                <div className="divider" style={{ margin: '16px 0' }} />
+                <p className="spiritual-card__desc">
+                  {lang === 'fr'
+                    ? 'Une séance approfondie pour obtenir une vision plus globale de votre situation et explorer plusieurs domaines de vie.'
+                    : 'An in-depth session to gain a broader view of your situation and explore several areas of life.'}
+                </p>
+                <ul className="spiritual-card__list">
+                  {lang === 'fr' ? (
+                    <>
+                      <li>Analyser les dynamiques actuelles</li>
+                      <li>Mettre en lumière les schémas récurrents</li>
+                      <li>Mieux comprendre les freins et les opportunités</li>
+                      <li>Anticiper les évolutions possibles</li>
+                      <li>Dégager des directions claires pour la suite</li>
+                    </>
+                  ) : (
+                    <>
+                      <li>Analyse current dynamics</li>
+                      <li>Illuminate recurring patterns</li>
+                      <li>Better understand blocks and opportunities</li>
+                      <li>Anticipate possible developments</li>
+                      <li>Define clear directions going forward</li>
+                    </>
+                  )}
+                </ul>
+                <p className="spiritual-card__format-note">
+                  {lang === 'fr'
+                    ? 'Recommandé pour prendre du recul sur une période de vie et bénéficier d\'un accompagnement plus complet.'
+                    : 'Recommended to step back on a life period and benefit from more complete support.'}
+                </p>
+                <div className="spiritual-card__cta">
+                  <span className="pract-card__coming-soon">
+                    {lang === 'fr' ? 'Bientôt disponible' : 'Coming soon'}
+                  </span>
+                </div>
+              </div>
             </div>
+
           </div>
         </section>
 
