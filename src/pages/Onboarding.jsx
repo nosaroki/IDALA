@@ -119,7 +119,7 @@ export default function Onboarding() {
             </div>
           </div>
 
-          <div className="join-submit">
+          <div className="join-submit" style={{ paddingBottom: '3rem' }}>
             <button type="submit" className="btn btn--violet-mid" disabled={saving}>
               {saving
                 ? (lang === 'fr' ? 'Envoi...' : 'Sending...')

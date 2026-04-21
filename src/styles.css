@@ -2593,8 +2593,15 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 /* ─────────────────────────────────────────
    FOOTER
 ───────────────────────────────────────── */
-.site-footer { background: var(--violet-bg); color: rgba(255,255,255,.5); padding: 32px var(--px) 24px; display: flex; flex-direction: column; gap: 16px; }
-.footer-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.site-footer { 
+  background: var(--violet-bg); 
+  color: rgba(255,255,255,.5); 
+  padding: 32px var(--px) 24px; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 16px;
+  width: 100%;
+}.footer-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
 .footer-brand { font-family: 'Cormorant Garamond', serif; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--violet-mid); }
 .footer-instagram { display: flex; align-items: center; gap: 8px; color: rgba(255,255,255,.45); text-decoration: none; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; transition: color var(--transition); font-family: 'Jost', sans-serif; }
 .footer-instagram:hover { color: var(--violet-mid); }
