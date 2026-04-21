@@ -51,12 +51,14 @@ const TYPE_SEANCE = [
 
 const emptyForm = {
   prenom: '', nom: '', email: '', telephone: '',
-  ville: '', pays: '', langues: '', langues_list: [],
+  ville: '', region: '', pays: '',
+  langues: '', langues_list: [],
   specialites: [],
+  pratiques_details: {},
   public_cible: [],
-  certifications: '', experience: '', bio_fr: '',
-  bio_en: '', type_seance: '',
-  description_seance: '', duree_seance: '', prix: '',
+  certifications: '', experience: '',
+  bio_fr: '', bio_en: '',
+  type_seance: '',
   mode_exercice: '',
   instagram: '', site_web: '',
   photos: [], main_photo: '',
@@ -114,38 +116,72 @@ function selectLocation(result) {
   setLocSuggestions([])
 }
 
-  async function handlePhotos(e) {
-    const files = Array.from(e.target.files)
-    if (!files.length) return
-    setUploading(true)
-    const urls = []
-    for (const file of files) {
-      const ext = file.name.split('.').pop()
-      const filename = `candidatures/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-      const { data, error } = await supabase.storage
-        .from('photos-praticiens')
-        .upload(filename, file, { upsert: true })
-      if (!error) {
-        const { data: urlData } = supabase.storage
-          .from('photos-praticiens')
-          .getPublicUrl(data.path)
-        urls.push(urlData.publicUrl)
+async function compressImage(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const maxSize = 1200
+        let width = img.width
+        let height = img.height
+        if (width > height && width > maxSize) {
+          height = (height * maxSize) / width
+          width = maxSize
+        } else if (height > width && height > maxSize) {
+          width = (width * maxSize) / height
+          height = maxSize
+        }
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, width, height)
+        canvas.toBlob((blob) => {
+          resolve(new File([blob], file.name, { type: 'image/jpeg' }))
+        }, 'image/jpeg', 0.8)
       }
+      img.src = e.target.result
     }
-    setForm(f => ({
-      ...f,
-      photos: [...f.photos, ...urls],
-      main_photo: f.main_photo || urls[0] || ''
-    }))
-    setUploading(false)
+    reader.readAsDataURL(file)
+  })
+}
+
+ async function handlePhotos(e) {
+  const files = Array.from(e.target.files)
+  if (!files.length) return
+  setUploading(true)
+  const urls = []
+  for (const file of files) {
+    const compressed = await compressImage(file)
+    const ext = 'jpg'
+    const filename = `candidatures/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+    const { data, error } = await supabase.storage
+      .from('photos-praticiens')
+      .upload(filename, compressed, { upsert: true })
+    if (!error) {
+      const { data: urlData } = supabase.storage
+        .from('photos-praticiens')
+        .getPublicUrl(data.path)
+      urls.push(urlData.publicUrl)
+    }
   }
+  setForm(f => ({
+    ...f,
+    photos: [...f.photos, ...urls],
+    main_photo: f.main_photo || urls[0] || ''
+  }))
+  setUploading(false)
+}
 
       function validate() {
       // Téléphone : minimum 8 chiffres, pas de suite 0123456789
-      const phoneClean = form.telephone.replace(/[\s\-+()]/g, '')
-      const isSequential = '0123456789'.includes(phoneClean)
-      if (!/^\d{8,15}$/.test(phoneClean) || isSequential) {
-        return lang === 'fr' ? 'Numéro de téléphone invalide.' : 'Invalid phone number.'
+      if (form.telephone) {
+        const phoneClean = form.telephone.replace(/[\s\-+()]/g, '')
+        const isSequential = '0123456789'.includes(phoneClean)
+        if (!/^\d{8,15}$/.test(phoneClean) || isSequential) {
+          return lang === 'fr' ? 'Numéro de téléphone invalide.' : 'Invalid phone number.'
+        }
       }
 
       // Email
@@ -154,10 +190,12 @@ function selectLocation(result) {
       }
 
       // IBAN (format basique : 2 lettres + 2 chiffres + jusqu'à 30 caractères alphanumériques)
-      const ibanClean = form.iban.replace(/\s/g, '').toUpperCase()
-      if (ibanClean && !/^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/.test(ibanClean)) {
-        return lang === 'fr' ? 'Format IBAN invalide.' : 'Invalid IBAN format.'
-      }
+        if (form.iban) {
+          const ibanClean = form.iban.replace(/\s/g, '').toUpperCase()
+          if (!/^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/.test(ibanClean)) {
+            return lang === 'fr' ? 'Format IBAN invalide.' : 'Invalid IBAN format.'
+          }
+        }
 
       // Spécialités : au moins une cochée
       if (form.specialites.length === 0) {
@@ -191,6 +229,7 @@ function selectLocation(result) {
       pays:               form.pays,
       langues:            form.langues,
       pratique:           form.specialites.join(', '),
+      pratiques_details:  form.pratiques_details,
       public_cible:       form.public_cible.join(', '),
       certifications:     form.certifications,
       experience:         form.experience,
@@ -206,6 +245,7 @@ function selectLocation(result) {
       site_web:           form.site_web,
       photos_urls: form.photos,
       main_photo: form.main_photo,
+      langue_interface: lang
     })
 
     if (error) {
@@ -221,6 +261,7 @@ function selectLocation(result) {
   }
 
   if (submitted) return (
+    
     <div className="join-success">
       <div className="join-success__card">
         <p className="join-success__icon">✦</p>
@@ -387,69 +428,235 @@ function selectLocation(result) {
           </div>
 
           {/* ── Profil & expertise ── */}
-          <div className="join-section">
-            <h2 className="join-section__title">
-              {lang === 'fr' ? 'Profil & expertise' : 'Profile & expertise'}
-            </h2>
+            <div className="join-section">
+              <h2 className="join-section__title">
+                {lang === 'fr' ? 'Profil & expertise' : 'Profile & expertise'}
+              </h2>
 
-            <div className="join-field">
-              <label>{lang === 'fr' ? 'Spécialités *' : 'Specialties *'}</label>
-              <div className="join-checkboxes">
-                {PRATIQUES.map(p => (
-                  <label key={p.value} className="join-checkbox">
-                    <input
-                      type="checkbox"
-                      checked={form.specialites.includes(p.value)}
-                      onChange={() => toggleCheckbox('specialites', p.value)}
-                    />
-                    {lang === 'fr' ? p.fr : p.en}
-                  </label>
-                ))}
+              {/* Spécialités */}
+              <div className="join-field">
+                <label>{lang === 'fr' ? 'Spécialités *' : 'Specialties *'}</label>
+                <div className="join-checkboxes">
+                  {PRATIQUES.map(p => (
+                    <label key={p.value} className="join-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={form.specialites.includes(p.value)}
+                        onChange={() => {
+                          const updated = form.specialites.includes(p.value)
+                            ? form.specialites.filter(v => v !== p.value)
+                            : [...form.specialites, p.value]
+                          const newDetails = { ...form.pratiques_details }
+                          if (!updated.includes(p.value)) delete newDetails[p.value]
+                          else if (!newDetails[p.value]) newDetails[p.value] = { bio_fr: '', bio_en: '', prix: '', duree: '' }
+                          setForm(f => ({ ...f, specialites: updated, pratiques_details: newDetails }))
+                        }}
+                      />
+                      {lang === 'fr' ? p.fr : p.en}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Blocs dynamiques par pratique */}
+              {form.specialites.length > 0 && (
+                <div className="join-pratiques-details">
+                  {form.specialites.map(slug => {
+                    const pratique = PRATIQUES.find(p => p.value === slug)
+                    const details = form.pratiques_details[slug] || { bio_fr: '', bio_en: '', offres: [] }
+                    return (
+                      <div key={slug} className="join-pratique-block">
+                        <h3 className="join-pratique-block__title">
+                          {lang === 'fr' ? pratique?.fr : pratique?.en}
+                        </h3>
+
+                        {/* Bio spécifique */}
+                        <div className="join-row">
+                          <div className="join-field">
+                            <label>{lang === 'fr' ? 'Description FR *' : 'Description FR *'}</label>
+                            <textarea rows={3}
+                              value={details.bio_fr || ''}
+                              placeholder={lang === 'fr' ? '2-3 phrases en français' : '2-3 sentences in French'}
+                              onChange={e => setForm(f => ({
+                                ...f,
+                                pratiques_details: {
+                                  ...f.pratiques_details,
+                                  [slug]: { ...f.pratiques_details[slug], bio_fr: e.target.value }
+                                }
+                              }))} />
+                          </div>
+                          <div className="join-field">
+                            <label>{lang === 'fr' ? 'Description EN *' : 'Description EN *'}</label>
+                            <textarea rows={3}
+                              value={details.bio_en || ''}
+                              placeholder={lang === 'fr' ? '2-3 phrases en anglais' : '2-3 sentences in English'}
+                              onChange={e => setForm(f => ({
+                                ...f,
+                                pratiques_details: {
+                                  ...f.pratiques_details,
+                                  [slug]: { ...f.pratiques_details[slug], bio_en: e.target.value }
+                                }
+                              }))} />
+                          </div>
+                        </div>
+
+                        {/* Offres */}
+                        <p className="join-offres-label">
+                          {lang === 'fr' ? 'Offres & tarifs' : 'Offers & pricing'}
+                        </p>
+                        {(details.offres || []).map((offre, i) => (
+                          <div key={i} className="join-offre-block">
+                            <div className="join-offre-block__header">
+                              <span className="join-offre-block__num">Offre {i + 1}</span>
+                              <button type="button" className="join-offre-remove"
+                                onClick={() => setForm(f => ({
+                                  ...f,
+                                  pratiques_details: {
+                                    ...f.pratiques_details,
+                                    [slug]: {
+                                      ...f.pratiques_details[slug],
+                                      offres: f.pratiques_details[slug].offres.filter((_, j) => j !== i)
+                                    }
+                                  }
+                                }))}>
+                                ✕
+                              </button>
+                            </div>
+                            <div className="join-row">
+                              <div className="join-field">
+                                <label>{lang === 'fr' ? 'Titre FR *' : 'Title FR *'}</label>
+                                <input value={offre.titre_fr || ''}
+                                  placeholder={lang === 'fr' ? 'ex: Séance Reiki adulte 1h' : 'e.g. Adult Reiki session 1h'}
+                                  onChange={e => setForm(f => {
+                                    const offres = [...f.pratiques_details[slug].offres]
+                                    offres[i] = { ...offres[i], titre_fr: e.target.value }
+                                    return { ...f, pratiques_details: { ...f.pratiques_details, [slug]: { ...f.pratiques_details[slug], offres } } }
+                                  })} />
+                              </div>
+                              <div className="join-field">
+                                <label>{lang === 'fr' ? 'Titre EN *' : 'Title EN *'}</label>
+                                <input value={offre.titre_en || ''}
+                                  placeholder="e.g. Adult Reiki session 1h"
+                                  onChange={e => setForm(f => {
+                                    const offres = [...f.pratiques_details[slug].offres]
+                                    offres[i] = { ...offres[i], titre_en: e.target.value }
+                                    return { ...f, pratiques_details: { ...f.pratiques_details, [slug]: { ...f.pratiques_details[slug], offres } } }
+                                  })} />
+                              </div>
+                            </div>
+                            <div className="join-row">
+                              <div className="join-field">
+                                <label>{lang === 'fr' ? 'Description FR' : 'Description FR'}</label>
+                                <textarea rows={2} value={offre.description_fr || ''}
+                                  onChange={e => setForm(f => {
+                                    const offres = [...f.pratiques_details[slug].offres]
+                                    offres[i] = { ...offres[i], description_fr: e.target.value }
+                                    return { ...f, pratiques_details: { ...f.pratiques_details, [slug]: { ...f.pratiques_details[slug], offres } } }
+                                  })} />
+                              </div>
+                              <div className="join-field">
+                                <label>{lang === 'fr' ? 'Description EN' : 'Description EN'}</label>
+                                <textarea rows={2} value={offre.description_en || ''}
+                                  onChange={e => setForm(f => {
+                                    const offres = [...f.pratiques_details[slug].offres]
+                                    offres[i] = { ...offres[i], description_en: e.target.value }
+                                    return { ...f, pratiques_details: { ...f.pratiques_details, [slug]: { ...f.pratiques_details[slug], offres } } }
+                                  })} />
+                              </div>
+                            </div>
+                            <div className="join-row">
+                              <div className="join-field">
+                                <label>{lang === 'fr' ? 'Prix (€)' : 'Price (€)'}</label>
+                                <input type="number" min="0" value={offre.prix || ''}
+                                  placeholder="ex: 80"
+                                  onChange={e => setForm(f => {
+                                    const offres = [...f.pratiques_details[slug].offres]
+                                    offres[i] = { ...offres[i], prix: e.target.value }
+                                    return { ...f, pratiques_details: { ...f.pratiques_details, [slug]: { ...f.pratiques_details[slug], offres } } }
+                                  })} />
+                              </div>
+                              <div className="join-field">
+                                <label>{lang === 'fr' ? 'Durée (minutes) *' : 'Duration (minutes) *'}</label>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  required
+                                  value={offre.duree || ''}
+                                  placeholder="ex: 60"
+                                  onChange={e => setForm(f => {
+                                    const offres = [...f.pratiques_details[slug].offres]
+                                    offres[i] = { ...offres[i], duree: e.target.value }
+                                    return { ...f, pratiques_details: { ...f.pratiques_details, [slug]: { ...f.pratiques_details[slug], offres } } }
+                                  })} />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+
+                        <button type="button" className="join-offre-add"
+                          onClick={() => setForm(f => ({
+                            ...f,
+                            pratiques_details: {
+                              ...f.pratiques_details,
+                              [slug]: {
+                                ...f.pratiques_details[slug],
+                                offres: [...(f.pratiques_details[slug]?.offres || []), { titre_fr: '', titre_en: '', description_fr: '', description_en: '', prix: '', duree: '' }]
+                              }
+                            }
+                          }))}>
+                          {lang === 'fr' ? '+ Ajouter une offre' : '+ Add an offer'}
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
+
+              {/* Public cible */}
+              <div className="join-field">
+                <label>{lang === 'fr' ? 'Public cible *' : 'Target audience *'}</label>
+                <div className="join-checkboxes join-checkboxes--row">
+                  {PUBLIC_CIBLE.map(p => (
+                    <label key={p.value} className="join-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={form.public_cible.includes(p.value)}
+                        onChange={() => toggleCheckbox('public_cible', p.value)}
+                      />
+                      {lang === 'fr' ? p.fr : p.en}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="join-field">
+                <label>{lang === 'fr' ? 'Diplômes & certifications *' : 'Diplomas & certifications *'}</label>
+                <textarea required rows={3} value={form.certifications}
+                  onChange={e => setForm({ ...form, certifications: e.target.value })} />
+              </div>
+
+              <div className="join-field">
+                <label>{lang === 'fr' ? "Années d'expérience *" : 'Years of experience *'}</label>
+                <input required value={form.experience}
+                  placeholder={lang === 'fr' ? 'ex: 5 ans' : 'e.g. 5 years'}
+                  onChange={e => setForm({ ...form, experience: e.target.value })} />
+              </div>
+
+              <div className="join-row">
+                <div className="join-field">
+                  <label>{lang === 'fr' ? 'Bio générale FR *' : 'General bio FR *'}</label>
+                  <textarea required rows={3} value={form.bio_fr}
+                    placeholder={lang === 'fr' ? '1-2 phrases de présentation générale en français' : '1-2 general introduction sentences in French'}
+                    onChange={e => setForm({ ...form, bio_fr: e.target.value })} />
+                </div>
+                <div className="join-field">
+                  <label>{lang === 'fr' ? 'Bio générale EN *' : 'General bio EN *'}</label>
+                  <textarea required rows={3} value={form.bio_en}
+                    placeholder={lang === 'fr' ? '1-2 phrases de présentation générale en anglais' : '1-2 general introduction sentences in English'}
+                    onChange={e => setForm({ ...form, bio_en: e.target.value })} />
+                </div>
               </div>
             </div>
-
-            <div className="join-field">
-              <label>{lang === 'fr' ? 'Public cible *' : 'Target audience *'}</label>
-              <div className="join-checkboxes join-checkboxes--row">
-                {PUBLIC_CIBLE.map(p => (
-                  <label key={p.value} className="join-checkbox">
-                    <input
-                      type="checkbox"
-                      checked={form.public_cible.includes(p.value)}
-                      onChange={() => toggleCheckbox('public_cible', p.value)}
-                    />
-                    {lang === 'fr' ? p.fr : p.en}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className="join-field">
-              <label>{lang === 'fr' ? 'Diplômes & certifications *' : 'Diplomas & certifications *'}</label>
-              <textarea required rows={3} value={form.certifications}
-                onChange={e => setForm({ ...form, certifications: e.target.value })} />
-            </div>
-
-            <div className="join-field">
-              <label>{lang === 'fr' ? "Années d'expérience *" : 'Years of experience *'}</label>
-              <input required value={form.experience}
-                placeholder={lang === 'fr' ? 'ex: 5 ans' : 'e.g. 5 years'}
-                onChange={e => setForm({ ...form, experience: e.target.value })} />
-            </div>
-
-            <div className="join-field">
-              <label>{lang === 'fr' ? 'Biographie FR *' : 'Biography FR *'}</label>
-              <textarea required rows={5} value={form.bio_fr || ''}
-                placeholder={lang === 'fr' ? '5 à 10 lignes en français' : '5 to 10 lines in French'}
-                onChange={e => setForm({ ...form, bio_fr: e.target.value })} />
-            </div>
-            <div className="join-field">
-              <label>{lang === 'fr' ? 'Biographie EN *' : 'Biography EN *'}</label>
-              <textarea required rows={5} value={form.bio_en || ''}
-                placeholder={lang === 'fr' ? '5 à 10 lignes en anglais' : '5 to 10 lines in English'}
-                onChange={e => setForm({ ...form, bio_en: e.target.value })} />
-            </div>
-          </div>
 
           {/* ── Offres & séances ── */}
           <div className="join-section">
@@ -476,46 +683,31 @@ function selectLocation(result) {
             </div>
 
             <div className="join-field">
-              <label>{lang === 'fr' ? 'Description des séances *' : 'Session description *'}</label>
-              <textarea required rows={4} value={form.description_seance}
-                onChange={e => setForm({ ...form, description_seance: e.target.value })} />
-            </div>
-
-            <div className="join-row">
-              <div className="join-field">
-                <label>{lang === 'fr' ? 'Durée *' : 'Duration *'}</label>
-                <input required value={form.duree_seance}
-                  placeholder={lang === 'fr' ? 'ex: 1h, 1h30' : 'e.g. 1h, 1h30'}
-                  onChange={e => setForm({ ...form, duree_seance: e.target.value })} />
-              </div>
-              <div className="join-field">
-                <label>{lang === 'fr' ? 'Prix (€) *' : 'Price (€) *'}</label>
-                <input required type="number" min="0" value={form.prix}
-                  onChange={e => setForm({ ...form, prix: e.target.value })} />
-              </div>
-            </div>
-
-            <div className="join-field">
               <label>{lang === 'fr' ? 'Format *' : 'Format *'}</label>
               <div className="join-checkboxes join-checkboxes--row">
-                <label className="join-checkbox">
-                  <input type="radio" name="mode_exercice" value="in-person"
-                    checked={form.mode_exercice === 'in-person'}
-                    onChange={() => setForm({ ...form, mode_exercice: 'in-person' })} />
-                  {lang === 'fr' ? 'Présentiel' : 'In person'}
-                </label>
-                <label className="join-checkbox">
-                  <input type="radio" name="mode_exercice" value="online"
-                    checked={form.mode_exercice === 'online'}
-                    onChange={() => setForm({ ...form, mode_exercice: 'online' })} />
-                  {lang === 'fr' ? 'Visio' : 'Online'}
-                </label>
-                <label className="join-checkbox">
-                  <input type="radio" name="mode_exercice" value="both"
-                    checked={form.mode_exercice === 'both'}
-                    onChange={() => setForm({ ...form, mode_exercice: 'both' })} />
-                  {lang === 'fr' ? 'Les deux' : 'Both'}
-                </label>
+                {[
+                  { value: 'in-person', fr: 'En personne', en: 'In person' },
+                  { value: 'home', fr: 'À domicile', en: 'Home visit' },
+                  { value: 'visio', fr: 'En visio', en: 'Online' },
+                ].map(opt => {
+                  const current = form.mode_exercice ? form.mode_exercice.split(',').map(s => s.trim()) : []
+                  const checked = current.includes(opt.value)
+                  return (
+                    <label key={opt.value} className="join-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => {
+                          const updated = checked
+                            ? current.filter(v => v !== opt.value)
+                            : [...current, opt.value]
+                          setForm(f => ({ ...f, mode_exercice: updated.join(', ') }))
+                        }}
+                      />
+                      {lang === 'fr' ? opt.fr : opt.en}
+                    </label>
+                  )
+                })}
               </div>
             </div>
           </div>

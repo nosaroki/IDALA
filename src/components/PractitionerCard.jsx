@@ -3,21 +3,22 @@ import { LangCtx } from './LangContext'
 import { useNavigate } from 'react-router-dom'
 
 function ModeTags({ mode, lang }) {
+  const modes = mode ? mode.split(',').map(m => m.trim()) : []
   const tags = []
-  if (mode === 'in-person' || mode === 'both') {
+  if (modes.includes('in-person')) {
     tags.push({ fr: 'En personne', en: 'In person', bg: '#3DCC7022', color: '#1a8844', border: '#3DCC7044' })
   }
-  if (mode === 'online' || mode === 'both') {
-    tags.push({ fr: 'En ligne', en: 'Online', bg: '#3AA8E022', color: '#1166aa', border: '#3AA8E044' })
+  if (modes.includes('home')) {
+    tags.push({ fr: 'À domicile', en: 'Home visit', bg: '#FF9A3C22', color: '#cc6600', border: '#FF9A3C44' })
+  }
+  if (modes.includes('visio')) {
+    tags.push({ fr: 'En visio', en: 'Online', bg: '#3AA8E022', color: '#1166aa', border: '#3AA8E044' })
   }
   return (
     <div className="mode-tags">
       {tags.map(t => (
-        <span
-          key={t.en}
-          className="mode-tag"
-          style={{ background: t.bg, color: t.color, border: `1px solid ${t.border}` }}
-        >
+        <span key={t.en} className="mode-tag"
+          style={{ background: t.bg, color: t.color, border: `1px solid ${t.border}` }}>
           {lang === 'fr' ? t.fr : t.en}
         </span>
       ))}

@@ -6,35 +6,40 @@ serve(async (req) => {
   const candidat = record
 
   // Email au candidat
-  const emailCandidat = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: 'The Idala Family <contact@theidalafamily.com>',
-      to: candidat.email,
-      subject: 'We received your application — The Idala Family',
-      html: `
-        <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; color: #281745;">
-          <p style="font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #9B6EBF; margin-bottom: 24px;">The Idala Family</p>
-          <h1 style="font-size: 28px; font-weight: 400; margin-bottom: 24px; line-height: 1.3;">Dear ${candidat.prenom},</h1>
-          <p style="font-size: 15px; line-height: 1.8; font-weight: 300; margin-bottom: 16px;">
-            Thank you for your interest in joining The Idala Family. We have received your application and will review it carefully.
-          </p>
-          <p style="font-size: 15px; line-height: 1.8; font-weight: 300; margin-bottom: 16px;">
-            We will get back to you as soon as possible.
-          </p>
-          <p style="font-size: 15px; line-height: 1.8; font-weight: 300; margin-bottom: 40px;">
-            With care,<br/>The Idala Family
-          </p>
-          <hr style="border: none; border-top: 1px solid #E4D8F5; margin-bottom: 24px;" />
-          <p style="font-size: 11px; color: #9B6EBF; letter-spacing: 2px; text-transform: uppercase;">theidalafamily.com</p>
-        </div>
-      `,
-    }),
-  })
+const isFr = record.langue_interface !== 'en'
+
+const emailCandidat = await fetch('https://api.resend.com/emails', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    from: 'The Idala Family <contact@theidalafamily.com>',
+    to: candidat.email,
+    subject: isFr
+      ? 'Candidature reçue — The Idala Family'
+      : 'Application received — The Idala Family',
+    html: `
+      <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; color: #281745;">
+        <p style="font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #9B6EBF; margin-bottom: 24px;">The Idala Family</p>
+        <h1 style="font-size: 28px; font-weight: 400; margin-bottom: 24px; line-height: 1.3;">
+          ${isFr ? `Cher(e) ${candidat.prenom},` : `Dear ${candidat.prenom},`}
+        </h1>
+        <p style="font-size: 15px; line-height: 1.8; font-weight: 300; margin-bottom: 16px;">
+          ${isFr
+            ? 'Merci pour votre intérêt. Nous avons bien reçu votre candidature et reviendrons vers vous dans les meilleurs délais.'
+            : 'Thank you for your interest. We have received your application and will get back to you as soon as possible.'}
+        </p>
+        <p style="font-size: 15px; line-height: 1.8; font-weight: 300; margin-bottom: 40px;">
+          ${isFr ? 'Bien à vous,' : 'With care,'}<br/>The Idala Family
+        </p>
+        <hr style="border: none; border-top: 1px solid #E4D8F5; margin-bottom: 24px;" />
+        <p style="font-size: 11px; color: #9B6EBF; letter-spacing: 2px; text-transform: uppercase;">theidalafamily.com</p>
+      </div>
+    `,
+  }),
+})
 
   // Email de notification à Idala
   const emailIdala = await fetch('https://api.resend.com/emails', {

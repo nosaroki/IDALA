@@ -51,10 +51,7 @@ export default function PracticePage() {
       }
 
       const { data: praticiensData } = await supabase
-        .from('praticiens_public')
-        .select('*')
-        .eq('pratique_id', pratiqueData.id)
-        .eq('actif', true)
+        .rpc('get_praticiens_by_pratique', { p_pratique_id: pratiqueData.id })
 
       setPratique(pratiqueData)
       setPraticiens(praticiensData || [])
@@ -64,7 +61,23 @@ export default function PracticePage() {
     fetchData()
   }, [slug])
 
-  if (loading) return <div className="practice-page__loader">...</div>
+  if (loading) return (
+    <div>
+      <div className="practice-page__banner" />
+      <section className="practice-page__practitioners">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="pract-card pract-card--skeleton">
+            <div className="skeleton-circle" />
+            <div className="pract-card__body">
+              <div className="skeleton-line skeleton-line--lg" />
+              <div className="skeleton-line skeleton-line--sm" />
+              <div className="skeleton-line" />
+            </div>
+          </div>
+        ))}
+      </section>
+    </div>
+  )
 
   const metaTitle = lang === 'fr'
     ? `${localData.titleFr} — The Idala Family`
@@ -104,7 +117,17 @@ export default function PracticePage() {
         ) : (
           <div className="practice-page__list">
             {praticiens.map(p => (
-              <PractitionerCard key={p.id} praticien={p} practiceSlug={slug} />
+               <PractitionerCard
+                  key={p.id}
+                  praticien={{
+                    ...p,
+                    bio_fr: p.pp_bio_fr || p.bio_fr,
+                    bio_en: p.pp_bio_en || p.bio_en,
+                    prix: p.pp_prix,
+                    duree_seance: p.pp_duree_seance,
+                  }}
+                  practiceSlug={slug}
+                />
             ))}
           </div>
         )}

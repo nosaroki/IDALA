@@ -11,7 +11,6 @@ import Footer from '../components/Footer';
 
 import trsprlogo from '../assets/trsprlogo.png';
 import dianeRegard    from '../assets/dianeregard.png';
-import meditDiane   from '../assets/meditationdiane.png';
 import soundHealing   from '../assets/soundhealing.jpg';
 import groupsound     from '../assets/groupsound.jpg';
 import groupyoga       from '../assets/groupyoga.jpg';
@@ -20,16 +19,15 @@ import groupmedit      from '../assets/groupmedit.jpg';
 // import breathwork     from '../assets/yogaplage.png';
 import meditation from '../assets/meditation.jpg';
 import sointbt from '../assets/sointbt.jpg';
-// practitioners frise
-// import marine from '../assets/practitioners/marine.JPG';
+import acu from '../assets/practitioners/acu.jpg';
 import marine_reiki from '../assets/practitioners/marine_reiki.JPG';
-// import sylvie_soin  from '../assets/practitioners/sylvie_soin.JPG';
-// import sylvie_soin2 from '../assets/practitioners/sylvie_soin2.JPG';
 import gobowl from '../assets/practitioners/gobowl.jpg';
 import taichilady from '../assets/practitioners/taichilady.jpg';
 import gogong from '../assets/practitioners/gogong.jpg';
 import ladyyoga from '../assets/practitioners/ladyyoga.jpg';
-import meditnature from '../assets/practitioners/meditnature.jpg';
+import breathwork from '../assets/practitioners/breathwrk.jpg';
+import facemedit from '../assets/practitioners/meditt.jpg';
+import updownyoga from '../assets/banner/banner_yoga2.jpg'
 
 const TESTIMONIALS = [
   {
@@ -156,10 +154,10 @@ function Home() {
                 <img src={gogong} alt="Qi Gong" onClick={() => navigate('/practices/qi-gong')} style={{ cursor: 'pointer' }} />
                 <img src={ladyyoga} alt="Yoga" onClick={() => navigate('/practices/yoga')} style={{ cursor: 'pointer' }} />
                 <img src={taichilady} alt="Tai Chi" onClick={() => navigate('/practices/tai-chi')} style={{ cursor: 'pointer' }} />
-                <img src={meditDiane} alt="Meditation" onClick={() => navigate('/practices/meditation')} style={{ cursor: 'pointer' }} />
+                <img src={acu} alt="Acupuncture" onClick={() => navigate('/practices/acupuncture')} style={{ cursor: 'pointer' }} />
                 <img src={gobowl} alt="Sound Healing" onClick={() => navigate('/practices/sound-healing')} style={{ cursor: 'pointer' }} />
-                <img src={meditnature} alt="Meditation" onClick={() => navigate('/practices/meditation')} style={{ cursor: 'pointer' }} />
-                {/* <img src={breathwork}    alt="Practitioner" /> */}
+                <img src={breathwork} alt="Breathwork" onClick={() => navigate('/practices/breathwork')} style={{ cursor: 'pointer' }} />
+                <img src={facemedit} alt="Meditation" onClick={() => navigate('/practices/meditation')} style={{ cursor: 'pointer' }} />
               </div>
             ))}
           </div>
@@ -213,9 +211,9 @@ function Home() {
                 <img src={marine_reiki} alt="Reiki" />
                 <span className="home-gallery__caption">Reiki</span>
               </div>
-              <div className="home-gallery__item" onClick={() => navigate('/practices/sound-healing')} style={{ cursor: 'pointer' }}>
-                <img src={soundHealing} alt="Sound healing" />
-                <span className="home-gallery__caption">Sound Healing</span>
+              <div className="home-gallery__item" onClick={() => navigate('/practices/yoga')} style={{ cursor: 'pointer' }}>
+                <img src={updownyoga} alt="Yoga" />
+                <span className="home-gallery__caption">Yoga</span>
               </div>
               <div className="home-gallery__item home-gallery__item--wide" onClick={() => navigate('/practices/meditation')} style={{ cursor: 'pointer' }}>
                 <img src={meditation} alt="meditation" />

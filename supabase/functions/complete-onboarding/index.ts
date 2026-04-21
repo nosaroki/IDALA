@@ -11,7 +11,7 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders })
   }
 
-  const { token, ...formData } = await req.json()
+  const { token, iban } = await req.json()
 
   const supabase = createClient(
     Deno.env.get('SUPABASE_URL')!,
@@ -34,7 +34,7 @@ serve(async (req) => {
   const { error: updateError } = await supabase
     .from('praticiens')
     .update({
-      ...formData,
+      iban,
       actif: true,
       onboarding_token: null,
     })

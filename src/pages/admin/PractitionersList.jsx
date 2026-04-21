@@ -30,23 +30,66 @@ useEffect(() => {
 }, [])
 
 async function handleSave(form) {
-  const { pratiques: _pratiques, ...cleanForm } = form
-  
+  const { pratiques: _pratiques, pratiques_associees, ...cleanForm } = form
+  const { id: _id, ...insertForm } = cleanForm
+
+  let praticienId = editing?.id
+
   if (editing) {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('praticiens')
       .update(cleanForm)
       .eq('id', editing.id)
-    console.log('update data:', data)
     console.log('update error:', error)
   } else {
-    const { id: _id, ...insertForm } = cleanForm
     const { data, error } = await supabase
       .from('praticiens')
       .insert(insertForm)
-    console.log('insert data:', data)
+      .select()
+      .single()
     console.log('insert error:', error)
+    praticienId = data?.id
   }
+
+  if (praticienId && pratiques_associees) {
+    const { data: oldPP } = await supabase
+      .from('praticien_pratiques')
+      .select('id')
+      .eq('praticien_id', praticienId)
+
+    if (oldPP) {
+      for (const pp of oldPP) {
+        await supabase.from('praticien_offres').delete().eq('praticien_pratique_id', pp.id)
+      }
+    }
+    await supabase.from('praticien_pratiques').delete().eq('praticien_id', praticienId)
+
+    for (const pa of pratiques_associees) {
+      const { data: newPP } = await supabase.from('praticien_pratiques').insert({
+        praticien_id: praticienId,
+        pratique_id: pa.pratique_id,
+        bio_fr: pa.bio_fr || '',
+        bio_en: pa.bio_en || '',
+      }).select().single()
+
+      if (newPP && pa.offres?.length > 0) {
+        for (let i = 0; i < pa.offres.length; i++) {
+          const offre = pa.offres[i]
+          await supabase.from('praticien_offres').insert({
+            praticien_pratique_id: newPP.id,
+            titre_fr: offre.titre_fr || '',
+            titre_en: offre.titre_en || '',
+            description_fr: offre.description_fr || '',
+            description_en: offre.description_en || '',
+            prix: offre.prix ? parseFloat(offre.prix) : null,
+            duree: offre.duree || '',
+            ordre: i,
+          })
+        }
+      }
+    }
+  }
+
   setEditing(null)
   setShowForm(false)
   fetchAll()

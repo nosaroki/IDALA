@@ -6,21 +6,22 @@ import { LangCtx } from '../../components/LangContext'
 import Footer from '../../components/Footer'
 
 function ModeTags({ mode, lang }) {
+  const modes = mode ? mode.split(',').map(m => m.trim()) : []
   const tags = []
-  if (mode === 'in-person' || mode === 'both') {
+  if (modes.includes('in-person')) {
     tags.push({ fr: 'En personne', en: 'In person', bg: '#3DCC7022', color: '#1a8844', border: '#3DCC7044' })
   }
-  if (mode === 'online' || mode === 'both') {
-    tags.push({ fr: 'En ligne', en: 'Online', bg: '#3AA8E022', color: '#1166aa', border: '#3AA8E044' })
+  if (modes.includes('home')) {
+    tags.push({ fr: 'À domicile', en: 'Home visit', bg: '#FF9A3C22', color: '#cc6600', border: '#FF9A3C44' })
+  }
+  if (modes.includes('visio')) {
+    tags.push({ fr: 'En visio', en: 'Online', bg: '#3AA8E022', color: '#1166aa', border: '#3AA8E044' })
   }
   return (
     <div className="mode-tags">
       {tags.map(t => (
-        <span
-          key={t.en}
-          className="mode-tag"
-          style={{ background: t.bg, color: t.color, border: `1px solid ${t.border}` }}
-        >
+        <span key={t.en} className="mode-tag"
+          style={{ background: t.bg, color: t.color, border: `1px solid ${t.border}` }}>
           {lang === 'fr' ? t.fr : t.en}
         </span>
       ))}
@@ -39,21 +40,63 @@ export default function PractitionerPage() {
   useEffect(() => {
     async function fetchData() {
       const { data, error } = await supabase
-        .from('praticiens_public')
+        .from('praticiens')
         .select('*, pratiques(*)')
         .eq('slug', practitionerSlug)
         .single()
 
       if (error || !data) { navigate('*'); return }
 
-      setPraticien(data)
-      setPratique(data.pratiques)
+      // Récupérer les infos spécifiques à la pratique visitée
+      const { data: ppData } = await supabase
+        .from('praticien_pratiques')
+        .select('*, pratiques(*)')
+        .eq('praticien_id', data.id)
+        .then(({ data: allPP }) => ({
+          data: allPP?.find(pp => pp.pratiques?.slug === practiceSlug) || null
+        }))
+
+        // Charger les offres de cette pratique
+        let offres = []
+        if (ppData?.id) {
+          const { data: offresData } = await supabase
+            .from('praticien_offres')
+            .select('*')
+            .eq('praticien_pratique_id', ppData.id)
+            .order('ordre')
+          offres = offresData || []
+        }
+
+      setPraticien({
+        ...data,
+        bio_fr: data.bio_fr,
+        bio_en: data.bio_en,
+        bio_complete_fr: ppData?.bio_fr || '',
+        bio_complete_en: ppData?.bio_en || '',
+        prix: ppData?.prix,
+        duree_seance: ppData?.duree_seance,
+        offres,
+      })
+      setPratique(ppData?.pratiques || data.pratiques)
       setLoading(false)
     }
     fetchData()
   }, [practitionerSlug])
 
-  if (loading) return <div className="practice-page__loader">...</div>
+  if (loading) return (
+    <div className="pract-profile">
+      <div className="pract-profile__card">
+        <div className="pract-profile__hero">
+          <div className="skeleton-circle skeleton-circle--lg" />
+          <div className="pract-profile__info" style={{ flex: 1 }}>
+            <div className="skeleton-line skeleton-line--lg" />
+            <div className="skeleton-line" />
+            <div className="skeleton-line skeleton-line--sm" />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 
  const PRACTS_MAP = {
   'yoga':                { fr: 'Yoga',                  en: 'Yoga' },
@@ -79,19 +122,30 @@ const practiceName = lang === 'fr'
   return (
     <>
       <Helmet>
-        <title>{praticien.prenom} {praticien.nom?.charAt(0)}. — {practiceName} — The Idala Family</title>
+        <title>{`${praticien.prenom || ''} ${praticien.nom?.charAt(0) || ''}. — ${practiceName || ''} — The Idala Family`}</title>
         <meta name="description"
-          content={praticien.bio || `Book a session with ${praticien.prenom} ${praticien.nom}, ${practiceName} practitioner at The Idala Family.`} />
+          content={praticien.bio_fr || praticien.bio || `Book a session with ${praticien.prenom} ${praticien.nom?.charAt(0)}.`} />
       </Helmet>
 
       <div className="pract-profile">
 
-        <button
-          className="pract-profile__back btn btn--outline btn--sm"
-          onClick={() => navigate(`/practices/${practiceSlug}`)}
-        >
-          {lang === 'fr' ? '← Retour' : '← Back'}
-        </button>
+        <div className="pract-profile__breadcrumb">
+          <button onClick={() => navigate('/')} className="pract-profile__breadcrumb-link">
+            {lang === 'fr' ? 'Accueil' : 'Home'}
+          </button>
+          <span className="pract-profile__breadcrumb-sep">›</span>
+          <button onClick={() => navigate('/practitioners')} className="pract-profile__breadcrumb-link">
+            {lang === 'fr' ? 'Praticiens' : 'Practitioners'}
+          </button>
+          <span className="pract-profile__breadcrumb-sep">›</span>
+          <button onClick={() => navigate(`/practices/${practiceSlug}`)} className="pract-profile__breadcrumb-link">
+            {practiceName}
+          </button>
+          <span className="pract-profile__breadcrumb-sep">›</span>
+          <span className="pract-profile__breadcrumb-current">
+            {praticien.prenom} {praticien.nom?.charAt(0)}.
+          </span>
+        </div>
 
         <div className="pract-profile__card">
 
@@ -126,6 +180,12 @@ const practiceName = lang === 'fr'
                 <p className="pract-profile__langues">{praticien.langues}</p>
               )}
               <ModeTags mode={praticien.mode_exercice} lang={lang} />
+              {lang === 'en' && praticien.langues && 
+                !praticien.langues.toLowerCase().includes('english') && (
+                <p className="pract-profile__lang-warning">
+                  ⚠️ This practitioner only offers sessions in French
+                </p>
+              )}
             </div>
           </div>
 
@@ -148,6 +208,33 @@ const practiceName = lang === 'fr'
                   : (praticien.bio_complete_en || praticien.bio_complete)}
               </p>
             )}
+
+              {praticien.offres?.length > 0 && (
+                <div className="pract-profile__offres">
+                  <p className="pract-profile__offres-title">
+                    {lang === 'fr' ? 'Offres & tarifs' : 'Offers & pricing'}
+                  </p>
+                  {praticien.offres.map((offre, i) => (
+                    <div key={i} className="pract-profile__offre">
+                      <div className="pract-profile__offre-header">
+                        <h4 className="pract-profile__offre-titre">
+                          {lang === 'fr' ? offre.titre_fr : offre.titre_en}
+                        </h4>
+                        <div className="pract-profile__offre-meta">
+                          {offre.duree && <span>{offre.duree} {lang === 'fr' ? 'min' : 'min'}</span>}
+                          {offre.prix && <span>{offre.prix} €</span>}
+                        </div>
+                      </div>
+                      {(lang === 'fr' ? offre.description_fr : offre.description_en) && (
+                        <p className="pract-profile__offre-desc">
+                          {lang === 'fr' ? offre.description_fr : offre.description_en}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
             {praticien.lien_reservation ? (
               
                <a href={praticien.lien_reservation}
