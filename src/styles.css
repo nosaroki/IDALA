@@ -370,7 +370,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 ───────────────────────────────────────── */
 .home-hero {
   background: linear-gradient(160deg, #ede8f5 0%, #e8f0f7 50%, #eef5ec 100%);
-  padding: clamp(64px, 10vw, 120px) var(--px);
+  padding: clamp(64px, 10vw, 0px) var(--px);
   display: flex; align-items: center; justify-content: center;
   text-align: center; position: relative; overflow: hidden;
   border-bottom: 1px solid rgba(155,110,191,.15);

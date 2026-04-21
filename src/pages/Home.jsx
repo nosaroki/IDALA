@@ -9,9 +9,9 @@ import { Helmet } from 'react-helmet-async';
 import { useReveal } from '../hooks/useReveal';
 import Footer from '../components/Footer';
 
-import trsprlogo from '../assets/trsprlogo.png';
+import newlogo from '../assets/newlogo.png';
 import dianeRegard    from '../assets/dianeregard.png';
-import soundHealing   from '../assets/soundhealing.jpg';
+// import soundHealing   from '../assets/soundhealing.jpg';
 import groupsound     from '../assets/groupsound.jpg';
 import groupyoga       from '../assets/groupyoga.jpg';
 import groupmedit      from '../assets/groupmedit.jpg';
@@ -98,7 +98,7 @@ function Home() {
 <section className="home-hero">
   <div className="home-hero__inner">
     <div className="home-hero__logo-wrap">
-      <img src={trsprlogo} alt="The Idala Family" className="home-hero__logo" />
+      <img src={newlogo} alt="The Idala Family" className="home-hero__logo" />
     </div>
     <p className="home-hero__tagline">
       {lang === 'fr' ? 'Bien-être · Corps · Esprit · Énergie' : 'Wellness · Body · Mind · Energy'}
