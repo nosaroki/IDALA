@@ -370,23 +370,23 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 ───────────────────────────────────────── */
 .home-hero {
   background: linear-gradient(160deg, #ede8f5 0%, #e8f0f7 50%, #eef5ec 100%);
-  padding: clamp(64px, 10vw, 0px) var(--px);
+  padding: 0 var(--px) clamp(40px, 6vw, 40px);
   display: flex; align-items: center; justify-content: center;
   text-align: center; position: relative; overflow: hidden;
   border-bottom: 1px solid rgba(155,110,191,.15);
 }
-.home-hero::before {
+/* .home-hero::before {
   content: ''; position: absolute;
   width: 600px; height: 600px; border-radius: 50%;
   border: 1px solid rgba(155,110,191,.10);
   top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none;
-}
-.home-hero::after {
+} */
+/* .home-hero::after {
   content: ''; position: absolute;
   width: 900px; height: 900px; border-radius: 50%;
   border: 1px solid rgba(155,110,191,.06);
   top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none;
-}
+} */
 .home-hero__inner {
   display: flex;
   flex-direction: column;
@@ -1667,7 +1667,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
    SECTIONS
 ───────────────────────────────────────── */
 .spiritual-section {
-  padding: clamp(56px, 7vw, 88px) var(--px);
+  padding: 0 var(--px) clamp(56px, 7vw, 88px);
   background: var(--root-bg);
 }
 
@@ -1922,7 +1922,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 .spiritual-card__format-note {
   font-family: 'Jost', sans-serif;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 300;
   font-style: italic;
   color: var(--violet-mid);

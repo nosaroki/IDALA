@@ -18,8 +18,8 @@ function About() {
       <Helmet>
         <title>{lang === 'fr' ? 'À propos de Diane Thomas | The Idala Family' : 'About Diane Thomas | The Idala Family'}</title>
         <meta name="description" content={lang === 'fr'
-          ? 'Découvrez Diane Thomas, fondatrice de The Idala Family. Professeure de yoga et Maître Reiki avec une formation en neurosciences.'
-          : 'Meet Diane Thomas, founder of The Idala Family. Yoga teacher and Reiki Master with a background in neuroscience.'} />
+          ? 'Découvrez Diane Thomas, fondatrice de The Idala Family. Professeure de yoga avec une formation en neurosciences.'
+          : 'Meet Diane Thomas, founder of The Idala Family. Yoga teacher with a background in neuroscience.'} />
       </Helmet>
 
       <div className="page-wrap">

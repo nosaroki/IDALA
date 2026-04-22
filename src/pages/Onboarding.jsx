@@ -127,9 +127,8 @@ export default function Onboarding() {
             </button>
           </div>
         </form>
-
-        <Footer />
       </div>
+      <Footer />
     </>
   )
 }

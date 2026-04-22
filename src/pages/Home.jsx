@@ -19,7 +19,7 @@ import groupmedit      from '../assets/groupmedit.jpg';
 // import breathwork     from '../assets/yogaplage.png';
 import meditation from '../assets/meditation.jpg';
 import sointbt from '../assets/sointbt.jpg';
-import acu from '../assets/practitioners/acu.jpg';
+// import acu from '../assets/practitioners/acu.jpg';
 import marine_reiki from '../assets/practitioners/marine_reiki.JPG';
 import gobowl from '../assets/practitioners/gobowl.jpg';
 import taichilady from '../assets/practitioners/taichilady.jpg';
@@ -154,7 +154,7 @@ function Home() {
                 <img src={gogong} alt="Qi Gong" onClick={() => navigate('/practices/qi-gong')} style={{ cursor: 'pointer' }} />
                 <img src={ladyyoga} alt="Yoga" onClick={() => navigate('/practices/yoga')} style={{ cursor: 'pointer' }} />
                 <img src={taichilady} alt="Tai Chi" onClick={() => navigate('/practices/tai-chi')} style={{ cursor: 'pointer' }} />
-                <img src={acu} alt="Acupuncture" onClick={() => navigate('/practices/acupuncture')} style={{ cursor: 'pointer' }} />
+                {/* <img src={acu} alt="Acupuncture" onClick={() => navigate('/practices/acupuncture')} style={{ cursor: 'pointer' }} /> */}
                 <img src={gobowl} alt="Sound Healing" onClick={() => navigate('/practices/sound-healing')} style={{ cursor: 'pointer' }} />
                 <img src={breathwork} alt="Breathwork" onClick={() => navigate('/practices/breathwork')} style={{ cursor: 'pointer' }} />
                 <img src={facemedit} alt="Meditation" onClick={() => navigate('/practices/meditation')} style={{ cursor: 'pointer' }} />
@@ -231,8 +231,8 @@ function Home() {
               <div className="divider" />
               <p className="home-diane__body">
                 {lang === 'fr'
-                  ? "Professeure de Yoga & Maître Reiki, Diane a fondé The Idala Family pour créer un espace où le corps et l'esprit se renforcent ensemble, au sein d'une communauté de confiance."
-                  : 'Yoga Teacher & Reiki Master, Diane founded The Idala Family to create a space where body and mind strengthen together, within a trusted community.'}
+                  ? "Diane a fondé The Idala Family pour créer un espace où le corps et l'esprit se renforcent ensemble, au sein d'une communauté de confiance."
+                  : 'Diane founded The Idala Family to create a space where body and mind strengthen together, within a trusted community.'}
               </p>
               <button className="btn btn--outline" onClick={() => navigate('/about')}>
                 {lang === 'fr' ? 'En savoir plus' : 'Learn More'}

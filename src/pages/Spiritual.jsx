@@ -89,7 +89,7 @@ function Spiritual() {
                   <sup>€</sup>50
                 </div>
                 <div className="divider" style={{ margin: '16px 0' }} />
-                <p className="spiritual-card__desc">
+                <p className="spiritual-card__desc" style={{ marginBottom: '12px' }}>
                   {lang === 'fr'
                     ? 'Une séance courte, précise et centrée sur une problématique spécifique : relation, choix personnel, situation professionnelle, prise de décision ou blocage actuel.'
                     : 'A short, precise session focused on a specific issue: relationship, personal choice, professional situation, decision-making or current block.'}
