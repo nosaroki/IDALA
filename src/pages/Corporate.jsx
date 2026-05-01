@@ -1,6 +1,8 @@
 import { useContext } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { LangCtx } from '../components/LangContext'
+import bannerCorporate from '../assets/banner/banner_entreprise.jpg'
+
 import Footer from '../components/Footer'
 
 const PROGRAMMES = [
@@ -51,8 +53,12 @@ export default function Corporate() {
       <div className="page-wrap">
 
         {/* Hero */}
-        <section className="corporate-hero">
-          <p className="corporate-hero__eyebrow">
+      <section
+          className="practice-page__banner"
+          style={{ backgroundImage: `url(${bannerCorporate})` }}
+        >          
+        <div className='practice-page__banner-overlay'>
+        <p className="corporate-hero__eyebrow">
             {lang === 'fr' ? 'Pour votre entreprise' : 'For your company'}
           </p>
           <h1 className="corporate-hero__title">
@@ -65,6 +71,7 @@ export default function Corporate() {
               ? 'Là où la forme mentale alimente la performance.'
               : 'Where mental fitness fuels performance.'}
           </p>
+          </div>
         </section>
 
         {/* Intro */}
@@ -106,7 +113,7 @@ export default function Corporate() {
           <p className="corporate-cta__text">
             {lang === 'fr'
               ? <>Construisons ensemble le dispositif le plus adapté à votre culture, vos équipes et vos objectifs.</>
-              : <>Write to us to co-create the most relevant experience for your teams.</>
+              : <>Contact us to co-create the most relevant experience for your teams.</>
               }
           </p>
           <a href="mailto:contact@theidalafamily.com" className="btn btn--violet-mid">

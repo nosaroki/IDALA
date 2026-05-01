@@ -369,24 +369,13 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
    HOME — HERO
 ───────────────────────────────────────── */
 .home-hero {
-  background: linear-gradient(160deg, #ede8f5 0%, #e8f0f7 50%, #eef5ec 100%);
+  background: linear-gradient(160deg, #ede8f5 0%, #e8f0f7 55%, #e4edf8 100%);
   padding: 0 var(--px) clamp(40px, 6vw, 40px);
   display: flex; align-items: center; justify-content: center;
   text-align: center; position: relative; overflow: hidden;
-  border-bottom: 1px solid rgba(155,110,191,.15);
+  border-bottom: 0.5px solid rgba(155,110,191,.15);
 }
-/* .home-hero::before {
-  content: ''; position: absolute;
-  width: 600px; height: 600px; border-radius: 50%;
-  border: 1px solid rgba(155,110,191,.10);
-  top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none;
-} */
-/* .home-hero::after {
-  content: ''; position: absolute;
-  width: 900px; height: 900px; border-radius: 50%;
-  border: 1px solid rgba(155,110,191,.06);
-  top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none;
-} */
+
 .home-hero__inner {
   display: flex;
   flex-direction: column;
@@ -561,7 +550,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .home-cta { background: linear-gradient(160deg, #f0ecfa 0%, #f7f0fa 50%, #eceefa 100%); padding: clamp(56px,8vw,96px) var(--px); text-align: center; border-bottom: 1px solid rgba(155,110,191,.12); }
 .home-cta__title { font-family: 'Cormorant Garamond', serif; font-size: clamp(24px,3.5vw,42px); font-weight: 300; color: var(--text); margin-bottom: 44px; letter-spacing: .5px; }
 .home-cta__row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-.home-cta__btn { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 28px 36px !important; min-width: 180px; font-size: 10px !important; letter-spacing: 3px !important; transition: all .35s ease !important; background: rgba(255,255,255,.7) !important; border: 1px solid var(--violet-light) !important; }
+.home-cta__btn { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 28px 36px !important; min-width: 150px; font-size: 10px !important; letter-spacing: 3px !important; transition: all .35s ease !important; background: rgba(255,255,255,.7) !important; border: 1px solid var(--violet-light) !important; }
 .home-cta__btn:hover { background: white !important; border-color: var(--violet-mid) !important; transform: translateY(-4px) !important; box-shadow: 0 12px 32px rgba(123,79,216,.15) !important; }
 
 /* ─────────────────────────────────────────
@@ -1365,6 +1354,45 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   margin: 0 0 2rem;
 }
 
+/* Pleine largeur */
+.retreats-hero {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: clamp(240px, 38vw, 500px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 60px 24px;
+  position: relative;
+}
+
+/* Overlay pour l'opacité */
+.retreats-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45); /* ajuste entre 0.3 et 0.6 selon goût */
+}
+
+/* Texte au-dessus de l'overlay */
+.retreats-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Intro recentrée */
+.retreats-intro {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px 24px;
+  text-align: center;
+}
+
 .retreats-hero__intro {
   font-family: 'Jost', sans-serif;
   font-size: 17px;
@@ -1375,7 +1403,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 
 .retreats-categories {
-  padding: 3rem var(--px) 4rem;
+  padding: 1rem var(--px) 4rem;
   background: var(--root-bg);
 }
 
@@ -1494,7 +1522,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 
 .corporate-intro {
-  padding: 2rem var(--px) 3rem;
+  padding: 2rem var(--px) 0rem;
   max-width: 760px;
   margin: 0 auto;
 }
@@ -1641,17 +1669,11 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 
 .spiritual-orb {
-  width: clamp(100px, 12vw, 150px);
-  height: clamp(100px, 12vw, 150px);
+  width: clamp(200px, 28vw, 480px);
+  aspect-ratio: 1 / 1;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--c6), var(--c7));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow:
-    0 20px 56px rgba(197,184,240,.3),
-    0 0 0 16px rgba(232,184,240,.08),
-    0 0 0 32px rgba(197,184,240,.04);
+  overflow: hidden; 
+  box-shadow: 0 20px 56px rgba(197, 184, 240, .3), 0 0 0 8px rgba(197, 184, 240, .08);
   position: relative;
 }
 
@@ -1905,7 +1927,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 .spiritual-card__list li {
   font-family: 'Jost', sans-serif;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 300;
   color: var(--text-light);
   line-height: 1.6;
@@ -1923,7 +1945,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .spiritual-card__format-note {
   font-family: 'Jost', sans-serif;
   font-size: 14px;
-  font-weight: 300;
+  font-weight: 400;
   font-style: italic;
   color: var(--violet-mid);
   margin: 0 0 1.5rem;

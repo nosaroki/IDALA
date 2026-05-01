@@ -9,7 +9,7 @@ import Footer from '../../components/Footer'
 
 const PRACTS_MAP = {
   'yoga':                { titleFr: 'Yoga',                  titleEn: 'Yoga',               messageFr: 'Renforcez le corps, libérez l\'esprit',          messageEn: 'Strengthen the body, free the mind' },
-  'osteopathy':          { titleFr: 'Ostéopathie',           titleEn: 'Osteopathy',          messageFr: 'Retrouvez l\'équilibre par la thérapie manuelle', messageEn: 'Restore balance through manual therapy' },
+  'osteotherapy':        { titleFr: 'Ostéothérapie',         titleEn: 'Osteotherapy',        messageFr: 'Retrouvez l\'équilibre par la thérapie manuelle', messageEn: 'Restore balance through manual therapy' },
   'therapeutic-massage': { titleFr: 'Massage Thérapeutique', titleEn: 'Therapeutic Massage', messageFr: 'Relâchez les tensions, invitez le repos profond',  messageEn: 'Release tension, invite deep rest' },
   'acupuncture':         { titleFr: 'Acupuncture',           titleEn: 'Acupuncture',         messageFr: 'Sagesse ancienne pour un équilibre moderne',      messageEn: 'Ancient wisdom for modern balance' },
   'tai-chi':             { titleFr: 'Tai Chi',               titleEn: 'Tai Chi',             messageFr: 'Bougez avec intention, trouvez votre calme',      messageEn: 'Move with intention, find your stillness' },

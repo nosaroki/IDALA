@@ -27,7 +27,7 @@ import gogong from '../assets/practitioners/gogong.jpg';
 import ladyyoga from '../assets/practitioners/ladyyoga.jpg';
 import breathwork from '../assets/practitioners/breathwrk.jpg';
 import facemedit from '../assets/practitioners/meditt.jpg';
-import updownyoga from '../assets/banner/banner_yoga2.jpg'
+import yogabeige from '../assets/yogabeige.jpg'
 
 const TESTIMONIALS = [
   {
@@ -203,16 +203,16 @@ function Home() {
         {/* ── SECTION 4 — GALERIE ── */}
           <section className="home-gallery reveal" ref={refGallery}>
             <div className="home-gallery__grid">
-              <div className="home-gallery__item home-gallery__item--tall" onClick={() => navigate('/practices/reiki')} style={{ cursor: 'pointer' }}>
+              <div className="home-gallery__item home-gallery__item--tall" onClick={() => navigate('/practices/sound-healing')} style={{ cursor: 'pointer' }}>
                 <img src={sointbt} alt="Healing" />
-                <span className="home-gallery__caption">{lang === 'fr' ? 'Soin énergetique' : 'Energetic alignment'}</span>
+                <span className="home-gallery__caption">{lang === 'fr' ? 'Sound Healing' : 'Sound Healing'}</span>
               </div>
               <div className="home-gallery__item" onClick={() => navigate('/practices/reiki')} style={{ cursor: 'pointer' }}>
                 <img src={marine_reiki} alt="Reiki" />
                 <span className="home-gallery__caption">Reiki</span>
               </div>
               <div className="home-gallery__item" onClick={() => navigate('/practices/yoga')} style={{ cursor: 'pointer' }}>
-                <img src={updownyoga} alt="Yoga" />
+                <img src={yogabeige} alt="Yoga" style={{ objectFit: 'cover', objectPosition: 'center 95%' }} />
                 <span className="home-gallery__caption">Yoga</span>
               </div>
               <div className="home-gallery__item home-gallery__item--wide" onClick={() => navigate('/practices/meditation')} style={{ cursor: 'pointer' }}>
@@ -281,9 +281,9 @@ function Home() {
             <button className="btn btn--outline home-cta__btn" onClick={() => navigate('/corporate')}>
               {lang === 'fr' ? 'Bien-être en entreprise' : 'Corporate Wellbeing'}
             </button>
-            {/* <button className="btn btn--outline home-cta__btn" onClick={() => navigate('/spiritual')}>
-              {lang === 'fr' ? 'Tarot & Guidance' : 'Reading & Guidance'}
-            </button> */}
+            <button className="btn btn--outline home-cta__btn" onClick={() => navigate('/spiritual')}>
+              {lang === 'fr' ? 'Guidance' : 'Guidance'}
+            </button>
             <button className="btn btn--outline home-cta__btn" onClick={() => navigate('/astrology')}>
               {lang === 'fr' ? 'Thème Astral' : 'Birth Chart'}
             </button>

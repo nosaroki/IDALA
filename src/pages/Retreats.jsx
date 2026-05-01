@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { LangCtx } from '../components/LangContext'
+import bannerRetraite from '../assets/banner/banner_retraite.jpg'
 import Footer from '../components/Footer'
 
 const Icons = {
@@ -87,33 +88,41 @@ export default function Retreats() {
 
       <div className="page-wrap">
 
-        {/* Hero */}
-        <section className="retreats-hero">
-          <p className="retreats-hero__eyebrow">
-            {lang === 'fr' ? 'Retraites' : 'Retreats'}
-          </p>
-          <h1 className="retreats-hero__title">
-            {lang === 'fr' ? 'Trouvez la retraite faite pour vous.' : 'Find the retreat made for you.'}
-          </h1>
-          <p className="retreats-hero__catch">
+       <section
+          className="practice-page__banner"
+          style={{ backgroundImage: `url(${bannerRetraite})` }}
+        >
+          <div className="practice-page__banner-overlay">
+            <p className="retreats-hero__eyebrow">
+              {lang === 'fr' ? 'Retraites' : 'Retreats'}
+            </p>
+            <h1 className="retreats-hero__title">
+              {lang === 'fr' ? 'Trouvez la retraite faite pour vous.' : 'Find the retreat made for you.'}
+            </h1>
+            <p className="retreats-hero__catch">
+              {lang === 'fr'
+                ? 'Sortir du quotidien pour mieux y revenir.'
+                : 'Step away from the everyday to return to yourself.'}
+            </p>
+          </div>
+        </section>
+
+        {/* Intro texte */}
+        <section className="retreats-intro">
+          <p className="retreats-hero__intro">
             {lang === 'fr'
-              ? 'Sortir du quotidien pour mieux y revenir.'
-              : 'Step away from the everyday to return to yourself.'}
+              ? <>Nous vous guidons vers des retraites d'exception à travers le monde, <br />conçues comme de véritables expériences immersives, hors du quotidien. <br/>Chaque séjour vous offre un cadre propice au lâcher-prise, <br />à la reconnexion et à un travail en profondeur sur l'équilibre entre le corps et l'esprit.</>
+              : <>We guide you towards exceptional retreats around the world, <br/>designed as truly immersive experiences away from the everyday. <br/>Each stay offers a setting conducive to letting go, <br></br>reconnecting and working deeply on the balance between body and mind.</>}
           </p>
           <p className="retreats-hero__intro">
             {lang === 'fr'
-              ? 'Nous vous guidons vers des retraites d\'exception à travers le monde, conçues comme de véritables expériences immersives, hors du quotidien. Chaque séjour vous offre un cadre propice au lâcher-prise, à la reconnexion et à un travail en profondeur sur l\'équilibre entre le corps et l\'esprit.'
-              : 'We guide you towards exceptional retreats around the world, designed as truly immersive experiences away from the everyday. Each stay offers a setting conducive to letting go, reconnecting and working deeply on the balance between body and mind.'}
+              ? <>Retraites de yoga, méditation, breathwork et autres disciplines dédiées au bien-être : <br/>chaque programme est structuré pour accompagner une transformation durable, <br/>dans un environnement inspirant et sécurisé.</>
+              : <>Yoga retreats, meditation, breathwork and other wellness disciplines: <br/>each programme is structured to support lasting transformation, in an inspiring and safe environment.</>}
           </p>
           <p className="retreats-hero__intro">
             {lang === 'fr'
-              ? 'Retraites de yoga, méditation, breathwork et autres disciplines dédiées au bien-être : chaque programme est structuré pour accompagner une transformation durable, dans un environnement inspirant et sécurisé.'
-              : 'Yoga retreats, meditation, breathwork and other wellness disciplines: each programme is structured to support lasting transformation, in an inspiring and safe environment.'}
-          </p>
-          <p className="retreats-hero__intro">
-            {lang === 'fr'
-              ? 'Nous sélectionnons avec exigence des lieux et des intervenants reconnus, afin de garantir des expériences authentiques, immersives et de haute qualité.'
-              : 'We rigorously select recognised venues and practitioners to guarantee authentic, immersive and high-quality experiences.'}
+              ? <>Nous sélectionnons avec exigence des lieux et des intervenants reconnus, <br/>afin de garantir des expériences authentiques, immersives et de haute qualité.</>
+              : <>We rigorously select recognised venues and practitioners to guarantee <br/>authentic, immersive and high-quality experiences.</>}
           </p>
         </section>
 
@@ -128,9 +137,9 @@ export default function Retreats() {
                   className="retreat-card"
                   style={{ '--retreat-color': hexColor }}
                 >
-                <div className="retreat-card__circle">
+                  <div className="retreat-card__circle">
                     <div className="retreat-card__icon">{cat.icon}</div>
-                </div>
+                  </div>
                   <h3 className="retreat-card__title">
                     {lang === 'fr' ? cat.titleFr : cat.titleEn}
                   </h3>
@@ -149,7 +158,7 @@ export default function Retreats() {
             {lang === 'fr'
               ? <>Une question ?<br />Contactez-nous pour trouver la retraite qui vous correspond.</>
               : <>A question?<br />Contact us to find the retreat that suits you.</>
-              }
+            }
           </p>
           <a href="mailto:contact@theidalafamily.com" className="btn btn--violet-mid">
             contact@theidalafamily.com

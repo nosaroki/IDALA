@@ -50,7 +50,7 @@ function About() {
                 <>
                   <p className="about-founder__body">Diane Thomas œuvre pour <strong>l'harmonie du corps et de l'esprit</strong> à travers une approche structurée et intégrative qui allie force physique, stabilité émotionnelle et clarté mentale.</p>
                   <p className="about-founder__body">Son parcours de <strong>coaching en neurosciences</strong> lui a permis de développer une compréhension fine du mental, de la résilience émotionnelle et des mécanismes de transformation durable.</p>
-                  <p className="about-founder__body"><br /><strong>Professeure de Yoga</strong> Hatha et Vinyasa et <strong>Maître Reiki</strong>, elle tisse un lien entre connaissance scientifique et équilibre intérieur, guidant chacun vers une présence plus consciente et un bien-être profond.</p>
+                  <p className="about-founder__body"><br /><strong>En tant que professeure de Yoga</strong> Hatha et Vinyasa, elle tisse un lien entre connaissance scientifique et équilibre intérieur, guidant chacun vers une présence plus consciente et un bien-être profond.</p>
                   <p className="about-founder__body">Diplômée en Entrepreneuriat & Innovation de l'University of Southern California (USC), elle apporte une vision stratégique et pérenne à tout ce qu'elle entreprend, incarnant l'union du sens et de la structure.</p>
                   <p className="about-founder__body">Guidée par la devise <strong>mens sana in corpore sano</strong>, elle crée The Idala Family : un espace de confiance où le corps et l'esprit évoluent ensemble, dans la recherche d'un bien-être durable et éclairé.</p>
                  
@@ -59,7 +59,7 @@ function About() {
                 <>
                   <p className="about-founder__body">Diane Thomas works towards harmony of body and mind through a structured and integrative approach that combines physical strength, emotional stability and mental clarity.</p>
                   <p className="about-founder__body">Her background in neuroscience-based coaching has given her a deep understanding of the mind, emotional resilience and the mechanisms of lasting transformation.</p>
-                  <p className="about-founder__body">A Hatha and Vinyasa Yoga Teacher and Reiki Master, she weaves a connection between scientific knowledge and inner balance, guiding each person towards more conscious presence and profound well-being.</p>
+                  <p className="about-founder__body">As a Hatha and Vinyasa Yoga Teacher, she weaves a connection between scientific knowledge and inner balance, guiding each person towards more conscious presence and profound well-being.</p>
                   <p className="about-founder__body">A graduate in Entrepreneurship & Innovation from the University of Southern California (USC), she brings strategic and lasting vision to everything she undertakes, embodying the union of meaning and structure.</p>
                   <p className="about-founder__body">Guided by the motto <em>mens sana in corpore sano</em>, she created The Idala Family : a trusted space where body and mind evolve together in the pursuit of lasting and enlightened well-being.</p>
                 </>

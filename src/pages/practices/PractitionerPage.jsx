@@ -100,7 +100,7 @@ export default function PractitionerPage() {
 
  const PRACTS_MAP = {
   'yoga':                { fr: 'Yoga',                  en: 'Yoga' },
-  'osteopathy':          { fr: 'Ostéopathie',           en: 'Osteopathy' },
+  'osteotherapy':          { fr: 'Ostéothérapie',           en: 'Osteotherapy' },
   'therapeutic-massage': { fr: 'Massage Thérapeutique', en: 'Therapeutic Massage' },
   'acupuncture':         { fr: 'Acupuncture',           en: 'Acupuncture' },
   'tai-chi':             { fr: 'Tai Chi',               en: 'Tai Chi' },

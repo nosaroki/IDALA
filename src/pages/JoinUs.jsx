@@ -22,7 +22,7 @@ const LANGUAGES = [
 
 const PRATIQUES = [
   { fr: 'Yoga',                  en: 'Yoga',                value: 'yoga' },
-  { fr: 'Ostéopathie',           en: 'Osteopathy',          value: 'osteopathy' },
+  { fr: 'Ostéothérapie',         en: 'Osteotherapy',          value: 'osteotherapy' },
   { fr: 'Massage Thérapeutique', en: 'Therapeutic Massage', value: 'therapeutic-massage' },
   { fr: 'Acupuncture',           en: 'Acupuncture',         value: 'acupuncture' },
   { fr: 'Tai Chi',               en: 'Tai Chi',             value: 'tai-chi' },
