@@ -2,7 +2,7 @@
 //  HOME 
 // ─────────────────────────────────────────
 
-import { useRef } from 'react';
+// import { useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLang } from '../components/LangContext';
 import { Helmet } from 'react-helmet-async';
@@ -29,38 +29,38 @@ import breathwork from '../assets/practitioners/breathwrk.jpg';
 import facemedit from '../assets/practitioners/meditt.jpg';
 import yogabeige from '../assets/yogabeige.jpg'
 
-const TESTIMONIALS = [
-  {
-    en: '"Working with an IDALA practitioner completely shifted how I approach my daily routine. My body feels stronger and my mind is finally quiet."',
-    fr: '"Travailler avec un praticien IDALA a complètement transformé ma façon d\'aborder mon quotidien. Mon corps est plus fort et mon esprit est enfin apaisé."',
-    author: '— Sarah M., London',
-  },
-  {
-    en: '"The coaching gave me exactly the clarity I needed. It felt grounded, professional and deeply insightful."',
-    fr: '"Le coaching m\'a apporté exactement la clarté dont j\'avais besoin. C\'était ancré, professionnel et vraiment éclairant."',
-    author: '— Marie-Claire D., Paris',
-  },
-  {
-    en: '"I attended one of Isabelle\'s retreats in Costa Rica and it was life-changing. The nervous system reset was exactly what my body needed."',
-    fr: '"J\'ai participé à l\'une des retraites d\'Isabelle au Costa Rica et c\'était une expérience transformatrice. La remise à zéro du système nerveux était exactement ce dont mon corps avait besoin."',
-    author: '— Thomas R., New York',
-  },
-  {
-    en: '"The yoga sessions through IDALA are unlike any I\'ve tried before. Structured, intentional and beautifully guided."',
-    fr: '"Les séances de yoga via IDALA sont incomparables. Structurées, intentionnelles et magnifiquement guidées."',
-    author: '— Amara L., Berlin',
-  },
-  {
-    en: '"My birth chart reading opened a whole new dimension of self-understanding. Incredibly thorough and compassionate."',
-    fr: '"La lecture de mon thème astral a ouvert une toute nouvelle dimension de connaissance de moi-même. Incroyablement approfondie et bienveillante."',
-    author: '— Isabelle F., Montréal',
-  },
-  {
-    en: '"IDALA feels like a trusted family. Every practitioner is professional and the community is genuinely supportive."',
-    fr: '"IDALA ressemble à une famille de confiance. Chaque praticien est professionnel et la communauté est vraiment bienveillante."',
-    author: '— Yuki T., Tokyo',
-  },
-];
+// const TESTIMONIALS = [
+//   {
+//     en: '"Working with an IDALA practitioner completely shifted how I approach my daily routine. My body feels stronger and my mind is finally quiet."',
+//     fr: '"Travailler avec un praticien IDALA a complètement transformé ma façon d\'aborder mon quotidien. Mon corps est plus fort et mon esprit est enfin apaisé."',
+//     author: '— Sarah M., London',
+//   },
+//   {
+//     en: '"The coaching gave me exactly the clarity I needed. It felt grounded, professional and deeply insightful."',
+//     fr: '"Le coaching m\'a apporté exactement la clarté dont j\'avais besoin. C\'était ancré, professionnel et vraiment éclairant."',
+//     author: '— Marie-Claire D., Paris',
+//   },
+//   {
+//     en: '"I attended one of Isabelle\'s retreats in Costa Rica and it was life-changing. The nervous system reset was exactly what my body needed."',
+//     fr: '"J\'ai participé à l\'une des retraites d\'Isabelle au Costa Rica et c\'était une expérience transformatrice. La remise à zéro du système nerveux était exactement ce dont mon corps avait besoin."',
+//     author: '— Thomas R., New York',
+//   },
+//   {
+//     en: '"The yoga sessions through IDALA are unlike any I\'ve tried before. Structured, intentional and beautifully guided."',
+//     fr: '"Les séances de yoga via IDALA sont incomparables. Structurées, intentionnelles et magnifiquement guidées."',
+//     author: '— Amara L., Berlin',
+//   },
+//   {
+//     en: '"My birth chart reading opened a whole new dimension of self-understanding. Incredibly thorough and compassionate."',
+//     fr: '"La lecture de mon thème astral a ouvert une toute nouvelle dimension de connaissance de moi-même. Incroyablement approfondie et bienveillante."',
+//     author: '— Isabelle F., Montréal',
+//   },
+//   {
+//     en: '"IDALA feels like a trusted family. Every practitioner is professional and the community is genuinely supportive."',
+//     fr: '"IDALA ressemble à une famille de confiance. Chaque praticien est professionnel et la communauté est vraiment bienveillante."',
+//     author: '— Yuki T., Tokyo',
+//   },
+// ];
 
 function Home() {
   const { lang }  = useLang();
@@ -71,18 +71,18 @@ function Home() {
   const refGallery     = useReveal(0);
   const refDiane       = useReveal(0);
   const refCta         = useReveal(0);
-  const refTestimonials = useReveal(0);
-  const trackRef  = useRef(null);
-  const durRef    = useRef(44);
-  const all       = [...TESTIMONIALS, ...TESTIMONIALS];
+  // const refTestimonials = useReveal(0);
+  // const trackRef  = useRef(null);
+  // const durRef    = useRef(44);
+  // const all       = [...TESTIMONIALS, ...TESTIMONIALS];
 
-  const adjustSpeed = faster => {
-    if (!trackRef.current) return;
-    durRef.current = faster
-      ? Math.max(durRef.current * 0.65, 8)
-      : Math.min(durRef.current * 1.4, 120);
-    trackRef.current.style.animationDuration = durRef.current + 's';
-  };
+  // const adjustSpeed = faster => {
+  //   if (!trackRef.current) return;
+  //   durRef.current = faster
+  //     ? Math.max(durRef.current * 0.65, 8)
+  //     : Math.min(durRef.current * 1.4, 120);
+  //   trackRef.current.style.animationDuration = durRef.current + 's';
+  // };
 
   return (
     <>
@@ -291,7 +291,7 @@ function Home() {
         </section>
 
         {/* ── SECTION 7 — TESTIMONIALS ── */}
-        <section className="testimonials-wrap reveal" ref={refTestimonials}>
+        {/* <section className="testimonials-wrap reveal" ref={refTestimonials}>
           <div className="testimonials-header">
             <span className="eyebrow">{lang === 'fr' ? 'Témoignages' : 'Testimonials'}</span>
             <h2 className="section-title">{lang === 'fr' ? 'Ce que dit notre communauté' : 'What Our Community Says'}</h2>
@@ -310,7 +310,7 @@ function Home() {
             <button className="tcard-btn" onClick={() => adjustSpeed(false)}>←</button>
             <button className="tcard-btn" onClick={() => adjustSpeed(true)}>→</button>
           </div>
-        </section>
+        </section> */}
 
         <Footer />
       </div>

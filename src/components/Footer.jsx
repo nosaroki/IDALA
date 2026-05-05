@@ -51,7 +51,7 @@ function Footer() {
       </div> */}
 
       {/* Ligne 3 — copyright */}
-      <div className="footer-bottom">
+      {/* <div className="footer-bottom">
         <div className="footer-copy">
           {lang === 'fr' ? (
             <>© Tous droits réservés. Développé par <a href="https://nod-consulting.com/" target="_blank" rel="noreferrer" style={{ color: 'var(--violet-mid)', textDecoration: 'none' }}>NOD Consulting</a></>
@@ -59,7 +59,7 @@ function Footer() {
             <>© All rights reserved. Developed by <a href="https://nod-consulting.com/" target="_blank" rel="noreferrer" style={{ color: 'var(--violet-mid)', textDecoration: 'none' }}>NOD Consulting</a></>
           )}
         </div>
-      </div>
+      </div> */}
 
     </footer>
   );

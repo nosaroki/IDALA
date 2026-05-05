@@ -712,7 +712,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 /* ── Practice Page ─────────────────────────────── */
 .practice-page__banner {
   min-height: 320px;
-  background: linear-gradient(135deg, var(--pale) 0%, var(--root-bg2) 100%);
+  background: linear-gradient(135deg, var(--pale) 0%, var(--root-bg2) 70%);
   background-size: cover;
   background-position: center;
   display: flex;
@@ -1329,10 +1329,10 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 .retreats-hero__eyebrow {
   font-family: 'Jost', sans-serif;
-  font-size: 9px;
+  font-size: 15px;
   letter-spacing: 4px;
   text-transform: uppercase;
-  color: var(--violet-mid);
+  color: #F0EAFA;
   margin: 0 0 1rem;
 }
 
@@ -1348,7 +1348,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .retreats-hero__catch {
   font-family: 'Cormorant Garamond', serif;
   font-size: clamp(1.2rem, 2.5vw, 1.6rem);
-  font-weight: 300;
+  font-weight: 500;
   font-style: italic;
   color: var(--violet-mid);
   margin: 0 0 2rem;
@@ -1496,7 +1496,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 .corporate-hero__eyebrow {
   font-family: 'Jost', sans-serif;
-  font-size: 9px;
+  font-size: 15px;
   letter-spacing: 4px;
   text-transform: uppercase;
   color: var(--violet-mid);
@@ -1515,7 +1515,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .corporate-hero__catch {
   font-family: 'Cormorant Garamond', serif;
   font-size: clamp(1.2rem, 2.5vw, 1.6rem);
-  font-weight: 300;
+  font-weight: 500;
   font-style: italic;
   color: var(--violet-mid);
   margin: 0;
