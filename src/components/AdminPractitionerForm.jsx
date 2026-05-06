@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import IbanField from './IbanField'
 
 const LANGUAGES = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
@@ -137,12 +138,13 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
 
   useEffect(() => {
     setTimeout(async () => {
+      const { praticien_pratiques: _pp, pratiques: _pratiques, ...cleanInitial } = initial || {}
       const base = {
-        ...(initial || emptyForm),
+        ...(initial ? cleanInitial : emptyForm),
         photo_url: form.photo_url || initial?.photo_url || '',
         photos_urls: (initial?.photos_urls && initial.photos_urls.length > 0)
-        ? initial.photos_urls
-        : (initial?.photo_url ? [initial.photo_url] : []),
+          ? initial.photos_urls
+          : (initial?.photo_url ? [initial.photo_url] : []),
         pratiques_associees: []
       }
 
@@ -269,11 +271,21 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
     async function handlePhotos(e) {
       const files = Array.from(e.target.files)
       if (!files.length) return
+
+      // Vérification taille : 10 MB max par fichier
+      const maxSize = 10 * 1024 * 1024
+      const oversized = files.filter(f => f.size > maxSize)
+      if (oversized.length > 0) {
+        alert('Certaines photos dépassent 10 MB. Veuillez les compresser avant l\'upload.')
+        return
+      }
+
       setUploading(true)
       const urls = []
       for (const file of files) {
         const compressed = await compressImage(file)
-        const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`
+        const ext = 'jpg'
+        const filename = `candidatures/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
         const { data, error } = await supabase.storage
           .from('photos-praticiens')
           .upload(filename, compressed, { upsert: true })
@@ -416,9 +428,10 @@ function handleSubmit(e) {
       </label>
 
       <label>IBAN
-        <input value={form.iban || ''}
-          placeholder="FR76..."
-          onChange={e => setForm({ ...form, iban: e.target.value })} />
+        <IbanField
+          iban={form.iban}
+          onChange={(value) => setForm({ ...form, iban: value })}
+        />
       </label>
 
       <div className="admin-form__row">
@@ -536,7 +549,7 @@ function handleSubmit(e) {
                         <div className="join-offre-block">
                           <div className="join-offre-block__header">
                             <span className="join-offre-block__num">Offre {i + 1}</span>
-                            <button type="button" className="join-offre-remove"
+                            <button type="button" className="join-offre-remove" aria-label="Supprimer cette offre"
                               onClick={() => {
                                 const updated = form.pratiques_associees.map(p =>
                                   p.pratique_id === pa.pratique_id
@@ -678,9 +691,7 @@ function handleSubmit(e) {
                   className={`join-photo-item ${form.photo_url === url ? 'join-photo-item--selected' : ''}`}
                   style={{ position: 'relative' }}
                 >
-                  <img
-                    src={url}
-                    alt={`photo ${i + 1}`}
+                  <img src={url} alt={`Photo ${i + 1}/${form.photos_urls.length}`}
                     onClick={() => setForm(f => ({ ...f, photo_url: url }))}
                     style={{ cursor: 'pointer' }}
                   />

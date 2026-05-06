@@ -1,0 +1,32 @@
+export const MODES_EXERCICE = [
+  {
+    value: 'in-person',
+    fr: 'Au cabinet',
+    en: 'In-person',
+    descFr: 'Le rendez-vous a lieu sur le lieu d\'exercice du praticien.',
+    descEn: 'The session takes place at the practitioner\'s office.',
+    bg: '#3DCC7022',
+    color: '#0F6B36',    
+    border: '#3DCC7044',
+  },
+  {
+    value: 'home',
+    fr: 'À domicile',
+    en: 'Home visit',
+    descFr: 'Le praticien se déplace chez vous.',
+    descEn: 'The practitioner comes to your home.',
+    bg: '#FF9A3C22',
+    color: '#9C4A00',     
+    border: '#FF9A3C44',
+  },
+  {
+    value: 'visio',
+    fr: 'En visio',
+    en: 'Online',
+    descFr: 'Le rendez-vous se fait à distance.',
+    descEn: 'The session takes place remotely.',
+    bg: '#3AA8E022',
+    color: '#0D4F7A',    
+    border: '#3AA8E044',
+  },
+]

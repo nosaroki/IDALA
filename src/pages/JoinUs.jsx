@@ -2,6 +2,8 @@ import { useState, useContext, useRef, useEffect  } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { supabase } from '../lib/supabaseClient'
 import { LangCtx } from '../components/LangContext'
+import { PRATIQUES } from '../constants/pratiques'
+import { PUBLIC_CIBLE, TYPE_SEANCE } from '../constants/audiences'
 
 const LANGUAGES = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
@@ -18,35 +20,6 @@ const LANGUAGES = [
   { code: 'pl', label: 'Polski', flag: '🇵🇱' },
   { code: 'tr', label: 'Türkçe', flag: '🇹🇷' },
   { code: 'hi', label: 'हिन्दी', flag: '🇮🇳' },
-]
-
-const PRATIQUES = [
-  { fr: 'Yoga',                  en: 'Yoga',                value: 'yoga' },
-  { fr: 'Ostéothérapie',         en: 'Osteotherapy',          value: 'osteotherapy' },
-  { fr: 'Massage Thérapeutique', en: 'Therapeutic Massage', value: 'therapeutic-massage' },
-  { fr: 'Acupuncture',           en: 'Acupuncture',         value: 'acupuncture' },
-  { fr: 'Tai Chi',               en: 'Tai Chi',             value: 'tai-chi' },
-  { fr: 'Qi Gong',               en: 'Qi Gong',             value: 'qi-gong' },
-  { fr: 'Méditation',            en: 'Meditation',          value: 'meditation' },
-  { fr: 'Breathwork',            en: 'Breathwork',          value: 'breathwork' },
-  { fr: 'Coaching',              en: 'Coaching',            value: 'coaching' },
-  { fr: 'Hypnothérapie',         en: 'Hypnotherapy',        value: 'hypnotherapy' },
-  { fr: 'Reiki',                 en: 'Reiki',               value: 'reiki' },
-  { fr: 'Sound Healing',         en: 'Sound Healing',       value: 'sound-healing' },
-  { fr: 'Naturopathie',          en: 'Naturopathy',         value: 'naturopathy' },
-]
-
-const PUBLIC_CIBLE = [
-  { fr: 'Adultes',      en: 'Adults',   value: 'adults' },
-  { fr: 'Enfants',      en: 'Children', value: 'children' },
-  { fr: 'Seniors',      en: 'Seniors',  value: 'seniors' },
-  { fr: 'Tous publics', en: 'All ages', value: 'all' },
-]
-
-const TYPE_SEANCE = [
-  { fr: 'Individuelle', en: 'Individual', value: 'individual' },
-  { fr: 'Groupe',       en: 'Group',      value: 'group' },
-  { fr: 'Les deux',     en: 'Both',       value: 'both' },
 ]
 
 const emptyForm = {
@@ -147,39 +120,50 @@ async function compressImage(file) {
   })
 }
 
- async function handlePhotos(e) {
-  const files = Array.from(e.target.files)
-  if (!files.length) return
-  setUploading(true)
-  const urls = []
-  for (const file of files) {
-    const compressed = await compressImage(file)
-    const ext = 'jpg'
-    const filename = `candidatures/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-    const { data, error } = await supabase.storage
-      .from('photos-praticiens')
-      .upload(filename, compressed, { upsert: true })
-    if (!error) {
-      const { data: urlData } = supabase.storage
-        .from('photos-praticiens')
-        .getPublicUrl(data.path)
-      urls.push(urlData.publicUrl)
+    async function handlePhotos(e) {
+      const files = Array.from(e.target.files)
+      if (!files.length) return
+
+      // Vérification taille : 10 MB max par fichier
+      const maxSize = 10 * 1024 * 1024 // 10 MB
+      const oversized = files.filter(f => f.size > maxSize)
+      if (oversized.length > 0) {
+        setError(lang === 'fr'
+          ? `Certaines photos dépassent 10 MB. Veuillez les compresser avant l'upload.`
+          : `Some photos exceed 10 MB. Please compress them before upload.`)
+        return
+      }
+
+      setUploading(true)
+      setError(null)
+      const urls = []
+      for (const file of files) {
+        const compressed = await compressImage(file)
+        const ext = 'jpg'
+        const filename = `candidatures/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+        const { data, error } = await supabase.storage
+          .from('photos-praticiens')
+          .upload(filename, compressed, { upsert: true })
+        if (!error) {
+          const { data: urlData } = supabase.storage
+            .from('photos-praticiens')
+            .getPublicUrl(data.path)
+          urls.push(urlData.publicUrl)
+        }
+      }
+      setForm(f => ({
+        ...f,
+        photos: [...f.photos, ...urls],
+        main_photo: f.main_photo || urls[0] || ''
+      }))
+      setUploading(false)
     }
-  }
-  setForm(f => ({
-    ...f,
-    photos: [...f.photos, ...urls],
-    main_photo: f.main_photo || urls[0] || ''
-  }))
-  setUploading(false)
-}
 
   function validate() {
     // Téléphone
     if (form.telephone) {
-      const phoneClean = form.telephone.replace(/[\s\-+()]/g, '')
-      const isSequential = '0123456789'.includes(phoneClean)
-      if (!/^\d{8,15}$/.test(phoneClean) || isSequential) {
+      const phoneClean = form.telephone.replace(/[^\d]/g, '')
+      if (phoneClean.length < 8 || phoneClean.length > 15) {
         return lang === 'fr' ? 'Numéro de téléphone invalide.' : 'Invalid phone number.'
       }
     }
@@ -406,8 +390,17 @@ async function compressImage(file) {
               </div>
               <div className="join-field">
                 <label>{lang === 'fr' ? 'Téléphone *' : 'Phone *'}</label>
-                <input required value={form.telephone}
-                  onChange={e => setForm({ ...form, telephone: e.target.value })} />
+                <input
+                  required
+                  value={form.telephone}
+                  placeholder={lang === 'fr' ? 'ex : +33612345678' : 'e.g. +33612345678'}
+                  onChange={e => {
+                    let value = e.target.value
+                    const hasPlus = value.startsWith('+')
+                    const cleaned = value.replace(/[^\d]/g, '')
+                    setForm({ ...form, telephone: hasPlus ? `+${cleaned}` : cleaned })
+                  }}
+                />
               </div>
             </div>
 
@@ -817,8 +810,12 @@ async function compressImage(file) {
                 <>
                   <p className="join-hint">
                     {lang === 'fr'
-                      ? 'Cliquez sur une photo pour la définir comme photo de profil principale'
-                      : 'Click on a photo to set it as your main profile picture'}
+                      ? form.photos.length === 1
+                        ? 'Cette photo est automatiquement définie comme photo de profil principale. Ajoutez-en d\'autres pour pouvoir choisir.'
+                        : 'Cliquez sur une photo pour la définir comme photo de profil principale'
+                      : form.photos.length === 1
+                        ? 'This photo is automatically set as your main profile picture. Add more to be able to choose.'
+                        : 'Click on a photo to set it as your main profile picture'}
                   </p>
                   <div className="join-photos-select">
                     {form.photos.map((url, i) => (
@@ -827,10 +824,10 @@ async function compressImage(file) {
                         className={`join-photo-item ${form.main_photo === url ? 'join-photo-item--selected' : ''}`}
                         onClick={() => setForm(f => ({ ...f, main_photo: url }))}
                       >
-                        <img src={url} alt={`photo ${i + 1}`} />
+                        <img src={url} alt={`Photo ${i + 1}/${form.photos.length}`} />
                         {form.main_photo === url && (
                           <div className="join-photo-item__badge">
-                            {lang === 'fr' ? 'Principal' : 'Main'}
+                            {lang === 'fr' ? 'Principale' : 'Main'}
                           </div>
                         )}
                       </div>

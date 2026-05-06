@@ -2,6 +2,9 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { useNavigate } from 'react-router-dom'
 import Toast from '../../components/Toast'
+import { PRATIQUES } from '../../constants/pratiques'
+import { MODES_EXERCICE } from '../../constants/modes'
+import { PUBLIC_CIBLE, TYPE_SEANCE } from '../../constants/audiences'
 
 const STATUTS = [
   { value: 'en_attente', labelFr: 'En attente', color: '#FF9A3C' },
@@ -9,46 +12,14 @@ const STATUTS = [
   { value: 'refusé',     labelFr: 'Refusé',     color: '#FF6B6B' },
 ]
 
-const FORMAT_LABELS = {
-  'in-person': 'Au cabinet',
-  'home': 'À domicile',
-  'visio': 'En visio',
-}
-
-const TYPE_SEANCE_LABELS = {
-  'individual': 'Individuelle',
-  'group': 'Groupe',
-  'both': 'Les deux',
-}
-
-const PUBLIC_CIBLE_LABELS = {
-  'adults': 'Adultes',
-  'children': 'Enfants',
-  'seniors': 'Seniors',
-  'all': 'Tous publics',
-}
-
-const PRATIQUES_LABELS = {
-  'yoga': 'Yoga',
-  'osteotherapy': 'Ostéothérapie',
-  'therapeutic-massage': 'Massage Thérapeutique',
-  'acupuncture': 'Acupuncture',
-  'tai-chi': 'Tai Chi',
-  'qi-gong': 'Qi Gong',
-  'meditation': 'Méditation',
-  'breathwork': 'Breathwork',
-  'coaching': 'Coaching',
-  'hypnotherapy': 'Hypnothérapie',
-  'reiki': 'Reiki',
-  'sound-healing': 'Sound Healing',
-  'naturopathy': 'Naturopathie',
-}
-
-function formatList(value, labels) {
+function formatList(value, source, lang = 'fr') {
   if (!value) return '—'
   return value.split(',')
     .map(v => v.trim())
-    .map(v => labels[v] || v)
+    .map(v => {
+      const item = source.find(s => s.value === v)
+      return item ? item[lang] : v
+    })
     .join(', ')
 }
 
@@ -104,12 +75,17 @@ export default function Candidatures() {
     }
   }
 
-  async function handleDelete(id) {
-    if (!confirm('Supprimer cette candidature ?')) return
-    await supabase.from('candidatures').delete().eq('id', id)
-    setCandidatures(prev => prev.filter(c => c.id !== id))
-    if (selected?.id === id) setSelected(null)
-  }
+    async function handleDelete(id) {
+      if (!confirm('Supprimer cette candidature ?')) return
+      const { error } = await supabase.from('candidatures').delete().eq('id', id)
+      if (error) {
+        setToast({ message: 'Erreur lors de la suppression', type: 'error' })
+        return
+      }
+      setCandidatures(prev => prev.filter(c => c.id !== id))
+      if (selected?.id === id) setSelected(null)
+      setToast({ message: 'Candidature supprimée', type: 'success' })
+    }
 
   async function handleLogout() {
     await supabase.auth.signOut()
@@ -165,7 +141,7 @@ export default function Candidatures() {
                   {statutInfo(c.statut).labelFr}
                 </span>
               </div>
-              <p className="cand-item__pratique">{formatList(c.pratique, PRATIQUES_LABELS)}</p>
+              <p className="cand-item__pratique">{formatList(c.pratique, PRATIQUES)}</p>
               <p className="cand-item__date">
                 {new Date(c.created_at).toLocaleDateString('fr-FR')}
               </p>
@@ -220,8 +196,8 @@ export default function Candidatures() {
               <div className="cand-section">
                 <h3>Profil & expertise</h3>
                 <div className="cand-grid">
-                  <div><span>Spécialités</span><p>{formatList(selected.pratique, PRATIQUES_LABELS)}</p></div>
-                  <div><span>Public cible</span><p>{formatList(selected.public_cible, PUBLIC_CIBLE_LABELS)}</p></div>
+                  <div><span>Spécialités</span><p>{formatList(selected.pratique, PRATIQUES)}</p></div>
+                  <div><span>Public cible</span><p>{formatList(selected.public_cible, PUBLIC_CIBLE)}</p></div>
                   <div><span>Expérience</span><p>{selected.experience || '—'}</p></div>
                 </div>
                 <div><span className="cand-label">Certifications</span><p className="cand-text">{selected.certifications || '—'}</p></div>
@@ -235,7 +211,7 @@ export default function Candidatures() {
                   <h3>Détail par pratique</h3>
                   {Object.entries(selected.pratiques_details).map(([slug, details]) => (
                     <div key={slug} className="cand-pratique-block">
-                      <h4 className="cand-pratique-title">{PRATIQUES_LABELS[slug] || slug}</h4>
+                      <h4 className="cand-pratique-title">{PRATIQUES.find(p => p.value === slug)?.fr || slug}</h4>
 
                       <div className="cand-grid" style={{ marginBottom: '16px' }}>
                         <div>
@@ -290,8 +266,8 @@ export default function Candidatures() {
               <div className="cand-section">
                 <h3>Offres & séances</h3>
                 <div className="cand-grid">
-                  <div><span>Type de séance</span><p>{TYPE_SEANCE_LABELS[selected.type_seance] || '—'}</p></div>
-                  <div><span>Format</span><p>{formatList(selected.mode_exercice, FORMAT_LABELS)}</p></div>
+                  <div><span>Type de séance</span><p>{TYPE_SEANCE.find(t => t.value === selected.type_seance)?.fr || '—'}</p></div>
+                  <div><span>Format</span><p>{formatList(selected.mode_exercice, MODES_EXERCICE)}</p></div>
                 </div>
               </div>
 
@@ -307,32 +283,52 @@ export default function Candidatures() {
               )}
 
               {/* Photos */}
-              {selected.photos_urls?.length > 0 && (
-                <div className="cand-section">
-                  <h3>Photos ({selected.photos_urls.length})</h3>
-                  <div className="cand-photos">
-                    {selected.photos_urls.map((url, i) => (
-                      <a key={i} href={url} target="_blank" rel="noopener noreferrer">
-                        <img src={url} alt={`photo ${i + 1}`} />
-                        {selected.main_photo === url && (
-                          <span style={{
-                            position: 'absolute',
-                            bottom: '4px',
-                            left: '4px',
-                            background: '#9B6EBF',
-                            color: 'white',
-                            fontSize: '10px',
-                            padding: '2px 8px',
-                            borderRadius: '4px',
-                            letterSpacing: '1px',
-                            textTransform: 'uppercase',
-                          }}>Principal</span>
-                        )}
-                      </a>
-                    ))}
+                {selected.photos_urls?.length > 0 && (
+                  <div className="cand-section">
+                    <h3>Photos ({selected.photos_urls.length})</h3>
+                    <div className="cand-photos">
+                      {selected.photos_urls.map((url, i) => (
+                        <a 
+                          key={i} 
+                          href={url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          style={{ 
+                            position: 'relative',
+                            display: 'inline-block',
+                            width: '100px',
+                            height: '100px',
+                            flexShrink: 0,
+                          }}
+                        >
+                          <img src={url} 
+                              alt={`Photo de ${selected.prenom} ${selected.nom} (${i + 1}/${selected.photos_urls.length})`} 
+                              style={{ 
+                              width: '100%',
+                              height: '100%',
+                              objectFit: 'cover',
+                              borderRadius: '8px',
+                            }}
+                          />
+                          {selected.main_photo === url && (
+                            <span style={{
+                              position: 'absolute',
+                              bottom: '4px',
+                              left: '4px',
+                              background: '#9B6EBF',
+                              color: 'white',
+                              fontSize: '10px',
+                              padding: '2px 8px',
+                              borderRadius: '4px',
+                              letterSpacing: '1px',
+                              textTransform: 'uppercase',
+                            }}>Principale</span>
+                          )}
+                        </a>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
             </div>
           </div>

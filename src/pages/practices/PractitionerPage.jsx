@@ -4,41 +4,17 @@ import { Helmet } from 'react-helmet-async'
 import { supabase } from '../../lib/supabaseClient'
 import { LangCtx } from '../../components/LangContext'
 import Footer from '../../components/Footer'
+import { MODES_EXERCICE } from '../../constants/modes'
+import { PRATIQUES } from '../../constants/pratiques'
 
 function ModeTags({ mode, lang }) {
   const modes = mode ? mode.split(',').map(m => m.trim()) : []
-  const tags = []
-  if (modes.includes('in-person')) {
-    tags.push({
-      fr: 'Au cabinet',
-      en: 'In-person',
-      descFr: 'Le rendez-vous a lieu sur le lieu d\'exercice du praticien.',
-      descEn: 'The session takes place at the practitioner\'s office.',
-      bg: '#3DCC7022', color: '#1a8844', border: '#3DCC7044'
-    })
-  }
-  if (modes.includes('home')) {
-    tags.push({
-      fr: 'À domicile',
-      en: 'Home visit',
-      descFr: 'Le praticien se déplace chez vous.',
-      descEn: 'The practitioner comes to your home.',
-      bg: '#FF9A3C22', color: '#cc6600', border: '#FF9A3C44'
-    })
-  }
-  if (modes.includes('visio')) {
-    tags.push({
-      fr: 'En visio',
-      en: 'Online',
-      descFr: 'Le rendez-vous se fait à distance.',
-      descEn: 'The session takes place remotely.',
-      bg: '#3AA8E022', color: '#1166aa', border: '#3AA8E044'
-    })
-  }
+  const tags = MODES_EXERCICE.filter(m => modes.includes(m.value))
+  
   return (
     <div className="pract-profile__modes">
       {tags.map(t => (
-        <div key={t.en} className="pract-profile__mode-item">
+        <div key={t.value} className="pract-profile__mode-item">
           <span className="mode-tag"
             style={{ background: t.bg, color: t.color, border: `1px solid ${t.border}` }}>
             {lang === 'fr' ? t.fr : t.en}
@@ -121,26 +97,11 @@ export default function PractitionerPage() {
     </div>
   )
 
- const PRACTS_MAP = {
-  'yoga':                { fr: 'Yoga',                  en: 'Yoga' },
-  'osteotherapy':          { fr: 'Ostéothérapie',           en: 'Osteotherapy' },
-  'therapeutic-massage': { fr: 'Massage Thérapeutique', en: 'Therapeutic Massage' },
-  'acupuncture':         { fr: 'Acupuncture',           en: 'Acupuncture' },
-  'tai-chi':             { fr: 'Tai Chi',               en: 'Tai Chi' },
-  'qi-gong':             { fr: 'Qi Gong',               en: 'Qi Gong' },
-  'meditation':          { fr: 'Méditation',            en: 'Meditation' },
-  'breathwork':          { fr: 'Breathwork',            en: 'Breathwork' },
-  'coaching':            { fr: 'Coaching',              en: 'Coaching' },
-  'hypnotherapy':        { fr: 'Hypnothérapie',         en: 'Hypnotherapy' },
-  'reiki':               { fr: 'Reiki',                 en: 'Reiki' },
-  'sound-healing':       { fr: 'Sound Healing',         en: 'Sound Healing' },
-  'naturopathy':         { fr: 'Naturopathie',          en: 'Naturopathy' },
-}
-
 const pratiqueSlug = pratique?.slug
-const practiceName = lang === 'fr'
-  ? (PRACTS_MAP[pratiqueSlug]?.fr || pratique?.nom)
-  : (PRACTS_MAP[pratiqueSlug]?.en || pratique?.nom)
+const pratiqueFromConst = PRATIQUES.find(p => p.value === pratiqueSlug)
+const practiceName = pratiqueFromConst
+  ? (lang === 'fr' ? pratiqueFromConst.fr : pratiqueFromConst.en)
+  : pratique?.nom
 
   return (
     <>
@@ -176,7 +137,7 @@ const practiceName = lang === 'fr'
           <div className="pract-profile__hero">
             <div className="pract-profile__photo">
               {praticien.photo_url
-                ? <img src={praticien.photo_url} alt={`${praticien.prenom} ${praticien.nom}`} />
+                ? <img src={praticien.photo_url} alt={praticien.slug} />
                 : <div className="pract-profile__photo-placeholder" />
               }
             </div>
