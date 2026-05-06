@@ -291,16 +291,16 @@ const calc = async () => {
               <div className="divider" />
               {lang === 'fr' ? (
                 <>
-                  <p className="astro-hero-v2__body">L'astrologie part d'une idée simple : au moment de votre naissance, le ciel adopte une configuration unique. À partir de votre date, heure et lieu de naissance, un thème astral personnalisé est établi, offrant une cartographie symbolique de votre monde intérieur.</p>
-                  <p className="astro-hero-v2__body">Ce thème met en lumière vos tendances de personnalité, vos réflexes émotionnels,<br /> vos ressources, vos zones de tension et les grands questionnements qui jalonnent<br /> votre vie. <br />Il ne dicte pas ce qui va vous arriver ; il éclaire plutôt votre manière de traverser<br /> les expériences.</p>
-                  <p className="astro-hero-v2__body">Approchée avec rigueur, l'astrologie devient un cadre structuré pour mieux vous observer : votre façon de penser, de ressentir, de vous relier aux autres, de décider<br /> et d'évoluer au fil du temps.</p>
-                  <p className="astro-hero-v2__body">Un outil d'introspection au service de l'alignement, de la clarté et de choix<br /> plus conscients.</p>
+                 <p className="astro-hero-v2__body">L'astrologie part d'une idée simple : au moment de votre naissance, le ciel adopte une configuration unique. À partir de votre date, heure et lieu de naissance, un thème astral personnalisé est établi, offrant une cartographie symbolique de votre monde intérieur.</p>
+                 <p className="astro-hero-v2__body">Ce thème met en lumière vos tendances de personnalité, vos réflexes émotionnels, vos ressources, vos zones de tension et les grands questionnements qui jalonnent votre vie. Il ne dicte pas ce qui va vous arriver ; il éclaire plutôt votre manière de traverser les expériences.</p>
+                 <p className="astro-hero-v2__body">Approchée avec rigueur, l'astrologie devient un cadre structuré pour mieux vous observer : votre façon de penser, de ressentir, de vous relier aux autres, de décider et d'évoluer au fil du temps.</p>
+                 <p className="astro-hero-v2__body">Un outil d'introspection au service de l'alignement, de la clarté et de choix plus conscients.</p>
                 </>
               ) : (
                 <>
                   <p className="astro-hero-v2__body">Astrology starts from a simple idea: at the moment of your birth, the sky adopts a unique configuration. From your date, time and place of birth, a personalised birth chart is drawn up, offering a symbolic map of your inner world.</p>
-                  <p className="astro-hero-v2__body">This chart illuminates your personality tendencies, emotional reflexes, resources, areas of tension and the key questions that run through your life. It does not dictate<br /> what will happen to you; rather, it sheds light on how you move through experiences.</p>
-                  <p className="astro-hero-v2__body">Approached with rigour, astrology becomes a structured framework for better<br /> self-observation: the way you think, feel, connect with others, make decisions<br /> and evolve over time.</p>
+                  <p className="astro-hero-v2__body">This chart illuminates your personality tendencies, emotional reflexes, resources, areas of tension and the key questions that run through your life. It does not dictate what will happen to you; rather, it sheds light on how you move through experiences.</p>
+                  <p className="astro-hero-v2__body">Approached with rigour, astrology becomes a structured framework for better self-observation: the way you think, feel, connect with others, make decisions and evolve over time.</p>
                   <p className="astro-hero-v2__body">A tool for introspection in service of alignment, clarity and more conscious choices.</p>
                 </>
               )}

@@ -174,41 +174,85 @@ async function compressImage(file) {
   setUploading(false)
 }
 
-      function validate() {
-      // Téléphone : minimum 8 chiffres, pas de suite 0123456789
-      if (form.telephone) {
-        const phoneClean = form.telephone.replace(/[\s\-+()]/g, '')
-        const isSequential = '0123456789'.includes(phoneClean)
-        if (!/^\d{8,15}$/.test(phoneClean) || isSequential) {
-          return lang === 'fr' ? 'Numéro de téléphone invalide.' : 'Invalid phone number.'
-        }
+  function validate() {
+    // Téléphone
+    if (form.telephone) {
+      const phoneClean = form.telephone.replace(/[\s\-+()]/g, '')
+      const isSequential = '0123456789'.includes(phoneClean)
+      if (!/^\d{8,15}$/.test(phoneClean) || isSequential) {
+        return lang === 'fr' ? 'Numéro de téléphone invalide.' : 'Invalid phone number.'
       }
-
-      // Email
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-        return lang === 'fr' ? 'Adresse email invalide.' : 'Invalid email address.'
-      }
-
-      // IBAN (format basique : 2 lettres + 2 chiffres + jusqu'à 30 caractères alphanumériques)
-        if (form.iban) {
-          const ibanClean = form.iban.replace(/\s/g, '').toUpperCase()
-          if (!/^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/.test(ibanClean)) {
-            return lang === 'fr' ? 'Format IBAN invalide.' : 'Invalid IBAN format.'
-          }
-        }
-
-      // Spécialités : au moins une cochée
-      if (form.specialites.length === 0) {
-        return lang === 'fr' ? 'Veuillez sélectionner au moins une spécialité.' : 'Please select at least one specialty.'
-      }
-
-      // Photos : minimum 2
-      if (form.photos.length < 2) {
-        return lang === 'fr' ? 'Veuillez uploader au moins 2 photos.' : 'Please upload at least 2 photos.'
-      }
-
-      return null
     }
+
+    // Email
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      return lang === 'fr' ? 'Adresse email invalide.' : 'Invalid email address.'
+    }
+
+    // Localisation
+    if (!form.ville || !form.pays) {
+      return lang === 'fr' ? 'Veuillez sélectionner une ville dans la liste.' : 'Please select a city from the list.'
+    }
+
+    // Langues
+    if (!form.langues_list || form.langues_list.length === 0) {
+      return lang === 'fr' ? 'Veuillez sélectionner au moins une langue.' : 'Please select at least one language.'
+    }
+
+    // Spécialités
+    if (form.specialites.length === 0) {
+      return lang === 'fr' ? 'Veuillez sélectionner au moins une spécialité.' : 'Please select at least one specialty.'
+    }
+
+    // Détails par pratique : descriptions FR/EN + au moins une offre complète
+    for (const slug of form.specialites) {
+      const details = form.pratiques_details[slug] || {}
+      if (!details.bio_fr?.trim() || !details.bio_en?.trim()) {
+        return lang === 'fr'
+          ? `Veuillez remplir les descriptions FR et EN pour chaque spécialité.`
+          : `Please fill in FR and EN descriptions for each specialty.`
+      }
+      if (!details.offres || details.offres.length === 0) {
+        return lang === 'fr'
+          ? `Veuillez ajouter au moins une offre par spécialité.`
+          : `Please add at least one offer per specialty.`
+      }
+      for (const offre of details.offres) {
+        if (!offre.titre_fr?.trim() || !offre.titre_en?.trim() || !offre.duree) {
+          return lang === 'fr'
+            ? 'Veuillez compléter le titre (FR/EN) et la durée pour chaque offre.'
+            : 'Please complete title (FR/EN) and duration for each offer.'
+        }
+      }
+    }
+
+    // Public cible
+    if (form.public_cible.length === 0) {
+      return lang === 'fr' ? 'Veuillez sélectionner au moins un public cible.' : 'Please select at least one target audience.'
+    }
+
+    // Type de séance
+    if (!form.type_seance) {
+      return lang === 'fr' ? 'Veuillez sélectionner un type de séance.' : 'Please select a session type.'
+    }
+
+    // Format
+    if (!form.mode_exercice) {
+      return lang === 'fr' ? 'Veuillez sélectionner au moins un format.' : 'Please select at least one format.'
+    }
+
+    // Photos
+    if (form.photos.length < 2) {
+      return lang === 'fr' ? 'Veuillez uploader au moins 2 photos.' : 'Please upload at least 2 photos.'
+    }
+
+    // Photo principale sélectionnée
+    if (!form.main_photo) {
+      return lang === 'fr' ? 'Veuillez sélectionner une photo principale.' : 'Please select a main photo.'
+    }
+
+    return null
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -260,23 +304,35 @@ async function compressImage(file) {
     setLoading(false)
   }
 
-  if (submitted) return (
-    
-    <div className="join-success">
-      <div className="join-success__card">
-        <p className="join-success__icon">✦</p>
-        <h1 className="join-success__title">
-          {lang === 'fr' ? 'Candidature envoyée' : 'Application received'}
-        </h1>
-        <p className="join-success__text">
-          {lang === 'fr'
-            ? <>Merci pour votre intérêt. <br />Nous examinerons votre profil avec soin et reviendrons vers vous dans les meilleurs délais.</>
-            : <>Thank you for your interest.<br /> We will carefully review your profile and get back to you as soon as possible.'</>
+    if (submitted) return (
+      <div className="join-success">
+        <div className="join-success__card">
+          <p className="join-success__icon">✦</p>
+          <h1 className="join-success__title">
+            {lang === 'fr' ? 'Candidature envoyée' : 'Application received'}
+          </h1>
+          <p className="join-success__text">
+            {lang === 'fr'
+              ? <>Merci pour votre intérêt. <br />Nous examinerons votre profil avec soin et reviendrons vers vous dans les meilleurs délais.</>
+              : <>Thank you for your interest.<br /> We will carefully review your profile and get back to you as soon as possible.</>
             }
-        </p>
+          </p>
+          <button
+            type="button"
+            className="btn btn--violet-mid"
+            onClick={() => {
+              setForm(emptyForm)
+              setSubmitted(false)
+              setError(null)
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            }}
+            style={{ marginTop: '24px' }}
+          >
+            {lang === 'fr' ? 'Soumettre une autre candidature' : 'Submit another application'}
+          </button>
+        </div>
       </div>
-    </div>
-  )
+    )
 
   return (
     <>
@@ -535,7 +591,7 @@ async function compressImage(file) {
                               </div>
                               <div className="join-field">
                                 <label>{lang === 'fr' ? 'Titre EN *' : 'Title EN *'}</label>
-                                <input value={offre.titre_en || ''}
+                                <input required value={offre.titre_en || ''}
                                   placeholder="e.g. Adult Reiki session 1h"
                                   onChange={e => setForm(f => {
                                     const offres = [...f.pratiques_details[slug].offres]
@@ -547,7 +603,7 @@ async function compressImage(file) {
                             <div className="join-row">
                               <div className="join-field">
                                 <label>{lang === 'fr' ? 'Description FR' : 'Description FR'}</label>
-                                <textarea rows={2} value={offre.description_fr || ''}
+                                <textarea required rows={2} value={offre.description_fr || ''}
                                   onChange={e => setForm(f => {
                                     const offres = [...f.pratiques_details[slug].offres]
                                     offres[i] = { ...offres[i], description_fr: e.target.value }
@@ -556,7 +612,7 @@ async function compressImage(file) {
                               </div>
                               <div className="join-field">
                                 <label>{lang === 'fr' ? 'Description EN' : 'Description EN'}</label>
-                                <textarea rows={2} value={offre.description_en || ''}
+                                <textarea required rows={2} value={offre.description_en || ''}
                                   onChange={e => setForm(f => {
                                     const offres = [...f.pratiques_details[slug].offres]
                                     offres[i] = { ...offres[i], description_en: e.target.value }
@@ -576,13 +632,13 @@ async function compressImage(file) {
                                   })} />
                               </div>
                               <div className="join-field">
-                                <label>{lang === 'fr' ? 'Durée (minutes) *' : 'Duration (minutes) *'}</label>
+                                <label>{lang === 'fr' ? 'Durée *' : 'Duration *'}</label>
                                 <input
                                   type="number"
                                   min="1"
                                   required
                                   value={offre.duree || ''}
-                                  placeholder="ex: 60"
+                                  placeholder={lang === 'fr' ? 'ex : 60' : 'e.g. 60'}
                                   onChange={e => setForm(f => {
                                     const offres = [...f.pratiques_details[slug].offres]
                                     offres[i] = { ...offres[i], duree: e.target.value }
@@ -686,7 +742,7 @@ async function compressImage(file) {
               <label>{lang === 'fr' ? 'Format *' : 'Format *'}</label>
               <div className="join-checkboxes join-checkboxes--row">
                 {[
-                  { value: 'in-person', fr: 'En personne', en: 'In person' },
+                  { value: 'in-person', fr: 'Au cabinet', en: 'In-person' },
                   { value: 'home', fr: 'À domicile', en: 'Home visit' },
                   { value: 'visio', fr: 'En visio', en: 'Online' },
                 ].map(opt => {

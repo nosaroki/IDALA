@@ -9,6 +9,49 @@ const STATUTS = [
   { value: 'refusé',     labelFr: 'Refusé',     color: '#FF6B6B' },
 ]
 
+const FORMAT_LABELS = {
+  'in-person': 'Au cabinet',
+  'home': 'À domicile',
+  'visio': 'En visio',
+}
+
+const TYPE_SEANCE_LABELS = {
+  'individual': 'Individuelle',
+  'group': 'Groupe',
+  'both': 'Les deux',
+}
+
+const PUBLIC_CIBLE_LABELS = {
+  'adults': 'Adultes',
+  'children': 'Enfants',
+  'seniors': 'Seniors',
+  'all': 'Tous publics',
+}
+
+const PRATIQUES_LABELS = {
+  'yoga': 'Yoga',
+  'osteotherapy': 'Ostéothérapie',
+  'therapeutic-massage': 'Massage Thérapeutique',
+  'acupuncture': 'Acupuncture',
+  'tai-chi': 'Tai Chi',
+  'qi-gong': 'Qi Gong',
+  'meditation': 'Méditation',
+  'breathwork': 'Breathwork',
+  'coaching': 'Coaching',
+  'hypnotherapy': 'Hypnothérapie',
+  'reiki': 'Reiki',
+  'sound-healing': 'Sound Healing',
+  'naturopathy': 'Naturopathie',
+}
+
+function formatList(value, labels) {
+  if (!value) return '—'
+  return value.split(',')
+    .map(v => v.trim())
+    .map(v => labels[v] || v)
+    .join(', ')
+}
+
 export default function Candidatures() {
   const [candidatures, setCandidatures] = useState([])
   const [selected, setSelected]         = useState(null)
@@ -31,25 +74,24 @@ export default function Candidatures() {
     load()
   }, [])
 
-async function handleStatut(id, statut) {
-  await supabase.from('candidatures').update({ statut }).eq('id', id)
-  setCandidatures(prev => prev.map(c => c.id === id ? { ...c, statut } : c))
-  if (selected?.id === id) setSelected(prev => ({ ...prev, statut }))
+  async function handleStatut(id, statut) {
+    await supabase.from('candidatures').update({ statut }).eq('id', id)
+    setCandidatures(prev => prev.map(c => c.id === id ? { ...c, statut } : c))
+    if (selected?.id === id) setSelected(prev => ({ ...prev, statut }))
 
-  // Envoyer l'email d'onboarding si validé et pas encore envoyé
-  if (statut === 'validé' && !selected?.onboarding_sent) {
-    const { data: { session } } = await supabase.auth.getSession()
-    const { error } = await supabase.functions.invoke('send-onboarding', {
-      headers: {
-        Authorization: `Bearer ${session?.access_token}`
-      },
-      body: {
-        candidature_id: selected.id,
-        prenom: selected.prenom,
-        nom: selected.nom,
-        email: selected.email,
-      }
-    })
+    if (statut === 'validé' && !selected?.onboarding_sent) {
+      const { data: { session } } = await supabase.auth.getSession()
+      const { error } = await supabase.functions.invoke('send-onboarding', {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        },
+        body: {
+          candidature_id: selected.id,
+          prenom: selected.prenom,
+          nom: selected.nom,
+          email: selected.email,
+        }
+      })
       if (!error) {
         setCandidatures(prev => prev.map(c =>
           c.id === id ? { ...c, onboarding_sent: true } : c
@@ -59,8 +101,8 @@ async function handleStatut(id, statut) {
       } else {
         setToast({ message: 'Erreur lors de l\'envoi', type: 'error' })
       }
+    }
   }
-}
 
   async function handleDelete(id) {
     if (!confirm('Supprimer cette candidature ?')) return
@@ -123,7 +165,7 @@ async function handleStatut(id, statut) {
                   {statutInfo(c.statut).labelFr}
                 </span>
               </div>
-              <p className="cand-item__pratique">{c.pratique}</p>
+              <p className="cand-item__pratique">{formatList(c.pratique, PRATIQUES_LABELS)}</p>
               <p className="cand-item__date">
                 {new Date(c.created_at).toLocaleDateString('fr-FR')}
               </p>
@@ -163,6 +205,7 @@ async function handleStatut(id, statut) {
 
             <div className="cand-detail__body">
 
+              {/* Informations générales */}
               <div className="cand-section">
                 <h3>Informations générales</h3>
                 <div className="cand-grid">
@@ -173,28 +216,86 @@ async function handleStatut(id, statut) {
                 </div>
               </div>
 
+              {/* Profil & expertise */}
               <div className="cand-section">
                 <h3>Profil & expertise</h3>
                 <div className="cand-grid">
-                  <div><span>Spécialités</span><p>{selected.pratique || '—'}</p></div>
-                  <div><span>Public cible</span><p>{selected.public_cible || '—'}</p></div>
+                  <div><span>Spécialités</span><p>{formatList(selected.pratique, PRATIQUES_LABELS)}</p></div>
+                  <div><span>Public cible</span><p>{formatList(selected.public_cible, PUBLIC_CIBLE_LABELS)}</p></div>
                   <div><span>Expérience</span><p>{selected.experience || '—'}</p></div>
                 </div>
                 <div><span className="cand-label">Certifications</span><p className="cand-text">{selected.certifications || '—'}</p></div>
-                <div><span className="cand-label">Biographie</span><p className="cand-text" style={{ whiteSpace: 'pre-wrap' }}>{selected.motivation || '—'}</p></div>
+                <div><span className="cand-label">Bio générale FR</span><p className="cand-text" style={{ whiteSpace: 'pre-wrap' }}>{selected.bio_fr || selected.motivation || '—'}</p></div>
+                <div><span className="cand-label">Bio générale EN</span><p className="cand-text" style={{ whiteSpace: 'pre-wrap' }}>{selected.bio_en || '—'}</p></div>
               </div>
 
+              {/* Pratiques détaillées */}
+              {selected.pratiques_details && Object.keys(selected.pratiques_details).length > 0 && (
+                <div className="cand-section">
+                  <h3>Détail par pratique</h3>
+                  {Object.entries(selected.pratiques_details).map(([slug, details]) => (
+                    <div key={slug} className="cand-pratique-block">
+                      <h4 className="cand-pratique-title">{PRATIQUES_LABELS[slug] || slug}</h4>
+
+                      <div className="cand-grid" style={{ marginBottom: '16px' }}>
+                        <div>
+                          <span>Description FR</span>
+                          <p style={{ whiteSpace: 'pre-wrap' }}>{details.bio_fr || '—'}</p>
+                        </div>
+                        <div>
+                          <span>Description EN</span>
+                          <p style={{ whiteSpace: 'pre-wrap' }}>{details.bio_en || '—'}</p>
+                        </div>
+                      </div>
+
+                      {details.offres?.length > 0 && (
+                        <div>
+                          <span className="cand-label">Offres</span>
+                          {details.offres.map((offre, i) => (
+                            <div key={i} className="cand-offre-block" style={{
+                              border: '1px solid #E4D8F5',
+                              borderRadius: '8px',
+                              padding: '12px',
+                              marginTop: '8px',
+                              background: '#FAF7FE'
+                            }}>
+                              <p style={{ fontWeight: 500, marginBottom: '8px' }}>
+                                Offre {i + 1} : {offre.titre_fr || '—'}
+                                {offre.titre_en && ` / ${offre.titre_en}`}
+                              </p>
+                              <div className="cand-grid">
+                                <div><span>Durée</span><p>{offre.duree ? `${offre.duree} min` : '—'}</p></div>
+                                <div><span>Prix</span><p>{offre.prix ? `${offre.prix} €` : '—'}</p></div>
+                              </div>
+                              {(offre.description_fr || offre.description_en) && (
+                                <div className="cand-grid" style={{ marginTop: '8px' }}>
+                                  {offre.description_fr && (
+                                    <div><span>Description FR</span><p style={{ whiteSpace: 'pre-wrap' }}>{offre.description_fr}</p></div>
+                                  )}
+                                  {offre.description_en && (
+                                    <div><span>Description EN</span><p style={{ whiteSpace: 'pre-wrap' }}>{offre.description_en}</p></div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Offres & séances (général) */}
               <div className="cand-section">
                 <h3>Offres & séances</h3>
                 <div className="cand-grid">
-                  <div><span>Type</span><p>{selected.type_seance || '—'}</p></div>
-                  <div><span>Durée</span><p>{selected.duree_seance || '—'}</p></div>
-                  <div><span>Prix</span><p>{selected.prix ? `${selected.prix} €` : '—'}</p></div>
-                  <div><span>Format</span><p>{selected.mode_exercice || '—'}</p></div>
+                  <div><span>Type de séance</span><p>{TYPE_SEANCE_LABELS[selected.type_seance] || '—'}</p></div>
+                  <div><span>Format</span><p>{formatList(selected.mode_exercice, FORMAT_LABELS)}</p></div>
                 </div>
-                <div><span className="cand-label">Description</span><p className="cand-text">{selected.description_seance || '—'}</p></div>
               </div>
 
+              {/* Présence en ligne */}
               {(selected.instagram || selected.site_web) && (
                 <div className="cand-section">
                   <h3>Présence en ligne</h3>
@@ -205,13 +306,28 @@ async function handleStatut(id, statut) {
                 </div>
               )}
 
+              {/* Photos */}
               {selected.photos_urls?.length > 0 && (
                 <div className="cand-section">
-                  <h3>Photos</h3>
+                  <h3>Photos ({selected.photos_urls.length})</h3>
                   <div className="cand-photos">
                     {selected.photos_urls.map((url, i) => (
                       <a key={i} href={url} target="_blank" rel="noopener noreferrer">
                         <img src={url} alt={`photo ${i + 1}`} />
+                        {selected.main_photo === url && (
+                          <span style={{
+                            position: 'absolute',
+                            bottom: '4px',
+                            left: '4px',
+                            background: '#9B6EBF',
+                            color: 'white',
+                            fontSize: '10px',
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            letterSpacing: '1px',
+                            textTransform: 'uppercase',
+                          }}>Principal</span>
+                        )}
                       </a>
                     ))}
                   </div>

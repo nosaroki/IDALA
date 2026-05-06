@@ -91,6 +91,7 @@ serve(async (req) => {
       bio_en,
       bio_complete_en,
       photo_url,
+      photos_urls: cand.photos_urls || [], 
       slug,
       onboarding_token: token,
       actif: false,

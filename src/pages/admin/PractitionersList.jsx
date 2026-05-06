@@ -15,7 +15,7 @@ export default function PractitionersList() {
   async function fetchAll() {
     const [{ data: prats }, { data: practiciens }] = await Promise.all([
       supabase.from('pratiques').select('*').order('nom'),
-      supabase.from('praticiens').select('*, pratiques(nom)').order('nom')
+      supabase.from('praticiens').select('*, praticien_pratiques(pratiques(nom))').order('nom')
     ])
     setPratiques(prats || [])
     setPraticiens(practiciens || [])
@@ -180,8 +180,14 @@ async function handleSave(form) {
                     }
                   </td>
                   <td>{p.prenom} {p.nom}</td>
-                  <td>{p.pratiques?.nom || '—'}</td>
-                  <td>{p.localisation || '—'}</td>
+                  <td>
+                    {p.praticien_pratiques?.length > 0
+                      ? p.praticien_pratiques.map(pp => pp.pratiques?.nom).filter(Boolean).join(', ')
+                      : '—'}
+                  </td>
+                  <td>
+                    {[p.ville, p.pays].filter(Boolean).join(', ') || p.localisation || '—'}
+                  </td>
                   <td>{p.actif ? '✓' : '—'}</td>
                   <td>
                     <button className="admin-btn admin-btn--sm"

@@ -95,21 +95,22 @@ function Home() {
 
       <div className="page-wrap">
 
-<section className="home-hero">
-  <div className="home-hero__inner">
-    <div className="home-hero__logo-wrap">
-      <img src={newlogo} alt="The Idala Family" className="home-hero__logo" />
-    </div>
-    <p className="home-hero__tagline">
-      {lang === 'fr' ? 'Bien-être · Corps · Esprit · Énergie' : 'Wellness · Body · Mind · Energy'}
-    </p>
-    <h1 className="home-hero__headline">
-      {lang === 'fr'
-        ? 'Prenez soin de vous'
-        : 'Taking care of yourself'}
-    </h1>
-  </div>
-</section>
+    <section className="home-hero">
+      <div className="home-hero__inner">
+            <h1 className="home-hero__headline">
+              {lang === 'fr'
+                ? 'Le bien-être commence par la bonne rencontre'
+                : 'Wellness begins with the right connection'}
+            </h1>
+        <div className="home-hero__logo-wrap">
+          <img src={newlogo} alt="The Idala Family" className="home-hero__logo" />
+        </div>
+        <p className="home-hero__tagline">
+          {lang === 'fr' ? 'Corps · Esprit · Énergie' : 'Body · Mind · Energy'}
+        </p>
+
+      </div>
+    </section>
 
         {/* ── SECTION 2 — CONCEPT ── */}
         <section className="home-concept reveal" ref={refConcept}>
@@ -121,7 +122,7 @@ function Home() {
             <div className="home-concept__text-col">
               {lang === 'en' ? (
                 <>
-                   <p className="home-concept__body">The Idala Family is a space dedicated to those who wish to evolve with intention and consistency.</p>
+                   <p className="home-concept__body">The Idala Family is a premium space dedicated to those who wish to evolve with intention and consistency.</p>
                    <p className="home-concept__body">We bring together practitioners of excellence around a vision of well-being that <strong>unifies body, mind and energy</strong>: strengthening the body, calming the mind and cultivating inner clarity.</p>
                    <p className="home-concept__body">Well-being is not a sum of practices, but a living balance. <strong>Physical strength, emotional stability and clarity</strong> nourish one another when one dimension rises, the whole transforms.</p>
                    <p className="home-concept__body">We converge these dimensions within a structured and demanding approach to modern well-being, designed for those seeking <strong>meaning, alignment and lasting transformation.</strong></p>
@@ -132,7 +133,7 @@ function Home() {
                 </>
               ) : (
                 <>
-                  <p className="home-concept__body">The Idala Family est un espace dédié à celles et ceux qui souhaitent évoluer avec intention et cohérence.</p>
+                  <p className="home-concept__body">The Idala Family est un espace premium dédié à celles et ceux qui souhaitent évoluer avec intention et cohérence.</p>
                   <p className="home-concept__body">Nous rassemblons des praticiens d’excellence autour d’une vision du bien‑être qui <strong>unifie corps, mental et énergie</strong>: renforcer le corps, apaiser le mental et cultiver la clarté intérieure.</p>
                   <p className="home-concept__body">Le bien‑être n’est pas une somme de pratiques, mais un équilibre vivant. <strong>Force physique, stabilité émotionnelle et lucidité</strong> se nourrissent mutuellement, quand une dimension s’élève, l’ensemble se transforme.</p>
                   <p className="home-concept__body">Nous faisons converger ces dimensions au sein d’une approche structurée et exigeante du bien‑être moderne pensée pour celles et ceux qui recherchent <strong>sens, alignement et transformation durable.</strong></p>                 

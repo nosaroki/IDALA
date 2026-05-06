@@ -1,5 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 const LANGUAGES = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
@@ -18,13 +21,56 @@ const LANGUAGES = [
   { code: 'hi', label: 'हिन्दी', flag: '🇮🇳' },
 ]
 
+function SortableOffre({ index, pa, children }) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: `${pa.pratique_id}-${index}` })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    cursor: isDragging ? 'grabbing' : 'default',
+  }
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <div
+        {...attributes}
+        {...listeners}
+        style={{
+          cursor: 'grab',
+          padding: '4px 8px',
+          background: '#F0EAFA',
+          borderRadius: '4px',
+          fontSize: '11px',
+          letterSpacing: '2px',
+          textTransform: 'uppercase',
+          color: '#9B6EBF',
+          marginBottom: '8px',
+          userSelect: 'none',
+          display: 'inline-block',
+        }}
+      >
+        ⋮⋮ Glisser pour réorganiser
+      </div>
+      {children}
+    </div>
+  )
+}
+
 export default function AdminPractitionerForm({ initial, pratiques, onSave, onCancel }) {
 
   const emptyForm = {
     prenom: '', nom: '', 
     email: '', telephone: '', localisation: '',
     lien_reservation: '', actif: true,
-    photo_url: '', slug: '',
+    photo_url: '', photos_urls: [], slug: '',
     mode_exercice: 'in-person',
     iban: '', langues: '', ville: '', region: '', pays: '',
     bio_fr: '', bio_en: '',
@@ -57,6 +103,28 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
   const [locLoading, setLocLoading]   = useState(false)
   const locRef                        = useRef(null)
 
+  const sensors = useSensors(
+      useSensor(PointerSensor, {
+        activationConstraint: { distance: 8 },
+      })
+    )
+
+    function handleDragEnd(event, pa) {
+      const { active, over } = event
+      if (!over || active.id === over.id) return
+
+      const oldIndex = parseInt(active.id.split('-').pop())
+      const newIndex = parseInt(over.id.split('-').pop())
+
+      setForm(f => ({
+        ...f,
+        pratiques_associees: f.pratiques_associees.map(p =>
+          p.pratique_id === pa.pratique_id
+            ? { ...p, offres: arrayMove(p.offres, oldIndex, newIndex) }
+            : p
+        )
+      }))
+    }
   useEffect(() => {
     function handleClickOutside(e) {
       if (locRef.current && !locRef.current.contains(e.target)) {
@@ -72,6 +140,9 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
       const base = {
         ...(initial || emptyForm),
         photo_url: form.photo_url || initial?.photo_url || '',
+        photos_urls: (initial?.photos_urls && initial.photos_urls.length > 0)
+        ? initial.photos_urls
+        : (initial?.photo_url ? [initial.photo_url] : []),
         pratiques_associees: []
       }
 
@@ -195,28 +266,49 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
   })
 }
 
-async function handlePhoto(e) {
-  const file = e.target.files[0]
-  if (!file) return
-  setUploading(true)
-  const compressed = await compressImage(file)
-  const filename = `${Date.now()}.jpg`
-  const { data, error } = await supabase.storage
-    .from('photos-praticiens')
-    .upload(filename, compressed, { upsert: true })
-  if (!error) {
-    const { data: urlData } = supabase.storage
-      .from('photos-praticiens')
-      .getPublicUrl(data.path)
-    setForm(f => ({ ...f, photo_url: urlData.publicUrl }))
-  }
-  setUploading(false)
-}
+    async function handlePhotos(e) {
+      const files = Array.from(e.target.files)
+      if (!files.length) return
+      setUploading(true)
+      const urls = []
+      for (const file of files) {
+        const compressed = await compressImage(file)
+        const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`
+        const { data, error } = await supabase.storage
+          .from('photos-praticiens')
+          .upload(filename, compressed, { upsert: true })
+        if (!error) {
+          const { data: urlData } = supabase.storage
+            .from('photos-praticiens')
+            .getPublicUrl(data.path)
+          urls.push(urlData.publicUrl)
+        }
+      }
+      setForm(f => ({
+        ...f,
+        photos_urls: [...(f.photos_urls || []), ...urls],
+        photo_url: f.photo_url || urls[0] || ''
+      }))
+      setUploading(false)
+    }
+
+    function removePhoto(url) {
+      setForm(f => {
+        const newPhotos = (f.photos_urls || []).filter(u => u !== url)
+        return {
+          ...f,
+          photos_urls: newPhotos,
+          photo_url: f.photo_url === url ? (newPhotos[0] || '') : f.photo_url
+        }
+      })
+    }
 
 function handleSubmit(e) {
   e.preventDefault()
   onSave(form)
 }
+
+
 
   return (
     <form onSubmit={handleSubmit} className="admin-form">
@@ -359,8 +451,8 @@ function handleSubmit(e) {
      <label>Mode d'exercice</label>
       <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
         {[
-          { value: 'in-person', label: 'En personne' },
-          { value: 'home', label: 'À domicile' },
+          { value: 'in-person', label: 'Au cabinet' },
+          { value: 'at your place', label: 'À domicile' },
           { value: 'visio', label: 'En visio' },
         ].map(opt => {
           const current = form.mode_exercice ? form.mode_exercice.split(',').map(s => s.trim()) : []
@@ -426,21 +518,35 @@ function handleSubmit(e) {
                 </div>
 
                 {/* Offres */}
-                <p className="join-offres-label">Offres & tarifs</p>
-                {(pa.offres || []).map((offre, i) => (
-                  <div key={i} className="join-offre-block">
-                    <div className="join-offre-block__header">
-                      <span className="join-offre-block__num">Offre {i + 1}</span>
-                      <button type="button" className="join-offre-remove"
-                        onClick={() => {
-                          const updated = form.pratiques_associees.map(p =>
-                            p.pratique_id === pa.pratique_id
-                              ? { ...p, offres: p.offres.filter((_, j) => j !== i) }
-                              : p
-                          )
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={(event) => handleDragEnd(event, pa)}
+                >
+                  <SortableContext
+                    items={(pa.offres || []).map((_, i) => `${pa.pratique_id}-${i}`)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    {(pa.offres || []).map((offre, i) => (
+                      <SortableOffre
+                        key={`${pa.pratique_id}-${i}`}
+                        index={i}
+                        pa={pa}
+                      >
+                        <div className="join-offre-block">
+                          <div className="join-offre-block__header">
+                            <span className="join-offre-block__num">Offre {i + 1}</span>
+                            <button type="button" className="join-offre-remove"
+                              onClick={() => {
+                                const updated = form.pratiques_associees.map(p =>
+                                  p.pratique_id === pa.pratique_id
+                                    ? { ...p, offres: p.offres.filter((_, j) => j !== i) }
+                                    : p
+                                )
                           setForm(f => ({ ...f, pratiques_associees: updated }))
                         }}>✕</button>
                     </div>
+                    
                     <div className="admin-form__row">
                       <label>Titre FR
                         <input value={offre.titre_fr || ''}
@@ -521,7 +627,10 @@ function handleSubmit(e) {
                       </label>
                     </div>
                   </div>
+                    </SortableOffre>
                 ))}
+              </SortableContext>
+            </DndContext>
 
                 <button type="button" className="join-offre-add"
                   onClick={() => {
@@ -539,16 +648,73 @@ function handleSubmit(e) {
           </>
         )}
       </div>
+      
 
-      {/* Photo */}
-      <label>Photo
-        <input type="file" accept="image/*" onChange={handlePhoto} />
-        {uploading && <span className="admin-hint">Upload en cours...</span>}
-        {form.photo_url && (
-          <img src={form.photo_url} alt="preview"
-            style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: '50%', marginTop: 8 }} />
+      {/* Photos */}
+      <div className="admin-photos-section">
+        <p className="admin-pratiques-section__title">Photos</p>
+
+        <input
+          id="admin-photo-upload"
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={handlePhotos}
+          style={{ display: 'none' }}
+        />
+        <label htmlFor="admin-photo-upload" className="join-file-btn">
+          {uploading ? 'Upload en cours...' : '+ Ajouter des photos'}
+        </label>
+
+        {form.photos_urls?.length > 0 && (
+          <>
+            <p className="admin-hint" style={{ marginTop: 12 }}>
+              Cliquez sur une photo pour la définir comme photo principale
+            </p>
+            <div className="join-photos-select" style={{ marginTop: 8 }}>
+              {form.photos_urls.map((url, i) => (
+                <div
+                  key={i}
+                  className={`join-photo-item ${form.photo_url === url ? 'join-photo-item--selected' : ''}`}
+                  style={{ position: 'relative' }}
+                >
+                  <img
+                    src={url}
+                    alt={`photo ${i + 1}`}
+                    onClick={() => setForm(f => ({ ...f, photo_url: url }))}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  {form.photo_url === url && (
+                    <div className="join-photo-item__badge">Principal</div>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(url)}
+                    style={{
+                      position: 'absolute',
+                      top: 4,
+                      right: 4,
+                      width: 22,
+                      height: 22,
+                      borderRadius: '50%',
+                      border: 'none',
+                      background: 'rgba(0,0,0,0.6)',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontSize: 12,
+                      lineHeight: '22px',
+                      padding: 0,
+                    }}
+                    title="Supprimer cette photo"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          </>
         )}
-      </label>
+      </div>
 
       <label className="admin-form__checkbox">
         <input type="checkbox" checked={form.actif}

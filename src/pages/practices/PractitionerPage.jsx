@@ -9,21 +9,44 @@ function ModeTags({ mode, lang }) {
   const modes = mode ? mode.split(',').map(m => m.trim()) : []
   const tags = []
   if (modes.includes('in-person')) {
-    tags.push({ fr: 'En personne', en: 'In person', bg: '#3DCC7022', color: '#1a8844', border: '#3DCC7044' })
+    tags.push({
+      fr: 'Au cabinet',
+      en: 'In-person',
+      descFr: 'Le rendez-vous a lieu sur le lieu d\'exercice du praticien.',
+      descEn: 'The session takes place at the practitioner\'s office.',
+      bg: '#3DCC7022', color: '#1a8844', border: '#3DCC7044'
+    })
   }
   if (modes.includes('home')) {
-    tags.push({ fr: 'À domicile', en: 'Home visit', bg: '#FF9A3C22', color: '#cc6600', border: '#FF9A3C44' })
+    tags.push({
+      fr: 'À domicile',
+      en: 'Home visit',
+      descFr: 'Le praticien se déplace chez vous.',
+      descEn: 'The practitioner comes to your home.',
+      bg: '#FF9A3C22', color: '#cc6600', border: '#FF9A3C44'
+    })
   }
   if (modes.includes('visio')) {
-    tags.push({ fr: 'En visio', en: 'Online', bg: '#3AA8E022', color: '#1166aa', border: '#3AA8E044' })
+    tags.push({
+      fr: 'En visio',
+      en: 'Online',
+      descFr: 'Le rendez-vous se fait à distance.',
+      descEn: 'The session takes place remotely.',
+      bg: '#3AA8E022', color: '#1166aa', border: '#3AA8E044'
+    })
   }
   return (
-    <div className="mode-tags">
+    <div className="pract-profile__modes">
       {tags.map(t => (
-        <span key={t.en} className="mode-tag"
-          style={{ background: t.bg, color: t.color, border: `1px solid ${t.border}` }}>
-          {lang === 'fr' ? t.fr : t.en}
-        </span>
+        <div key={t.en} className="pract-profile__mode-item">
+          <span className="mode-tag"
+            style={{ background: t.bg, color: t.color, border: `1px solid ${t.border}` }}>
+            {lang === 'fr' ? t.fr : t.en}
+          </span>
+          <p className="pract-profile__mode-desc">
+            {lang === 'fr' ? t.descFr : t.descEn}
+          </p>
+        </div>
       ))}
     </div>
   )
