@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabaseClient'
 import { LangCtx } from '../components/LangContext'
 import { PRATIQUES } from '../constants/pratiques'
 import { PUBLIC_CIBLE, TYPE_SEANCE } from '../constants/audiences'
+import { MODES_EXERCICE } from '../constants/modes'
 
 const LANGUAGES = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
@@ -40,6 +41,8 @@ const emptyForm = {
 export default function JoinUs() {
   const { lang }          = useContext(LangCtx)
   const [form, setForm]   = useState(emptyForm)
+  const [existingPraticien, setExistingPraticien] = useState(null)
+  const [checkingEmail, setCheckingEmail] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [error, setError] = useState(null)
@@ -58,14 +61,24 @@ export default function JoinUs() {
         return () => document.removeEventListener('mousedown', handleClickOutside)
       }, [])
 
-  function toggleCheckbox(field, value) {
-    setForm(f => ({
-      ...f,
-      [field]: f[field].includes(value)
-        ? f[field].filter(v => v !== value)
-        : [...f[field], value]
-    }))
-  }
+      async function checkExistingEmail(email) {
+      if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setExistingPraticien(null)
+        return
+      }
+      setCheckingEmail(true)
+      const { data } = await supabase
+        .from('praticiens')
+        .select('id, prenom, nom, email, slug')
+        .ilike('email', email.trim().toLowerCase())
+
+      if (data?.[0]) {
+        setExistingPraticien(data[0])
+      } else {
+        setExistingPraticien(null)
+      }
+      setCheckingEmail(false)
+    }
 
   async function handleLocSearch(value) {
   setForm(f => ({ ...f, ville: value }))
@@ -160,6 +173,65 @@ async function compressImage(file) {
     }
 
   function validate() {
+      // Mode allégé pour praticien existant : vérifier uniquement les pratiques
+        if (existingPraticien) {
+          if (form.specialites.length === 0) {
+            return lang === 'fr' ? 'Veuillez sélectionner au moins une spécialité.' : 'Please select at least one specialty.'
+          }
+          for (const slug of form.specialites) {
+            const details = form.pratiques_details[slug] || {}
+            if (!details.bio_fr?.trim() || !details.bio_en?.trim()) {
+              return lang === 'fr'
+                ? 'Veuillez remplir les descriptions FR et EN pour chaque spécialité.'
+                : 'Please fill in FR and EN descriptions for each specialty.'
+            }
+            if (!details.offres || details.offres.length === 0) {
+              return lang === 'fr'
+                ? 'Veuillez ajouter au moins une offre par spécialité.'
+                : 'Please add at least one offer per specialty.'
+            }
+            if (!details.public_cible) {
+              return lang === 'fr'
+                ? 'Veuillez sélectionner un public cible pour chaque spécialité.'
+                : 'Please select a target audience for each specialty.'
+            }
+            if (!details.type_seance) {
+              return lang === 'fr'
+                ? 'Veuillez sélectionner un type de séance pour chaque spécialité.'
+                : 'Please select a session type for each specialty.'
+            }
+            if (!details.mode_exercice) {
+              return lang === 'fr'
+                ? 'Veuillez sélectionner un format pour chaque spécialité.'
+                : 'Please select a format for each specialty.'
+            }
+            if (!details.public_cible) {
+              return lang === 'fr'
+                ? 'Veuillez sélectionner un public cible pour chaque spécialité.'
+                : 'Please select a target audience for each specialty.'
+            }
+            if (!details.type_seance) {
+              return lang === 'fr'
+                ? 'Veuillez sélectionner un type de séance pour chaque spécialité.'
+                : 'Please select a session type for each specialty.'
+            }
+            if (!details.mode_exercice) {
+              return lang === 'fr'
+                ? 'Veuillez sélectionner un format pour chaque spécialité.'
+                : 'Please select a format for each specialty.'
+            }
+            for (const offre of details.offres) {
+              if (!offre.titre_fr?.trim() || !offre.titre_en?.trim() || !offre.duree) {
+                return lang === 'fr'
+                  ? 'Veuillez compléter le titre (FR/EN) et la durée pour chaque offre.'
+                  : 'Please complete title (FR/EN) and duration for each offer.'
+              }
+            }
+          }
+          return null
+        }
+
+        // Validation complète pour nouveau praticien
     // Téléphone
     if (form.telephone) {
       const phoneClean = form.telephone.replace(/[^\d]/g, '')
@@ -210,22 +282,6 @@ async function compressImage(file) {
       }
     }
 
-    // Public cible
-    if (form.public_cible.length === 0) {
-      return lang === 'fr' ? 'Veuillez sélectionner au moins un public cible.' : 'Please select at least one target audience.'
-    }
-
-    // Type de séance
-    if (!form.type_seance) {
-      return lang === 'fr' ? 'Veuillez sélectionner un type de séance.' : 'Please select a session type.'
-    }
-
-    // Format
-    if (!form.mode_exercice) {
-      return lang === 'fr' ? 'Veuillez sélectionner au moins un format.' : 'Please select at least one format.'
-    }
-
-    // Photos
     if (form.photos.length < 2) {
       return lang === 'fr' ? 'Veuillez uploader au moins 2 photos.' : 'Please upload at least 2 photos.'
     }
@@ -385,9 +441,22 @@ async function compressImage(file) {
             <div className="join-row">
               <div className="join-field">
                 <label>Email *</label>
-                <input required type="email" value={form.email}
-                  onChange={e => setForm({ ...form, email: e.target.value })} />
+                <input
+                  required
+                  type="email"
+                  value={form.email}
+                  onChange={e => {
+                    setForm({ ...form, email: e.target.value })
+                    setExistingPraticien(null)
+                  }}
+                  onBlur={e => checkExistingEmail(e.target.value)}
+                />
+                {checkingEmail && (
+                  <p className="join-hint">Vérification en cours...</p>
+                )}
               </div>
+              {!existingPraticien && (
+                <>
               <div className="join-field">
                 <label>{lang === 'fr' ? 'Téléphone *' : 'Phone *'}</label>
                 <input
@@ -402,8 +471,52 @@ async function compressImage(file) {
                   }}
                 />
               </div>
+                </>
+              )}
             </div>
+            {/* Praticien existant détecté */}
+              {existingPraticien && (
+                <div className="join-section" style={{
+                  background: '#F0EAFA',
+                  borderRadius: '12px',
+                  padding: '24px',
+                  marginTop: '16px',
+                  marginBottom: '16px',
+                }}>
+                  <p style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontSize: '1.2rem',
+                    color: '#3e295d',
+                    marginBottom: '12px',
+                  }}>
+                    {lang === 'fr'
+                      ? `Bonjour ${existingPraticien.prenom} ! Nous avons détecté que vous êtes déjà praticien chez Idala.`
+                      : `Hello ${existingPraticien.prenom}! We detected that you are already a practitioner at Idala.`}
+                  </p>
+                  <p style={{
+                    fontSize: '14px',
+                    color: '#6B5B7E',
+                    lineHeight: 1.6,
+                    marginBottom: '16px',
+                  }}>
+                    {lang === 'fr'
+                      ? 'Sélectionnez la ou les nouvelles pratiques que vous souhaitez ajouter à votre profil, puis remplissez les détails associés.'
+                      : 'Select the new practice(s) you would like to add to your profile, then fill in the associated details.'}
+                  </p>
+                  <p style={{
+                    fontSize: '12px',
+                    color: '#9B6EBF',
+                    fontStyle: 'italic',
+                  }}>
+                    {lang === 'fr'
+                      ? 'Pour modifier vos informations personnelles, contactez-nous à contact@theidalafamily.com'
+                      : 'To update your personal information, contact us at contact@theidalafamily.com'}
+                  </p>
+                </div>
+              )}
 
+          {!existingPraticien && (
+            <>
             <div className="join-row">
              <div className="join-field" style={{ position: 'relative' }}>
               <label>{lang === 'fr' ? 'Ville *' : 'City *'}</label>
@@ -474,13 +587,36 @@ async function compressImage(file) {
                 </div>
               )}
             </div>
+           </>  
+        )}
           </div>
+     
 
           {/* ── Profil & expertise ── */}
             <div className="join-section">
               <h2 className="join-section__title">
                 {lang === 'fr' ? 'Profil & expertise' : 'Profile & expertise'}
               </h2>
+
+          {/* Bios générales */}
+          {!existingPraticien && (
+            <>
+              <div className="join-row">
+                <div className="join-field">
+                  <label>{lang === 'fr' ? 'Bio générale FR *' : 'General bio FR *'}</label>
+                  <textarea required rows={3} value={form.bio_fr}
+                    placeholder={lang === 'fr' ? '1-2 phrases de présentation générale en français' : '1-2 general introduction sentences in French'}
+                    onChange={e => setForm({ ...form, bio_fr: e.target.value })} />
+                </div>
+                <div className="join-field">
+                  <label>{lang === 'fr' ? 'Bio générale EN *' : 'General bio EN *'}</label>
+                  <textarea required rows={3} value={form.bio_en}
+                    placeholder={lang === 'fr' ? '1-2 phrases de présentation générale en anglais' : '1-2 general introduction sentences in English'}
+                    onChange={e => setForm({ ...form, bio_en: e.target.value })} />
+                </div>
+              </div>
+              </>
+            )}
 
               {/* Spécialités */}
               <div className="join-field">
@@ -549,6 +685,95 @@ async function compressImage(file) {
                           </div>
                         </div>
 
+                        {/* Public cible */}
+                        <div className="join-field">
+                          <label>{lang === 'fr' ? 'Public cible *' : 'Target audience *'}</label>
+                          <div className="join-checkboxes join-checkboxes--row">
+                            {PUBLIC_CIBLE.map(p => {
+                              const current = details.public_cible ? details.public_cible.split(',').map(s => s.trim()) : []
+                              const checked = current.includes(p.value)
+                              return (
+                                <label key={p.value} className="join-checkbox">
+                                  <input
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={() => {
+                                      const updated = checked
+                                        ? current.filter(v => v !== p.value)
+                                        : [...current, p.value]
+                                      setForm(f => ({
+                                        ...f,
+                                        pratiques_details: {
+                                          ...f.pratiques_details,
+                                          [slug]: { ...f.pratiques_details[slug], public_cible: updated.join(', ') }
+                                        }
+                                      }))
+                                    }}
+                                  />
+                                  {lang === 'fr' ? p.fr : p.en}
+                                </label>
+                              )
+                            })}
+                          </div>
+                        </div>
+
+                        {/* Type de séance */}
+                        <div className="join-field">
+                          <label>{lang === 'fr' ? 'Type de séance *' : 'Session type *'}</label>
+                          <div className="join-checkboxes join-checkboxes--row">
+                            {TYPE_SEANCE.map(t => (
+                              <label key={t.value} className="join-checkbox">
+                                <input
+                                  type="radio"
+                                  name={`type_seance_${slug}`}
+                                  value={t.value}
+                                  checked={details.type_seance === t.value}
+                                  onChange={() => setForm(f => ({
+                                    ...f,
+                                    pratiques_details: {
+                                      ...f.pratiques_details,
+                                      [slug]: { ...f.pratiques_details[slug], type_seance: t.value }
+                                    }
+                                  }))}
+                                />
+                                {lang === 'fr' ? t.fr : t.en}
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Mode d'exercice */}
+                        <div className="join-field">
+                          <label>{lang === 'fr' ? 'Format *' : 'Format *'}</label>
+                          <div className="join-checkboxes join-checkboxes--row">
+                            {MODES_EXERCICE.map(opt => {
+                              const current = details.mode_exercice ? details.mode_exercice.split(',').map(s => s.trim()) : []
+                              const checked = current.includes(opt.value)
+                              return (
+                                <label key={opt.value} className="join-checkbox">
+                                  <input
+                                    type="checkbox"
+                                    checked={checked}
+                                    onChange={() => {
+                                      const updated = checked
+                                        ? current.filter(v => v !== opt.value)
+                                        : [...current, opt.value]
+                                      setForm(f => ({
+                                        ...f,
+                                        pratiques_details: {
+                                          ...f.pratiques_details,
+                                          [slug]: { ...f.pratiques_details[slug], mode_exercice: updated.join(', ') }
+                                        }
+                                      }))
+                                    }}
+                                  />
+                                  {lang === 'fr' ? opt.fr : opt.en}
+                                </label>
+                              )
+                            })}
+                          </div>
+                        </div>
+
                         {/* Offres */}
                         <p className="join-offres-label">
                           {lang === 'fr' ? 'Offres & tarifs' : 'Offers & pricing'}
@@ -558,6 +783,7 @@ async function compressImage(file) {
                             <div className="join-offre-block__header">
                               <span className="join-offre-block__num">Offre {i + 1}</span>
                               <button type="button" className="join-offre-remove"
+                                aria-label="Supprimer cette offre"
                                 onClick={() => setForm(f => ({
                                   ...f,
                                   pratiques_details: {
@@ -584,7 +810,7 @@ async function compressImage(file) {
                               </div>
                               <div className="join-field">
                                 <label>{lang === 'fr' ? 'Titre EN *' : 'Title EN *'}</label>
-                                <input required value={offre.titre_en || ''}
+                                <input value={offre.titre_en || ''}
                                   placeholder="e.g. Adult Reiki session 1h"
                                   onChange={e => setForm(f => {
                                     const offres = [...f.pratiques_details[slug].offres]
@@ -596,7 +822,7 @@ async function compressImage(file) {
                             <div className="join-row">
                               <div className="join-field">
                                 <label>{lang === 'fr' ? 'Description FR' : 'Description FR'}</label>
-                                <textarea required rows={2} value={offre.description_fr || ''}
+                                <textarea rows={2} value={offre.description_fr || ''}
                                   onChange={e => setForm(f => {
                                     const offres = [...f.pratiques_details[slug].offres]
                                     offres[i] = { ...offres[i], description_fr: e.target.value }
@@ -605,7 +831,7 @@ async function compressImage(file) {
                               </div>
                               <div className="join-field">
                                 <label>{lang === 'fr' ? 'Description EN' : 'Description EN'}</label>
-                                <textarea required rows={2} value={offre.description_en || ''}
+                                <textarea rows={2} value={offre.description_en || ''}
                                   onChange={e => setForm(f => {
                                     const offres = [...f.pratiques_details[slug].offres]
                                     offres[i] = { ...offres[i], description_en: e.target.value }
@@ -657,27 +883,12 @@ async function compressImage(file) {
                         </button>
                       </div>
                     )
+                      
                   })}
                 </div>
               )}
-
-              {/* Public cible */}
-              <div className="join-field">
-                <label>{lang === 'fr' ? 'Public cible *' : 'Target audience *'}</label>
-                <div className="join-checkboxes join-checkboxes--row">
-                  {PUBLIC_CIBLE.map(p => (
-                    <label key={p.value} className="join-checkbox">
-                      <input
-                        type="checkbox"
-                        checked={form.public_cible.includes(p.value)}
-                        onChange={() => toggleCheckbox('public_cible', p.value)}
-                      />
-                      {lang === 'fr' ? p.fr : p.en}
-                    </label>
-                  ))}
-                </div>
-              </div>
-
+            {!existingPraticien && (
+             <>     
               <div className="join-field">
                 <label>{lang === 'fr' ? 'Diplômes & certifications *' : 'Diplomas & certifications *'}</label>
                 <textarea required rows={3} value={form.certifications}
@@ -691,23 +902,14 @@ async function compressImage(file) {
                   onChange={e => setForm({ ...form, experience: e.target.value })} />
               </div>
 
-              <div className="join-row">
-                <div className="join-field">
-                  <label>{lang === 'fr' ? 'Bio générale FR *' : 'General bio FR *'}</label>
-                  <textarea required rows={3} value={form.bio_fr}
-                    placeholder={lang === 'fr' ? '1-2 phrases de présentation générale en français' : '1-2 general introduction sentences in French'}
-                    onChange={e => setForm({ ...form, bio_fr: e.target.value })} />
-                </div>
-                <div className="join-field">
-                  <label>{lang === 'fr' ? 'Bio générale EN *' : 'General bio EN *'}</label>
-                  <textarea required rows={3} value={form.bio_en}
-                    placeholder={lang === 'fr' ? '1-2 phrases de présentation générale en anglais' : '1-2 general introduction sentences in English'}
-                    onChange={e => setForm({ ...form, bio_en: e.target.value })} />
-                </div>
-              </div>
+              </>
+          )}
+
             </div>
 
           {/* ── Offres & séances ── */}
+          {/* {!existingPraticien && (
+          <>
           <div className="join-section">
             <h2 className="join-section__title">
               {lang === 'fr' ? 'Offres & séances' : 'Offers & sessions'}
@@ -760,8 +962,12 @@ async function compressImage(file) {
               </div>
             </div>
           </div>
+           </>
+        )} */}
 
           {/* ── Présence en ligne ── */}
+          {!existingPraticien && (
+          <>
           <div className="join-section">
             <h2 className="join-section__title">
               {lang === 'fr' ? 'Présence en ligne' : 'Online presence'}
@@ -837,13 +1043,17 @@ async function compressImage(file) {
               )}
             </div>
           </div>
+           </>
+          )}
 
           {error && <p className="join-error">{error}</p>}
 
           <div className="join-submit">
             <button type="submit" className="btn btn--violet-mid" disabled={loading}>
               {loading
-                ? (lang === 'fr' ? 'Envoi en cours...' : 'Sending...')
+              ? (lang === 'fr' ? 'Envoi en cours...' : 'Sending...')
+              : existingPraticien
+                ? (lang === 'fr' ? 'Ajouter cette pratique' : 'Add this practice')
                 : (lang === 'fr' ? 'Envoyer ma candidature' : 'Submit my application')}
             </button>
           </div>

@@ -41,6 +41,7 @@ serve(async (req) => {
     Deno.env.get('SERVICE_ROLE_KEY')!
   )
 
+  // 🔎 Récupération candidature
   const { data: cand, error: candError } = await supabase
     .from('candidatures')
     .select('*')
@@ -56,7 +57,9 @@ serve(async (req) => {
 
   const isFr = cand.langue_interface !== 'en'
   const token = crypto.randomUUID()
-  const slug = generateSlug(prenom, nom)
+
+  // 🔥 MODIF IMPORTANTE : normalisation email
+  const normalizedEmail = cand.email?.trim().toLowerCase()
 
   const bio_fr = firstSentence(cand.bio_fr || cand.motivation || '')
   const bio_complete_fr = restOfText(cand.bio_fr || cand.motivation || '')
@@ -75,50 +78,101 @@ serve(async (req) => {
     .select('id, slug')
     .in('slug', practiqueSlugs)
 
-  const { data: newPraticien, error: insertError } = await supabase
+  // =========================================================
+  // 🔥 MODIF 1 : DETECTION PRATICIEN EXISTANT
+  // =========================================================
+  const { data: existingPraticien } = await supabase
     .from('praticiens')
-    .insert({
-      prenom,
-      nom,
-      email: cand.email,
-      telephone: cand.telephone,
-      ville: cand.ville,
-      pays: cand.pays,
-      langues: cand.langues,
-      mode_exercice: cand.mode_exercice,
-      bio_fr,
-      bio_complete_fr,
-      bio_en,
-      bio_complete_en,
-      photo_url,
-      photos_urls: cand.photos_urls || [], 
-      slug,
-      onboarding_token: token,
-      actif: false,
-    })
-    .select()
-    .single()
+    .select('*')
+    .eq('email', normalizedEmail)
+    .maybeSingle()
 
-  if (insertError) {
-    return new Response(JSON.stringify({ error: insertError.message }), {
-      status: 500,
-      headers: corsHeaders
-    })
+  let newPraticien
+  let isExistingPraticien = false
+
+  if (existingPraticien) {
+    // CAS 1 : praticien déjà existant
+    newPraticien = existingPraticien
+    isExistingPraticien = true
+    console.log('✔ Praticien existant détecté:', existingPraticien.id)
+
+  } else {
+    // CAS 2 : création nouveau praticien
+    const slug = generateSlug(prenom, nom)
+
+    const { data: created, error: insertError } = await supabase
+      .from('praticiens')
+      .insert({
+        prenom,
+        nom,
+        email: normalizedEmail,
+        telephone: cand.telephone,
+        ville: cand.ville,
+        pays: cand.pays,
+        langues: cand.langues,
+        mode_exercice: cand.mode_exercice,
+        bio_fr,
+        bio_complete_fr,
+        bio_en,
+        bio_complete_en,
+        photo_url,
+        photos_urls: cand.photos_urls || [],
+        slug,
+        onboarding_token: token,
+        actif: false,
+      })
+      .select()
+      .single()
+
+    if (insertError) {
+      console.error('INSERT ERROR:', insertError)
+      return new Response(JSON.stringify({ error: insertError.message }), {
+        status: 500,
+        headers: corsHeaders
+      })
+    }
+
+    newPraticien = created
   }
 
+  // =========================================================
+  // 🔥 MODIF 2 : AJOUT PRATIQUES (ANTI DOUBLON)
+  // =========================================================
   if (pratiquesData && newPraticien) {
     for (const pratique of pratiquesData) {
       const details = pratiquesDetails[pratique.slug] || {}
-      const { data: newPP } = await supabase.from('praticien_pratiques').insert({
-        praticien_id: newPraticien.id,
-        pratique_id: pratique.id,
-        bio_fr: details.bio_fr || '',
-        bio_en: details.bio_en || '',
-      }).select().single()
+
+      // 🔥 check existence pratique
+      const { data: existingPP } = await supabase
+        .from('praticien_pratiques')
+        .select('id')
+        .eq('praticien_id', newPraticien.id)
+        .eq('pratique_id', pratique.id)
+        .maybeSingle()
+
+      if (existingPP) {
+        console.log(`Pratique déjà existante: ${pratique.slug}`)
+        continue
+      }
+
+      const { data: newPP } = await supabase
+        .from('praticien_pratiques')
+        .insert({
+          praticien_id: newPraticien.id,
+          pratique_id: pratique.id,
+          bio_fr: details.bio_fr || '',
+          bio_en: details.bio_en || '',
+          public_cible: details.public_cible || '',
+          type_seance: details.type_seance || '',
+          mode_exercice: details.mode_exercice || '',
+        })
+        .select()
+        .single()
 
       if (newPP && details.offres?.length > 0) {
         for (let i = 0; i < details.offres.length; i++) {
           const offre = details.offres[i]
+
           await supabase.from('praticien_offres').insert({
             praticien_pratique_id: newPP.id,
             titre_fr: offre.titre_fr || '',
@@ -134,11 +188,17 @@ serve(async (req) => {
     }
   }
 
+  // =========================================================
+  // UPDATE candidature
+  // =========================================================
   await supabase
     .from('candidatures')
     .update({ onboarding_sent: true })
     .eq('id', candidature_id)
 
+  // =========================================================
+  // EMAIL (MODIF logique selon existant / nouveau)
+  // =========================================================
   await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -147,37 +207,35 @@ serve(async (req) => {
     },
     body: JSON.stringify({
       from: 'The Idala Family <contact@theidalafamily.com>',
-      to: email,
-      subject: isFr
-        ? 'Bienvenue dans The Idala Family — Finalisez votre profil'
-        : 'Welcome to The Idala Family — Complete your profile',
+      to: normalizedEmail,
+      subject: isExistingPraticien
+        ? 'Votre nouvelle pratique a été ajoutée à votre profil Idala'
+        : 'Bienvenue dans The Idala Family — Finalisez votre profil',
+
       html: `
         <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; color: #281745;">
-          <p style="font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #9B6EBF; margin-bottom: 24px;">The Idala Family</p>
-          <h1 style="font-size: 28px; font-weight: 400; margin-bottom: 24px; line-height: 1.3;">
-            ${isFr ? `Bienvenue ${prenom},` : `Welcome ${prenom},`}
+          <p style="font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #9B6EBF;">The Idala Family</p>
+
+          <h1 style="font-size: 28px; font-weight: 400;">
+            ${isExistingPraticien ? `Bonjour ${prenom}` : `Bienvenue ${prenom}`}
           </h1>
-          <p style="font-size: 15px; line-height: 1.8; font-weight: 300; margin-bottom: 16px;">
-            ${isFr
-              ? 'Nous avons le plaisir de vous accueillir au sein de The Idala Family. Votre profil a été validé par notre équipe.'
-              : 'We are delighted to welcome you to The Idala Family. Your profile has been validated by our team.'}
+
+          <p style="font-size: 15px; line-height: 1.8;">
+            ${
+              isExistingPraticien
+                ? "Votre nouvelle pratique a été ajoutée à votre profil."
+                : "Votre profil a été validé par notre équipe."
+            }
           </p>
-          <p style="font-size: 15px; line-height: 1.8; font-weight: 300; margin-bottom: 32px;">
-            ${isFr
-              ? 'Pour finaliser votre inscription et commencer à recevoir des réservations, veuillez compléter votre profil en cliquant sur le lien ci-dessous.'
-              : 'To complete your registration and start receiving bookings, please complete your profile by clicking the link below.'}
-          </p>
-          <a href="https://theidalafamily.com/#/onboarding/${token}"
-            style="display: inline-block; padding: 14px 32px; background: #3e295d; color: white; text-decoration: none; font-family: Jost, sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; border-radius: 8px;">
-            ${isFr ? 'Compléter mon profil' : 'Complete my profile'}
+
+          <a href="${isExistingPraticien ? 'https://theidalafamily.com' : `https://theidalafamily.com/#/onboarding/${token}`}"
+            style="display:inline-block;padding:14px 32px;background:#3e295d;color:#fff;text-decoration:none;border-radius:8px;font-family:Jost,sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;border-radius:1em;">
+            ${
+              isExistingPraticien
+                ? "Voir le site"
+                : "Compléter mon profil"
+            }
           </a>
-          <p style="font-size: 13px; line-height: 1.8; font-weight: 300; color: #9B6EBF; margin-top: 32px;">
-            ${isFr
-              ? 'Ce lien est personnel et sécurisé. Ne le partagez pas.'
-              : 'This link is personal and secure. Do not share it.'}
-          </p>
-          <hr style="border: none; border-top: 1px solid #E4D8F5; margin: 32px 0;" />
-          <p style="font-size: 11px; color: #9B6EBF; letter-spacing: 2px; text-transform: uppercase;">theidalafamily.com</p>
         </div>
       `,
     }),

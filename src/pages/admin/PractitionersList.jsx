@@ -76,6 +76,9 @@ export default function PractitionersList() {
           pratique_id: pa.pratique_id,
           bio_fr: pa.bio_fr || '',
           bio_en: pa.bio_en || '',
+          public_cible: pa.public_cible || '',
+          type_seance: pa.type_seance || '',
+          mode_exercice: pa.mode_exercice || '',
         }).select().single()
 
         if (newPP && pa.offres?.length > 0) {

@@ -4,6 +4,7 @@ import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from 
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import IbanField from './IbanField'
+import PhotoPositioner from './PhotoPositioner'
 
 const LANGUAGES = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
@@ -72,6 +73,7 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
     email: '', telephone: '', localisation: '',
     lien_reservation: '', actif: true,
     photo_url: '', photos_urls: [], slug: '',
+    photo_position: 'center center',
     mode_exercice: 'in-person',
     iban: '', langues: '', ville: '', region: '', pays: '',
     bio_fr: '', bio_en: '',
@@ -169,6 +171,9 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
               bio_fr: pp.bio_fr || '',
               bio_en: pp.bio_en || '',
               pp_id: pp.id,
+              public_cible: pp.public_cible || '',
+              type_seance: pp.type_seance || '',
+              mode_exercice: pp.mode_exercice || '',
               offres: (offres || []).map(o => ({
                 titre_fr: o.titre_fr || '',
                 titre_en: o.titre_en || '',
@@ -461,33 +466,6 @@ function handleSubmit(e) {
         </label>
       </div>
 
-     <label>Mode d'exercice</label>
-      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-        {[
-          { value: 'in-person', label: 'Au cabinet' },
-          { value: 'at your place', label: 'À domicile' },
-          { value: 'visio', label: 'En visio' },
-        ].map(opt => {
-          const current = form.mode_exercice ? form.mode_exercice.split(',').map(s => s.trim()) : []
-          const checked = current.includes(opt.value)
-          return (
-            <label key={opt.value} className="admin-pratique-check">
-              <input
-                type="checkbox"
-                checked={checked}
-                onChange={() => {
-                  const updated = checked
-                    ? current.filter(v => v !== opt.value)
-                    : [...current, opt.value]
-                  setForm(f => ({ ...f, mode_exercice: updated.join(', ') }))
-                }}
-              />
-              {opt.label}
-            </label>
-          )
-        })}
-      </div>
-
       <label>
         <span>Slug</span> <span className="admin-hint">(ex: marie-bru)</span>
         <input value={form.slug || ''}
@@ -528,6 +506,88 @@ function handleSubmit(e) {
                       placeholder="Practice-specific description in English"
                       onChange={e => updatePratiqueDetail(pa.pratique_id, 'bio_en', e.target.value)} />
                   </label>
+                  {/* Public cible */}
+                    <div style={{ marginTop: '12px' }}>
+                      <label>Public cible</label>
+                      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '4px' }}>
+                        {[
+                          { value: 'adults', label: 'Adultes' },
+                          { value: 'children', label: 'Enfants' },
+                          { value: 'seniors', label: 'Seniors' },
+                          { value: 'all', label: 'Tous publics' },
+                        ].map(opt => {
+                          const current = pa.public_cible ? pa.public_cible.split(',').map(s => s.trim()) : []
+                          const checked = current.includes(opt.value)
+                          return (
+                            <label key={opt.value} className="admin-pratique-check">
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={() => {
+                                  const updated = checked
+                                    ? current.filter(v => v !== opt.value)
+                                    : [...current, opt.value]
+                                  updatePratiqueDetail(pa.pratique_id, 'public_cible', updated.join(', '))
+                                }}
+                              />
+                              {opt.label}
+                            </label>
+                          )
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Type de séance */}
+                    <div style={{ marginTop: '12px' }}>
+                      <label>Type de séance</label>
+                      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '4px' }}>
+                        {[
+                          { value: 'individual', label: 'Individuelle' },
+                          { value: 'group', label: 'Groupe' },
+                          { value: 'both', label: 'Les deux' },
+                        ].map(opt => (
+                          <label key={opt.value} className="admin-pratique-check">
+                            <input
+                              type="radio"
+                              name={`type_seance_${pa.pratique_id}`}
+                              checked={pa.type_seance === opt.value}
+                              onChange={() => updatePratiqueDetail(pa.pratique_id, 'type_seance', opt.value)}
+                            />
+                            {opt.label}
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Mode d'exercice */}
+                    <div style={{ marginTop: '12px' }}>
+                      <label>Format</label>
+                      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '4px' }}>
+                        {[
+                          { value: 'in-person', label: 'Au cabinet' },
+                          { value: 'home', label: 'À domicile' },
+                          { value: 'visio', label: 'En visio' },
+                        ].map(opt => {
+                          const current = pa.mode_exercice ? pa.mode_exercice.split(',').map(s => s.trim()) : []
+                          const checked = current.includes(opt.value)
+                          return (
+                            <label key={opt.value} className="admin-pratique-check">
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={() => {
+                                  const updated = checked
+                                    ? current.filter(v => v !== opt.value)
+                                    : [...current, opt.value]
+                                  updatePratiqueDetail(pa.pratique_id, 'mode_exercice', updated.join(', '))
+                                }}
+                              />
+                              {opt.label}
+                            </label>
+                          )
+                        })}
+                      </div>
+                    </div>
                 </div>
 
                 {/* Offres */}
@@ -684,6 +744,13 @@ function handleSubmit(e) {
             <p className="admin-hint" style={{ marginTop: 12 }}>
               Cliquez sur une photo pour la définir comme photo principale
             </p>
+            {form.photo_url && (
+              <PhotoPositioner
+                src={form.photo_url}
+                position={form.photo_position}
+                onChange={(value) => setForm(f => ({ ...f, photo_position: value }))}
+              />
+            )}
             <div className="join-photos-select" style={{ marginTop: 8 }}>
               {form.photos_urls.map((url, i) => (
                 <div

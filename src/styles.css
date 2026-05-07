@@ -1819,6 +1819,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   height: 120%;
   object-fit: cover;
   border-radius: 50%;
+  transform: scale(1.3);
 }
 .spiritual-card__content {
   padding: clamp(24px, 3vw, 36px);
@@ -3646,6 +3647,9 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   .astro-benefits__grid { grid-template-columns: repeat(2,1fr); }
 }
 
+input[type="range"] {
+  accent-color: #9B6EBF;
+}
 /* ─────────────────────────────────────────
    CSS VARIABLES
 ───────────────────────────────────────── */
