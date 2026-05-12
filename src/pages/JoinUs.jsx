@@ -605,13 +605,13 @@ async function compressImage(file) {
                 <div className="join-field">
                   <label>{lang === 'fr' ? 'Bio générale FR *' : 'General bio FR *'}</label>
                   <textarea required rows={3} value={form.bio_fr}
-                    placeholder={lang === 'fr' ? '1-2 phrases de présentation générale en français' : '1-2 general introduction sentences in French'}
+                    placeholder={lang === 'fr' ? '1-2 phrases de présentation générale en français à rédiger à la première personne' : '1-2 general introduction sentences in French in the first person'}
                     onChange={e => setForm({ ...form, bio_fr: e.target.value })} />
                 </div>
                 <div className="join-field">
                   <label>{lang === 'fr' ? 'Bio générale EN *' : 'General bio EN *'}</label>
                   <textarea required rows={3} value={form.bio_en}
-                    placeholder={lang === 'fr' ? '1-2 phrases de présentation générale en anglais' : '1-2 general introduction sentences in English'}
+                    placeholder={lang === 'fr' ? '1-2 phrases de présentation générale en anglais à rédiger à la première person' : '1-2 general introduction sentences in English in the first person'}
                     onChange={e => setForm({ ...form, bio_en: e.target.value })} />
                 </div>
               </div>
@@ -656,7 +656,7 @@ async function compressImage(file) {
                         </h3>
 
                         {/* Bio spécifique */}
-                        <div className="join-row">
+                        {/* <div className="join-row">
                           <div className="join-field">
                             <label>{lang === 'fr' ? 'Description FR *' : 'Description FR *'}</label>
                             <textarea rows={3}
@@ -683,7 +683,7 @@ async function compressImage(file) {
                                 }
                               }))} />
                           </div>
-                        </div>
+                        </div> */}
 
                         {/* Public cible */}
                         <div className="join-field">
@@ -823,6 +823,7 @@ async function compressImage(file) {
                               <div className="join-field">
                                 <label>{lang === 'fr' ? 'Description FR' : 'Description FR'}</label>
                                 <textarea rows={2} value={offre.description_fr || ''}
+                                placeholder={lang === 'fr' ? '2-3 phrases en français' : '2-3 sentences in French'}
                                   onChange={e => setForm(f => {
                                     const offres = [...f.pratiques_details[slug].offres]
                                     offres[i] = { ...offres[i], description_fr: e.target.value }
@@ -831,7 +832,8 @@ async function compressImage(file) {
                               </div>
                               <div className="join-field">
                                 <label>{lang === 'fr' ? 'Description EN' : 'Description EN'}</label>
-                                <textarea rows={2} value={offre.description_en || ''}
+                                <textarea rows={2} value={offre.description_en || ''} 
+                                placeholder={lang === 'fr' ? '2-3 phrases en anglais' : '2-3 sentences in English'}
                                   onChange={e => setForm(f => {
                                     const offres = [...f.pratiques_details[slug].offres]
                                     offres[i] = { ...offres[i], description_en: e.target.value }

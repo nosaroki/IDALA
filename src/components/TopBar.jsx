@@ -7,12 +7,12 @@ const SERVICES = [
   { path: '/practitioners', en: 'Practitioners', fr: 'Praticiens' },
   { path: '/retreats',      en: 'Retreats',      fr: 'Retraites'  },
   { path: '/corporate',     en: 'Corporate',     fr: 'Entreprises' },
+  { path: '/spiritual',     en: 'Guidance',      fr: 'Guidance'   },
+  { path: '/astrology', en: 'Birth Chart', fr: 'Thème Astral' },
   
 ]
 
 const NAV = [
-  { path: '/spiritual',     en: 'Guidance',      fr: 'Guidance'   },
-  { path: '/astrology', en: 'Birth Chart', fr: 'Thème Astral' },
   { path: '/about',     en: 'About',       fr: 'À propos'     },
 ]
 

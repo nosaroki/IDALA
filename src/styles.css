@@ -740,7 +740,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .practice-page__banner-overlay {
   text-align: center;
   padding: 3rem var(--px);
-  background: rgba(240, 234, 250, 0.55);
+  background: rgba(255, 255, 255, 0.55);
   backdrop-filter: blur(6px);
   width: 100%;
   min-height: 400px;

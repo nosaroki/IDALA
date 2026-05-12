@@ -76,6 +76,9 @@ export default function Candidatures() {
   }
 
     async function handleDelete(id) {
+        if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette candidature ? Cette action est irréversible.')) {
+        return
+      }
       if (!confirm('Supprimer cette candidature ?')) return
       const { error } = await supabase.from('candidatures').delete().eq('id', id)
       if (error) {

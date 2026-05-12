@@ -58,9 +58,9 @@ export default function Corporate() {
           style={{ backgroundImage: `url(${bannerCorporate})` }}
         >          
         <div className='practice-page__banner-overlay'>
-        <p className="corporate-hero__eyebrow">
+        {/* <p className="corporate-hero__eyebrow">
             {lang === 'fr' ? 'Pour votre entreprise' : 'For your company'}
-          </p>
+          </p> */}
           <h1 className="corporate-hero__title">
             {lang === 'fr'
               ? 'Bien-être en entreprise'

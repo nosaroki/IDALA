@@ -15,7 +15,7 @@ const PRACTS_MAP = {
   'tai-chi':             { titleFr: 'Tai Chi',               titleEn: 'Tai Chi',             messageFr: 'Bougez avec intention, trouvez votre calme',      messageEn: 'Move with intention, find your stillness' },
   'qi-gong':             { titleFr: 'Qi Gong',               titleEn: 'Qi Gong',             messageFr: 'Harmonisez votre énergie vitale',                 messageEn: 'Harmonise your vital energy' },
   'meditation':          { titleFr: 'Méditation',            titleEn: 'Meditation',          messageFr: 'Entraînez votre esprit, cultivez le calme',       messageEn: 'Train your mind, cultivate inner calm' },
-  'breathwork':          { titleFr: 'Breathwork',            titleEn: 'Breathwork',          messageFr: 'Respirez plus profond, vivez plus pleinement',    messageEn: 'Breathe deeper, live fuller' },
+  'breathwork':          { titleFr: 'Breathwork',            titleEn: 'Breathwork',          messageFr: 'Respirez plus profondément, vivez plus pleinement',    messageEn: 'Breathe deeper, live fuller' },
   'coaching':            { titleFr: 'Coaching',              titleEn: 'Coaching',            messageFr: 'Clarté, direction, changement aligné',            messageEn: 'Clarity, direction, aligned change' },
   'hypnotherapy':        { titleFr: 'Hypnothérapie',         titleEn: 'Hypnotherapy',        messageFr: 'Accédez aux couches profondes du changement',     messageEn: 'Access the deeper layers of change' },
   'reiki':               { titleFr: 'Reiki',                 titleEn: 'Reiki',               messageFr: 'Énergie douce pour une harmonie profonde',        messageEn: 'Gentle energy for deep harmony' },
@@ -118,16 +118,17 @@ export default function PracticePage() {
           <div className="practice-page__list">
             {praticiens.map(p => (
                <PractitionerCard
-                  key={p.id}
-                  praticien={{
-                    ...p,
-                    bio_fr: p.pp_bio_fr || p.bio_fr,
-                    bio_en: p.pp_bio_en || p.bio_en,
-                    prix: p.pp_prix,
-                    duree_seance: p.pp_duree_seance,
-                  }}
-                  practiceSlug={slug}
-                />
+                key={p.id}
+                praticien={{
+                  ...p,
+                  bio_fr: p.pp_bio_fr || p.bio_fr,
+                  bio_en: p.pp_bio_en || p.bio_en,
+                  prix: p.pp_prix,
+                  duree_seance: p.pp_duree_seance,
+                  mode_exercice: p.pp_mode_exercice || p.mode_exercice,
+                }}
+                practiceSlug={slug}
+              />
             ))}
           </div>
         )}

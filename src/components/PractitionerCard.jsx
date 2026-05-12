@@ -22,6 +22,7 @@ function ModeTags({ mode, lang }) {
 export default function PractitionerCard({ praticien, practiceSlug }) {
   const { lang } = useContext(LangCtx)
   const navigate = useNavigate()
+  console.log('PRATICIEN COMPLET:', praticien)
 
   const handleLearnMore = () => {
     navigate(`/practices/${practiceSlug}/${praticien.slug}`)

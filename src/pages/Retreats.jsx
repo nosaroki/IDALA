@@ -93,9 +93,9 @@ export default function Retreats() {
           style={{ backgroundImage: `url(${bannerRetraite})` }}
         >
           <div className="practice-page__banner-overlay">
-            <p className="retreats-hero__eyebrow">
+            {/* <p className="retreats-hero__eyebrow">
               {lang === 'fr' ? 'Retraites' : 'Retreats'}
-            </p>
+            </p> */}
             <h1 className="retreats-hero__title">
               {lang === 'fr' ? 'Trouvez la retraite faite pour vous.' : 'Find the retreat made for you.'}
             </h1>

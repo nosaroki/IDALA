@@ -70,10 +70,13 @@ export default function PractitionerPage() {
         ...data,
         bio_fr: data.bio_fr,
         bio_en: data.bio_en,
-        bio_complete_fr: ppData?.bio_fr || '',
-        bio_complete_en: ppData?.bio_en || '',
+        bio_complete_fr: ppData?.bio_fr || data.bio_complete_fr || '',
+        bio_complete_en: ppData?.bio_en || data.bio_complete_en || '',
         prix: ppData?.prix,
         duree_seance: ppData?.duree_seance,
+        mode_exercice_pratique: ppData?.mode_exercice || '',
+        type_seance: ppData?.type_seance || '',
+        public_cible: ppData?.public_cible || '',
         offres,
       })
       setPratique(ppData?.pratiques || data.pratiques)
@@ -163,7 +166,7 @@ const practiceName = pratiqueFromConst
               {praticien.langues && (
                 <p className="pract-profile__langues">{praticien.langues}</p>
               )}
-              <ModeTags mode={praticien.mode_exercice} lang={lang} />
+              <ModeTags mode={praticien.mode_exercice_pratique || praticien.mode_exercice} lang={lang} />
               {lang === 'en' && praticien.langues && 
                 !praticien.langues.toLowerCase().includes('english') && (
                 <p className="pract-profile__lang-warning">

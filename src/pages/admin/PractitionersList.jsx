@@ -109,6 +109,9 @@ export default function PractitionersList() {
   }
 
   async function handleDelete(id) {
+     if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce praticien ? Cette action est irréversible.')) {
+      return
+    }
     if (!confirm('Supprimer ce praticien ?')) return
     const { error } = await supabase.from('praticiens').delete().eq('id', id)
     if (error) {
@@ -263,7 +266,15 @@ export default function PractitionersList() {
                     <td>{p.actif ? '✓' : '—'}</td>
                     <td>
                       <button className="admin-btn admin-btn--sm"
-                        onClick={() => { setEditing(p); setShowForm(true) }}>
+                        onClick={async () => {
+                          const { data } = await supabase
+                            .from('praticiens')
+                            .select('*')
+                            .eq('id', p.id)
+                            .single()
+                          setEditing(data)
+                          setShowForm(true)
+                        }}>
                         Modifier
                       </button>
                       <button className="admin-btn admin-btn--sm admin-btn--danger"
