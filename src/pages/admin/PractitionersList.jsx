@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabaseClient'
 import { useNavigate } from 'react-router-dom'
 import AdminPractitionerForm from '../../components/AdminPractitionerForm'
 import Toast from '../../components/Toast'
+import OptimizedImage from "../../components/OptimizedImage"
 
 export default function PractitionersList() {
   const [toast, setToast] = useState(null)
@@ -79,6 +80,7 @@ export default function PractitionersList() {
           public_cible: pa.public_cible || '',
           type_seance: pa.type_seance || '',
           mode_exercice: pa.mode_exercice || '',
+          photo_url: pa.photo_url || null, 
         }).select().single()
 
         if (newPP && pa.offres?.length > 0) {
@@ -250,7 +252,7 @@ export default function PractitionersList() {
                   <tr key={p.id} style={{ opacity: p.actif ? 1 : 0.45 }}>
                     <td>
                       {p.photo_url
-                        ? <img src={p.photo_url} alt={`${p.prenom} ${p.nom}`} style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 2 }} />
+                        ? <OptimizedImage src={p.photo_url} alt={`${p.prenom} ${p.nom}`} style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: 2 }} />
                         : <div style={{ width: 40, height: 40, background: 'var(--pale)', borderRadius: 2 }} />
                       }
                     </td>

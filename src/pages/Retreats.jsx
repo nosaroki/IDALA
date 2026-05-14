@@ -4,6 +4,7 @@ import { LangCtx } from '../components/LangContext'
 import bannerRetraite from '../assets/banner/banner_retraite.jpg'
 import Footer from '../components/Footer'
 
+
 const Icons = {
   Yoga: (<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="20" cy="7" r="3"/><path d="M20 10 Q14 18 8 22M20 10 Q26 18 32 22"/><path d="M14 30 Q17 24 20 22 Q23 24 26 30"/><path d="M8 22 Q10 28 14 30M32 22 Q30 28 26 30"/></svg>),
   Breathwork: (<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M20 34 Q20 26 20 20"/><path d="M20 20 Q14 16 8 18"/><path d="M20 20 Q26 16 32 18"/><path d="M8 18 Q6 14 9 12 Q12 10 14 13"/><path d="M32 18 Q34 14 31 12 Q28 10 26 13"/><circle cx="20" cy="8" r="4" strokeDasharray="2 2"/></svg>),

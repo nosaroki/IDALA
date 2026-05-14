@@ -4,6 +4,8 @@
 
 import { useLang } from '../components/LangContext'; 
 // import newlogo from '../assets/newlogo.png';
+// import OptimizedImage from '../components/OptimizedImage'
+
 
 function ComingSoon() {
   const { lang, setLang } = useLang(); 
@@ -13,7 +15,7 @@ function ComingSoon() {
     <div className="coming-soon">
       <div className="coming-soon__logo">
         {/* <div className="circle-logo circle-logo--main">
-          <img src={newlogo} alt="IDALA Logo" className="coming-soon__logo-img" />
+          <OptimizedImage src={newlogo} alt="IDALA Logo" className="coming-soon__logo-img" />
         </div> */}
       </div>
 

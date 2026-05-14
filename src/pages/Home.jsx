@@ -28,6 +28,7 @@ import ladyyoga from '../assets/practitioners/ladyyoga.jpg';
 import breathwork from '../assets/practitioners/breathwrk.jpg';
 import facemedit from '../assets/practitioners/meditt.jpg';
 import yogabeige from '../assets/yogabeige.jpg'
+import OptimizedImage from "../components/OptimizedImage"
 
 // const TESTIMONIALS = [
 //   {
@@ -94,23 +95,62 @@ function Home() {
       </Helmet>
 
       <div className="page-wrap">
+        <section className="home-hero">
+          <div className="home-hero__inner">
+            <div className="home-hero__left">
+              <div className="home-hero__logo-wrap">
+                <img src={newlogo} alt="The Idala Family" className="home-hero__logo" />
+              </div>
+              <p className="home-hero__tagline">
+                {lang === 'fr' ? 'Corps · Esprit · Énergie' : 'Body · Mind · Energy'}
+              </p>
+            </div>
+            
+            <div className="home-hero__content">
+              <h1 className="home-hero__headline">
+                {lang === 'fr' ? (
+                  <>
+                    Le bien-être commence par la{' '}
+                    <span style={{ color: '#9B6EBF' }}>bonne rencontre</span>
+                  </>
+                ) : (
+                  <>
+                    Wellness begins with the{' '}
+                    <span style={{ color: '#9B6EBF' }}>right connection</span>
+                  </>
+                )}
+              </h1>
 
-    <section className="home-hero">
-      <div className="home-hero__inner">
-            <h1 className="home-hero__headline">
-              {lang === 'fr'
-                ? 'Le bien-être commence par la bonne rencontre'
-                : 'Wellness begins with the right connection'}
-            </h1>
-        <div className="home-hero__logo-wrap">
-          <img src={newlogo} alt="The Idala Family" className="home-hero__logo" />
-        </div>
-        <p className="home-hero__tagline">
-          {lang === 'fr' ? 'Corps · Esprit · Énergie' : 'Body · Mind · Energy'}
-        </p>
+              <p className="home-hero__subtext">
+                {lang === 'fr'
+                  ? 'Trouvez des praticiens vérifiés en yoga, reiki, méditation et breathwork pour renforcer le corps, apaiser l\'esprit et cultiver la clarté.'
+                  : 'Find verified practitioners in yoga, reiki, meditation and breathwork to strengthen the body, calm the mind and cultivate clarity.'}
+              </p>
 
-      </div>
-    </section>
+              <button 
+                className="home-hero__cta"
+                onClick={() => navigate('/practitioners')}
+                onMouseEnter={(e) => e.target.style.background = '#7d5599'}
+                onMouseLeave={(e) => e.target.style.background = '#9B6EBF'}
+                style={{
+                  background: '#9B6EBF',
+                  color: 'white',
+                  border: 'none',
+                  padding: '14px 32px',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  letterSpacing: '2px',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  fontWeight: 500,
+                  transition: 'background 0.2s',
+                }}
+              >
+                {lang === 'fr' ? 'Trouver un Praticien' : 'Find a Practitioner'}
+              </button>
+            </div>
+          </div>
+        </section>
 
         {/* ── SECTION 2 — CONCEPT ── */}
         <section className="home-concept reveal" ref={refConcept}>
@@ -152,13 +192,13 @@ function Home() {
           <div className="home-practitioners-strip__track">
             {[...Array(2)].map((_, pass) => (
               <div key={pass} className="home-practitioners-strip__row">
-                <img src={gogong} alt="Qi Gong" onClick={() => navigate('/practices/qi-gong')} style={{ cursor: 'pointer' }} />
-                <img src={ladyyoga} alt="Yoga" onClick={() => navigate('/practices/yoga')} style={{ cursor: 'pointer' }} />
-                <img src={taichilady} alt="Tai Chi" onClick={() => navigate('/practices/tai-chi')} style={{ cursor: 'pointer' }} />
-                {/* <img src={acu} alt="Acupuncture" onClick={() => navigate('/practices/acupuncture')} style={{ cursor: 'pointer' }} /> */}
-                <img src={gobowl} alt="Sound Healing" onClick={() => navigate('/practices/sound-healing')} style={{ cursor: 'pointer' }} />
-                <img src={breathwork} alt="Breathwork" onClick={() => navigate('/practices/breathwork')} style={{ cursor: 'pointer' }} />
-                <img src={facemedit} alt="Meditation" onClick={() => navigate('/practices/meditation')} style={{ cursor: 'pointer' }} />
+                <OptimizedImage src={gogong} alt="Qi Gong" onClick={() => navigate('/practices/qi-gong')} style={{ cursor: 'pointer' }} />
+                <OptimizedImage src={ladyyoga} alt="Yoga" onClick={() => navigate('/practices/yoga')} style={{ cursor: 'pointer' }} />
+                <OptimizedImage src={taichilady} alt="Tai Chi" onClick={() => navigate('/practices/tai-chi')} style={{ cursor: 'pointer' }} />
+                {/* <OptimizedImage src={acu} alt="Acupuncture" onClick={() => navigate('/practices/acupuncture')} style={{ cursor: 'pointer' }} /> */}
+                <OptimizedImage src={gobowl} alt="Sound Healing" onClick={() => navigate('/practices/sound-healing')} style={{ cursor: 'pointer' }} />
+                <OptimizedImage src={breathwork} alt="Breathwork" onClick={() => navigate('/practices/breathwork')} style={{ cursor: 'pointer' }} />
+                <OptimizedImage src={facemedit} alt="Meditation" onClick={() => navigate('/practices/meditation')} style={{ cursor: 'pointer' }} />
               </div>
             ))}
           </div>
@@ -205,19 +245,19 @@ function Home() {
           <section className="home-gallery reveal" ref={refGallery}>
             <div className="home-gallery__grid">
               <div className="home-gallery__item home-gallery__item--tall" onClick={() => navigate('/practices/sound-healing')} style={{ cursor: 'pointer' }}>
-                <img src={sointbt} alt="Healing" />
+                <OptimizedImage src={sointbt} alt="Healing" />
                 <span className="home-gallery__caption">{lang === 'fr' ? 'Sound Healing' : 'Sound Healing'}</span>
               </div>
               <div className="home-gallery__item" onClick={() => navigate('/practices/reiki')} style={{ cursor: 'pointer' }}>
-                <img src={marine_reiki} alt="Reiki" />
+                <OptimizedImage src={marine_reiki} alt="Reiki" />
                 <span className="home-gallery__caption">Reiki</span>
               </div>
               <div className="home-gallery__item" onClick={() => navigate('/practices/yoga')} style={{ cursor: 'pointer' }}>
-                <img src={yogabeige} alt="Yoga" style={{ objectFit: 'cover', objectPosition: 'center 95%' }} />
+                <OptimizedImage src={yogabeige} alt="Yoga" style={{ objectFit: 'cover', objectPosition: 'center 95%' }} />
                 <span className="home-gallery__caption">Yoga</span>
               </div>
               <div className="home-gallery__item home-gallery__item--wide" onClick={() => navigate('/practices/meditation')} style={{ cursor: 'pointer' }}>
-                <img src={meditation} alt="meditation" />
+                <OptimizedImage src={meditation} alt="meditation" />
                 <span className="home-gallery__caption">Meditation</span>
               </div>
             </div>
@@ -240,7 +280,7 @@ function Home() {
               </button>
             </div>
             <div className="home-diane__photo-wrap">
-              <img src={dianeRegard} alt="Diane Thomas" className="home-diane__photo" />
+              <OptimizedImage src={dianeRegard} alt="Diane Thomas" className="home-diane__photo" />
               <div className="home-diane__photo-ring" />
             </div>
           </div>
@@ -250,15 +290,15 @@ function Home() {
         <section className="home-gallery-2">
           <div className="home-gallery-2__row">
             <div className="home-gallery-2__item" onClick={() => navigate('/practices/sound-healing')} style={{ cursor: 'pointer' }}>
-              <img src={groupsound} alt="Sound Healing" />
+              <OptimizedImage src={groupsound} alt="Sound Healing" />
               <span className="home-gallery__caption">Sound Healing</span>
             </div>
             <div className="home-gallery-2__item" onClick={() => navigate('/practices/yoga')} style={{ cursor: 'pointer' }}>
-              <img src={groupyoga} alt="Yoga" />
+              <OptimizedImage src={groupyoga} alt="Yoga" />
               <span className="home-gallery__caption">Yoga</span>
             </div>
             <div className="home-gallery-2__item" onClick={() => navigate('/practices/meditation')} style={{ cursor: 'pointer' }}>
-              <img src={groupmedit} alt="Meditation" />
+              <OptimizedImage src={groupmedit} alt="Meditation" />
               <span className="home-gallery__caption">Meditation</span>
             </div>
           </div>
@@ -273,9 +313,9 @@ function Home() {
             {lang === 'fr' ? 'Par où souhaitez-vous commencer ?' : 'Where would you like to begin?'}
           </h2>
           <div className="home-cta__row">
-            <button className="btn btn--outline home-cta__btn" onClick={() => navigate('/practitioners')}>
+            {/* <button className="btn btn--outline home-cta__btn" onClick={() => navigate('/practitioners')}>
               {lang === 'fr' ? 'Trouver un Praticien' : 'Find a Practitioner'}
-            </button>
+            </button> */}
             <button className="btn btn--outline home-cta__btn" onClick={() => navigate('/retreats')}>
               {lang === 'fr' ? 'Retraites' : 'Retreats'}
             </button>

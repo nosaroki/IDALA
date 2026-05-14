@@ -32,7 +32,11 @@ export default function PractitionerCard({ praticien, practiceSlug }) {
     <div className="pract-card">
       <div className="pract-card__photo">
         {praticien.photo_url
-          ? <img src={praticien.photo_url} alt={praticien.slug} />
+          ? <img 
+              src={praticien.pratique_photo || praticien.photo_url} 
+              alt={praticien.slug}
+              style={{ objectPosition: praticien.photo_position || 'center center' }}
+            />
           : <div className="pract-card__photo-placeholder" />
         }
       </div>

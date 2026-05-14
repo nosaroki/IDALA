@@ -4,6 +4,8 @@ import Footer from '../components/Footer';
 import tarotOrb from '../assets/tarot2.jpg'
 // import tarotImg from '../assets/yogameditdiane.png';
 // import psychicImg from '../assets/meditationdiane.png';
+import OptimizedImage from '../components/OptimizedImage'
+
 
 function Spiritual() {
   const { lang } = useLang();
@@ -58,7 +60,7 @@ function Spiritual() {
             </div>
             <div className="spiritual-hero-v2__visual">
               <div className="spiritual-orb spiritual-orb--photo">
-                <img src={tarotOrb} alt="Tarot" />
+                <OptimizedImage src={tarotOrb} alt="Tarot" />
               </div>
               <span className="spiritual-orb-label">IDALA Tarot &amp; Oracle</span>
             </div>
@@ -78,7 +80,7 @@ function Spiritual() {
             {/* Lecture ciblée 30 min */}
             <div className="spiritual-card spiritual-card--c7">
               {/* <div className="spiritual-card__image">
-                <img src={tarotImg} alt={lang === 'fr' ? 'Lecture ciblée' : 'Focused reading'} />
+                <OptimizedImage src={tarotImg} alt={lang === 'fr' ? 'Lecture ciblée' : 'Focused reading'} />
               </div> */}
               <div className="spiritual-card__content">
                 <div className="spiritual-card__duration">30 min</div>
@@ -127,7 +129,7 @@ function Spiritual() {
             {/* Lecture complète 60 min */}
             <div className="spiritual-card spiritual-card--c5">
               {/* <div className="spiritual-card__image">
-                <img src={psychicImg} alt={lang === 'fr' ? 'Lecture complète' : 'Full reading'} />
+                <OptimizedImage src={psychicImg} alt={lang === 'fr' ? 'Lecture complète' : 'Full reading'} />
               </div> */}
               <div className="spiritual-card__content">
                 <div className="spiritual-card__duration">60 min</div>

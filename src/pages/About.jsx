@@ -8,6 +8,7 @@ import { Helmet } from 'react-helmet-async';
 import Footer from '../components/Footer';
 import dianeRegard from '../assets/dianeregard.png';
 import idaPingala  from '../assets/idapingala.png';
+import OptimizedImage from "../components/OptimizedImage"
 
 function About() {
   const { lang }   = useLang();
@@ -30,7 +31,7 @@ function About() {
 
             <div className="about-founder__photo-col">
               <div className="about-founder__photo-wrap">
-                <img src={dianeRegard} alt="Diane Thomas" className="about-founder__photo" />
+                <OptimizedImage src={dianeRegard} alt="Diane Thomas" className="about-founder__photo" />
                 <div className="about-founder__photo-ring" />
               </div>
               <div className="about-founder__name">Diane Thomas</div>
@@ -105,7 +106,7 @@ function About() {
             </div>
 
             <div className="about-idala__image-col">
-              <img src={idaPingala} alt="Ida & Pingala : energy channels" className="about-idala__img" />
+              <OptimizedImage src={idaPingala} alt="Ida & Pingala : energy channels" className="about-idala__img" />
             </div>
 
             <div className="about-idala__col about-idala__col--right">

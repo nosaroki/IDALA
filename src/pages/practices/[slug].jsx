@@ -121,6 +121,7 @@ export default function PracticePage() {
                 key={p.id}
                 praticien={{
                   ...p,
+                  photo_url: p.pp_photo_url || p.photo_url,
                   bio_fr: p.pp_bio_fr || p.bio_fr,
                   bio_en: p.pp_bio_en || p.bio_en,
                   prix: p.pp_prix,

@@ -107,6 +107,7 @@ serve(async (req) => {
         nom,
         email: normalizedEmail,
         telephone: cand.telephone,
+        siret: cand.siret || '',
         ville: cand.ville,
         pays: cand.pays,
         langues: cand.langues,

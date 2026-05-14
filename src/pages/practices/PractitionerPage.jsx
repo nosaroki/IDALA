@@ -6,6 +6,8 @@ import { LangCtx } from '../../components/LangContext'
 import Footer from '../../components/Footer'
 import { MODES_EXERCICE } from '../../constants/modes'
 import { PRATIQUES } from '../../constants/pratiques'
+import OptimizedImage from "../../components/OptimizedImage"
+
 
 function ModeTags({ mode, lang }) {
   const modes = mode ? mode.split(',').map(m => m.trim()) : []
@@ -68,6 +70,7 @@ export default function PractitionerPage() {
 
       setPraticien({
         ...data,
+        photo_url: ppData?.photo_url || data.photo_url, 
         bio_fr: data.bio_fr,
         bio_en: data.bio_en,
         bio_complete_fr: ppData?.bio_fr || data.bio_complete_fr || '',
@@ -83,7 +86,7 @@ export default function PractitionerPage() {
       setLoading(false)
     }
     fetchData()
-  }, [practitionerSlug])
+  }, [practitionerSlug, practiceSlug])
 
   if (loading) return (
     <div className="pract-profile">
@@ -140,7 +143,11 @@ const practiceName = pratiqueFromConst
           <div className="pract-profile__hero">
             <div className="pract-profile__photo">
               {praticien.photo_url
-                ? <img src={praticien.photo_url} alt={praticien.slug} />
+                ? <OptimizedImage 
+                    src={praticien.photo_url} 
+                    alt={praticien.slug}
+                    style={{ objectPosition: praticien.photo_position || 'center center' }}
+                  />
                 : <div className="pract-profile__photo-placeholder" />
               }
             </div>

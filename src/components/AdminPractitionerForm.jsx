@@ -5,6 +5,7 @@ import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } 
 import { CSS } from '@dnd-kit/utilities'
 import IbanField from './IbanField'
 import PhotoPositioner from './PhotoPositioner'
+import OptimizedImage from "./OptimizedImage"
 
 const LANGUAGES = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
@@ -78,7 +79,8 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
     iban: '', langues: '', ville: '', region: '', pays: '',
     bio_fr: '', bio_en: '',
     pratiques_associees: [],
-    instagram: '', site_web: ''
+    instagram: '', site_web: '',
+    siret: '',
   }
 
   const [langDropOpen, setLangDropOpen] = useState(false)
@@ -174,6 +176,7 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
               public_cible: pp.public_cible || '',
               type_seance: pp.type_seance || '',
               mode_exercice: pp.mode_exercice || '',
+              photo_url: pp.photo_url || null,
               offres: (offres || []).map(o => ({
                 titre_fr: o.titre_fr || '',
                 titre_en: o.titre_en || '',
@@ -352,6 +355,14 @@ function handleSubmit(e) {
             placeholder="ex: +33612345678"
             onChange={e => setForm({ ...form, telephone: e.target.value })} />
         </label>
+        <div>
+          <label>SIRET</label>
+          <input
+            type="text"
+            value={form.siret || ''}
+            onChange={e => setForm({ ...form, siret: e.target.value })}
+          />
+        </div>
       </div>
 
       {/* Localisation avec autocomplétion */}
@@ -506,6 +517,106 @@ function handleSubmit(e) {
                       placeholder="Practice-specific description in English"
                       onChange={e => updatePratiqueDetail(pa.pratique_id, 'bio_en', e.target.value)} />
                   </label>
+
+                {/* Photo spécifique à cette pratique */}
+                <div style={{ marginTop: '16px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px' }}>
+                    Photo pour cette pratique (optionnel)
+                  </label>
+                  <label
+                    htmlFor={`photo-upload-${pa.pratique_id}`}
+                    style={{
+                      display: 'inline-block',
+                      padding: '8px 16px',
+                      background: '#F0EAFA',
+                      border: '1px solid #C5B8F0',
+                      borderRadius: '6px',
+                      color: '#9B6EBF',
+                      fontSize: '12px',
+                      letterSpacing: '1.5px',
+                      textTransform: 'uppercase',
+                      cursor: 'pointer',
+                      fontWeight: 500,
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.background = '#E4D8F5'
+                      e.target.style.borderColor = '#9B6EBF'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.background = '#F0EAFA'
+                      e.target.style.borderColor = '#C5B8F0'
+                    }}
+                  >
+                    Choisir une photo
+                  </label>
+                  <input
+                    id={`photo-upload-${pa.pratique_id}`}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0]
+                      if (!file) return
+
+                      const ext = file.name.split('.').pop()
+                      const fileName = `pratiques/${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`
+                      
+                      const { data, error } = await supabase.storage
+                        .from('photos-praticiens')
+                        .upload(fileName, file)
+
+                      if (error) {
+                        alert('Erreur upload')
+                        console.error(error)
+                        return
+                      }
+
+                      const { data: { publicUrl } } = supabase.storage
+                        .from('photos-praticiens')
+                        .getPublicUrl(data.path)
+
+                      const updated = form.pratiques_associees.map(p => 
+                        p.pratique_id === pa.pratique_id 
+                          ? { ...p, photo_url: publicUrl }
+                          : p
+                      )
+                      setForm({ ...form, pratiques_associees: updated })
+                    }}
+                  />
+                  {pa.photo_url && (
+                    <div style={{ marginTop: '8px' }}>
+                      <img
+                        src={pa.photo_url}
+                        alt="Photo pratique"
+                        style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 4 }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = form.pratiques_associees.map(p => 
+                            p.pratique_id === pa.pratique_id 
+                              ? { ...p, photo_url: null }
+                              : p
+                          )
+                          setForm({ ...form, pratiques_associees: updated })
+                        }}
+                        style={{
+                          marginLeft: '8px',
+                          padding: '4px 8px',
+                          fontSize: '11px',
+                          background: 'transparent',
+                          border: '1px solid #C5B8F0',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Retirer
+                      </button>
+                    </div>
+                  )}
+                </div>
+
                   {/* Public cible */}
                     <div style={{ marginTop: '12px' }}>
                       <label>Public cible</label>
@@ -681,7 +792,7 @@ function handleSubmit(e) {
                                 : p
                             )
                             setForm(f => ({ ...f, pratiques_associees: updated }))
-                          }} />
+                          }} onWheel={(e) => e.target.blur()} />
                       </label>
                       <label>Durée (minutes)
                         <input
@@ -696,7 +807,7 @@ function handleSubmit(e) {
                                 : p
                             )
                             setForm(f => ({ ...f, pratiques_associees: updated }))
-                          }} />
+                          }} onWheel={(e) => e.target.blur()} />
                       </label>
                     </div>
                   </div>
@@ -758,12 +869,12 @@ function handleSubmit(e) {
                   className={`join-photo-item ${form.photo_url === url ? 'join-photo-item--selected' : ''}`}
                   style={{ position: 'relative' }}
                 >
-                  <img src={url} alt={`Photo ${i + 1}/${form.photos_urls.length}`}
+                  <OptimizedImage src={url} alt={`Photo ${i + 1}/${form.photos_urls.length}`}
                     onClick={() => setForm(f => ({ ...f, photo_url: url }))}
                     style={{ cursor: 'pointer' }}
                   />
                   {form.photo_url === url && (
-                    <div className="join-photo-item__badge">Principal</div>
+                    <div className="join-photo-item__badge">Principale</div>
                   )}
                   <button
                     type="button"

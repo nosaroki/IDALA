@@ -5,6 +5,7 @@ import Toast from '../../components/Toast'
 import { PRATIQUES } from '../../constants/pratiques'
 import { MODES_EXERCICE } from '../../constants/modes'
 import { PUBLIC_CIBLE, TYPE_SEANCE } from '../../constants/audiences'
+import OptimizedImage from "../../components/OptimizedImage"
 
 const STATUTS = [
   { value: 'en_attente', labelFr: 'En attente', color: '#FF9A3C' },
@@ -304,7 +305,7 @@ export default function Candidatures() {
                             flexShrink: 0,
                           }}
                         >
-                          <img src={url} 
+                          <OptimizedImage src={url} 
                               alt={`Photo de ${selected.prenom} ${selected.nom} (${i + 1}/${selected.photos_urls.length})`} 
                               style={{ 
                               width: '100%',

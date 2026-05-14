@@ -5,6 +5,7 @@ import { LangCtx } from '../components/LangContext'
 import { PRATIQUES } from '../constants/pratiques'
 import { PUBLIC_CIBLE, TYPE_SEANCE } from '../constants/audiences'
 import { MODES_EXERCICE } from '../constants/modes'
+import OptimizedImage from "../components/OptimizedImage"
 
 const LANGUAGES = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
@@ -24,7 +25,7 @@ const LANGUAGES = [
 ]
 
 const emptyForm = {
-  prenom: '', nom: '', email: '', telephone: '',
+  prenom: '', nom: '', email: '', telephone: '', siret: '',
   ville: '', region: '', pays: '',
   langues: '', langues_list: [],
   specialites: [],
@@ -245,6 +246,13 @@ async function compressImage(file) {
       return lang === 'fr' ? 'Adresse email invalide.' : 'Invalid email address.'
     }
 
+   // SIRET
+    if (!form.siret || form.siret.replace(/\s/g, '').length !== 14) {
+      return lang === 'fr' 
+        ? 'Veuillez entrer un numéro SIRET valide (14 chiffres).' 
+        : 'Please enter a valid SIRET number (14 digits).'
+    }
+
     // Localisation
     if (!form.ville || !form.pays) {
       return lang === 'fr' ? 'Veuillez sélectionner une ville dans la liste.' : 'Please select a city from the list.'
@@ -309,6 +317,7 @@ async function compressImage(file) {
       nom:                form.nom,
       email:              form.email,
       telephone:          form.telephone,
+      siret:              form.siret,
       ville:              form.ville,
       pays:               form.pays,
       langues:            form.langues,
@@ -471,6 +480,16 @@ async function compressImage(file) {
                   }}
                 />
               </div>
+              
+                <div className="join-field">
+                  <label>{lang === 'fr' ? 'Numéro SIRET' : 'SIRET number'}</label>
+                  <input required
+                    type="text"
+                    value={form.siret || ''}
+                    placeholder={lang === 'fr' ? 'Ex: 123 456 789 00010' : 'E.g. 123 456 789 00010'}
+                    onChange={e => setForm({ ...form, siret: e.target.value })}
+                  />
+                </div>
                 </>
               )}
             </div>
@@ -611,7 +630,7 @@ async function compressImage(file) {
                 <div className="join-field">
                   <label>{lang === 'fr' ? 'Bio générale EN *' : 'General bio EN *'}</label>
                   <textarea required rows={3} value={form.bio_en}
-                    placeholder={lang === 'fr' ? '1-2 phrases de présentation générale en anglais à rédiger à la première person' : '1-2 general introduction sentences in English in the first person'}
+                    placeholder={lang === 'fr' ? '1-2 phrases de présentation générale en anglais à rédiger à la première personne' : '1-2 general introduction sentences in English in the first person'}
                     onChange={e => setForm({ ...form, bio_en: e.target.value })} />
                 </div>
               </div>
@@ -1032,7 +1051,7 @@ async function compressImage(file) {
                         className={`join-photo-item ${form.main_photo === url ? 'join-photo-item--selected' : ''}`}
                         onClick={() => setForm(f => ({ ...f, main_photo: url }))}
                       >
-                        <img src={url} alt={`Photo ${i + 1}/${form.photos.length}`} />
+                        <OptimizedImage src={url} alt={`Photo ${i + 1}/${form.photos.length}`} />
                         {form.main_photo === url && (
                           <div className="join-photo-item__badge">
                             {lang === 'fr' ? 'Principale' : 'Main'}

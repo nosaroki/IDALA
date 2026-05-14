@@ -8,6 +8,8 @@ import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import chakras from '../assets/chakras.png';
+import OptimizedImage from '../components/OptimizedImage'
+
 
 const Icons = {
   Yoga: (<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="20" cy="7" r="3"/><path d="M20 10 Q14 18 8 22M20 10 Q26 18 32 22"/><path d="M14 30 Q17 24 20 22 Q23 24 26 30"/><path d="M8 22 Q10 28 14 30M32 22 Q30 28 26 30"/></svg>),
@@ -148,7 +150,7 @@ function Practitioners() {
 
           <div className="pract-chakra-top">
             <div className="pract-chakra-figure">
-              <img src={chakras} alt="Chakra meditation figure" className="chakra-figure-img" />
+              <OptimizedImage src={chakras} alt="Chakra meditation figure" className="chakra-figure-img" />
               <div className="chakra-labels">
                 {[...CHAKRA_DOTS].reverse().map(d => (
                   <div key={d.name} className="chakra-label">

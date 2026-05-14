@@ -8,6 +8,7 @@ import { useLang } from '../components/LangContext';
 import { Helmet } from 'react-helmet-async';
 import charte    from '../assets/chartecarre.jpg';
 import Footer from '../components/Footer';
+import OptimizedImage from "../components/OptimizedImage"
 
 // ─── Zodiac Icons ────────────────────────
 const ZodiacIcons = {
@@ -307,7 +308,7 @@ const calc = async () => {
             </div>
             <div className="astro-hero-v2__visual">
               <div className="astro-orb-v2">
-              <img src={charte} alt="charte astrale" className="astrology-charte" />
+              <OptimizedImage src={charte} alt="charte astrale" className="astrology-charte" />
               </div>
             </div>
           </div>
@@ -427,7 +428,7 @@ const calc = async () => {
               <div className="chart-result-v2">
                 <div className="chart-result-v2__header">
                   <div className="chart-result-v2__circle">
-                    <img src={charte} alt="charte astrale" />
+                    <OptimizedImage src={charte} alt="charte astrale" />
                   </div>
                   <div>
                     <div className="chart-result-v2__name">{result.name}</div>

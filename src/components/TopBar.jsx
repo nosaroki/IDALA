@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { useLang } from '../components/LangContext';
 import newlogo from '../assets/newlogo.png';
+import OptimizedImage from "./OptimizedImage"
 
 const SERVICES = [
   { path: '/practitioners', en: 'Practitioners', fr: 'Praticiens' },
@@ -31,7 +32,7 @@ function TopBar() {
     <>
       <header className="topbar">
         <div className="topbar__brand" onClick={() => go('/')} style={{ cursor: 'pointer' }}>
-          <img src={newlogo} alt="Idala logo" className="topbar__logo" />
+          <OptimizedImage src={newlogo} alt="Idala logo" className="topbar__logo" />
           THE IDALA FAMILY
         </div>
 
