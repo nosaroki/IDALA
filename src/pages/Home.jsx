@@ -123,8 +123,8 @@ function Home() {
 
               <p className="home-hero__subtext">
                 {lang === 'fr'
-                  ? 'Trouvez des praticiens vérifiés en yoga, reiki, méditation et breathwork pour renforcer le corps, apaiser l\'esprit et cultiver la clarté.'
-                  : 'Find verified practitioners in yoga, reiki, meditation and breathwork to strengthen the body, calm the mind and cultivate clarity.'}
+                  ? 'Des praticiens d\'excellence sélectionnés pour vous.'
+                  : 'Top-tier practitioners selected for you.'}
               </p>
 
               <button 
@@ -146,7 +146,7 @@ function Home() {
                   transition: 'background 0.2s',
                 }}
               >
-                {lang === 'fr' ? 'Trouver un Praticien' : 'Find a Practitioner'}
+                {lang === 'fr' ? 'Découvrez les praticiens' : 'Discover our practitioners'}
               </button>
             </div>
           </div>
