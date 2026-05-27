@@ -2,6 +2,7 @@ import { useContext } from 'react'
 import { LangCtx } from './LangContext'
 import { useNavigate } from 'react-router-dom'
 import { MODES_EXERCICE } from '../constants/modes'
+import OptimizedImage from './OptimizedImage'
 
 function ModeTags({ mode, lang }) {
   const modes = mode ? mode.split(',').map(m => m.trim()) : []
@@ -32,7 +33,7 @@ export default function PractitionerCard({ praticien, practiceSlug }) {
     <div className="pract-card">
       <div className="pract-card__photo">
         {praticien.photo_url
-          ? <img 
+          ? <OptimizedImage
               src={praticien.pratique_photo || praticien.photo_url} 
               alt={praticien.slug}
               style={{ objectPosition: praticien.photo_position || 'center center' }}

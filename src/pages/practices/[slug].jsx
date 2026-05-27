@@ -122,6 +122,7 @@ export default function PracticePage() {
                 praticien={{
                   ...p,
                   photo_url: p.pp_photo_url || p.photo_url,
+                  photo_position: p.pp_photo_position || p.photo_position || 'center center', 
                   bio_fr: p.pp_bio_fr || p.bio_fr,
                   bio_en: p.pp_bio_en || p.bio_en,
                   prix: p.pp_prix,

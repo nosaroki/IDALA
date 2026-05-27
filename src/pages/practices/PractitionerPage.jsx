@@ -71,6 +71,7 @@ export default function PractitionerPage() {
       setPraticien({
         ...data,
         photo_url: ppData?.photo_url || data.photo_url, 
+        photo_position: ppData?.photo_position || data.photo_position || 'center center', 
         bio_fr: data.bio_fr,
         bio_en: data.bio_en,
         bio_complete_fr: ppData?.bio_fr || data.bio_complete_fr || '',
@@ -195,13 +196,13 @@ const practiceName = pratiqueFromConst
                   : (praticien.bio_en || praticien.bio)}
               </p>
             )}
-            {(praticien.bio_complete_fr || praticien.bio_complete_en || praticien.bio_complete) && (
+            {/* {(praticien.bio_complete_fr || praticien.bio_complete_en || praticien.bio_complete) && (
               <p className="pract-profile__bio">
                 {lang === 'fr'
                   ? (praticien.bio_complete_fr || praticien.bio_complete)
                   : (praticien.bio_complete_en || praticien.bio_complete)}
               </p>
-            )}
+            )} */}
 
               {praticien.offres?.length > 0 && (
                 <div className="pract-profile__offres">
