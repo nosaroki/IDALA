@@ -42,6 +42,7 @@ const emptyForm = {
 export default function JoinUs() {
   const { lang }          = useContext(LangCtx)
   const [form, setForm]   = useState(emptyForm)
+  const [candidatureId] = useState(() => crypto.randomUUID())
   const [existingPraticien, setExistingPraticien] = useState(null)
   const [checkingEmail, setCheckingEmail] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -134,42 +135,41 @@ async function compressImage(file) {
   })
 }
 
-    async function handlePhotos(e) {
-      const files = Array.from(e.target.files)
-      if (!files.length) return
+    async function handlePhotoPratique(e, slug) {
+      const file = e.target.files?.[0]
+      if (!file) return
 
-      // Vérification taille : 10 MB max par fichier
       const maxSize = 10 * 1024 * 1024 // 10 MB
-      const oversized = files.filter(f => f.size > maxSize)
-      if (oversized.length > 0) {
+      if (file.size > maxSize) {
         setError(lang === 'fr'
-          ? `Certaines photos dépassent 10 MB. Veuillez les compresser avant l'upload.`
-          : `Some photos exceed 10 MB. Please compress them before upload.`)
+          ? `La photo dépasse 10 MB. Veuillez la compresser avant l'upload.`
+          : `The photo exceeds 10 MB. Please compress it before upload.`)
         return
       }
 
       setUploading(true)
       setError(null)
-      const urls = []
-      for (const file of files) {
-        const compressed = await compressImage(file)
-        const ext = 'jpg'
-        const filename = `candidatures/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-        const { data, error } = await supabase.storage
+
+      const compressed = await compressImage(file)
+      const filename = `candidatures/${candidatureId}/${slug}-${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`
+      const { data, error } = await supabase.storage
+        .from('photos-praticiens')
+        .upload(filename, compressed, { upsert: true })
+
+      if (!error) {
+        const { data: urlData } = supabase.storage
           .from('photos-praticiens')
-          .upload(filename, compressed, { upsert: true })
-        if (!error) {
-          const { data: urlData } = supabase.storage
-            .from('photos-praticiens')
-            .getPublicUrl(data.path)
-          urls.push(urlData.publicUrl)
-        }
+          .getPublicUrl(data.path)
+        setForm(f => ({
+          ...f,
+          pratiques_details: {
+            ...f.pratiques_details,
+            [slug]: { ...f.pratiques_details[slug], photo_url: urlData.publicUrl }
+          }
+        }))
+      } else {
+        setError(lang === 'fr' ? 'Erreur lors de l\'upload.' : 'Upload error.')
       }
-      setForm(f => ({
-        ...f,
-        photos: [...f.photos, ...urls],
-        main_photo: f.main_photo || urls[0] || ''
-      }))
       setUploading(false)
     }
 
@@ -181,11 +181,6 @@ async function compressImage(file) {
           }
           for (const slug of form.specialites) {
             const details = form.pratiques_details[slug] || {}
-            if (!details.bio_fr?.trim() || !details.bio_en?.trim()) {
-              return lang === 'fr'
-                ? 'Veuillez remplir les descriptions FR et EN pour chaque spécialité.'
-                : 'Please fill in FR and EN descriptions for each specialty.'
-            }
             if (!details.offres || details.offres.length === 0) {
               return lang === 'fr'
                 ? 'Veuillez ajouter au moins une offre par spécialité.'
@@ -227,6 +222,11 @@ async function compressImage(file) {
                   ? 'Veuillez compléter le titre (FR/EN) et la durée pour chaque offre.'
                   : 'Please complete title (FR/EN) and duration for each offer.'
               }
+            }
+            if (!details.photo_url) {
+              return lang === 'fr'
+                ? 'Veuillez ajouter une photo pour chaque spécialité.'
+                : 'Please add a photo for each specialty.'
             }
           }
           return null
@@ -271,11 +271,6 @@ async function compressImage(file) {
     // Détails par pratique : descriptions FR/EN + au moins une offre complète
     for (const slug of form.specialites) {
       const details = form.pratiques_details[slug] || {}
-      if (!details.bio_fr?.trim() || !details.bio_en?.trim()) {
-        return lang === 'fr'
-          ? `Veuillez remplir les descriptions FR et EN pour chaque spécialité.`
-          : `Please fill in FR and EN descriptions for each specialty.`
-      }
       if (!details.offres || details.offres.length === 0) {
         return lang === 'fr'
           ? `Veuillez ajouter au moins une offre par spécialité.`
@@ -288,16 +283,22 @@ async function compressImage(file) {
             : 'Please complete title (FR/EN) and duration for each offer.'
         }
       }
+
+      if (!details.photo_url) {
+        return lang === 'fr'
+          ? 'Veuillez ajouter une photo pour chaque spécialité.'
+          : 'Please add a photo for each specialty.'
+      }
     }
 
-    if (form.photos.length < 2) {
-      return lang === 'fr' ? 'Veuillez uploader au moins 2 photos.' : 'Please upload at least 2 photos.'
-    }
+    // if (form.photos.length < 2) {
+    //   return lang === 'fr' ? 'Veuillez uploader au moins 2 photos.' : 'Please upload at least 2 photos.'
+    // }
 
-    // Photo principale sélectionnée
-    if (!form.main_photo) {
-      return lang === 'fr' ? 'Veuillez sélectionner une photo principale.' : 'Please select a main photo.'
-    }
+    // // Photo principale sélectionnée
+    // if (!form.main_photo) {
+    //   return lang === 'fr' ? 'Veuillez sélectionner une photo principale.' : 'Please select a main photo.'
+    // }
 
     return null
   }
@@ -311,6 +312,9 @@ async function compressImage(file) {
     }
     setLoading(true)
     setError(null)
+
+    const firstSlug = form.specialites[0]
+    const fallbackPhoto = form.pratiques_details[firstSlug]?.photo_url || ''
 
     const { error } = await supabase.from('candidatures').insert({
       prenom:             form.prenom,
@@ -336,12 +340,14 @@ async function compressImage(file) {
       mode_exercice:      form.mode_exercice,
       instagram:          form.instagram,
       site_web:           form.site_web,
-      photos_urls: form.photos,
-      main_photo: form.main_photo,
+      photos_urls: form.specialites.map(s => form.pratiques_details[s]?.photo_url).filter(Boolean),
+      main_photo: fallbackPhoto,
+      candidature_uuid: candidatureId,
       langue_interface: lang
     })
 
-    if (error) {
+    if (error) {     
+      console.log('ERREUR INSERT CANDIDATURE:', error)
       setError(lang === 'fr'
         ? 'Une erreur est survenue. Veuillez réessayer.'
         : 'An error occurred. Please try again.')
@@ -673,6 +679,38 @@ async function compressImage(file) {
                         <h3 className="join-pratique-block__title">
                           {lang === 'fr' ? pratique?.fr : pratique?.en}
                         </h3>
+
+                        {/* Photo de cette pratique */}
+                        <div className="join-field">
+                          <label>
+                            {lang === 'fr'
+                              ? 'Photo pour cette pratique *'
+                              : 'Photo for this practice *'}
+                          </label>
+                          <input
+                            id={`photo-${slug}`}
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handlePhotoPratique(e, slug)}
+                            style={{ display: 'none' }}
+                          />
+                          <label htmlFor={`photo-${slug}`} className="join-file-btn">
+                            {uploading
+                              ? (lang === 'fr' ? 'Upload en cours...' : 'Uploading...')
+                              : details.photo_url
+                                ? (lang === 'fr' ? 'Changer la photo' : 'Change photo')
+                                : (lang === 'fr' ? 'Choisir une photo' : 'Choose a photo')}
+                          </label>
+                          {details.photo_url && (
+                            <div style={{ marginTop: '12px' }}>
+                              <OptimizedImage
+                                src={details.photo_url}
+                                alt={lang === 'fr' ? 'Photo de la pratique' : 'Practice photo'}
+                                style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 8 }}
+                              />
+                            </div>
+                          )}
+                        </div>
 
                         {/* Bio spécifique */}
                         {/* <div className="join-row">
@@ -1010,7 +1048,7 @@ async function compressImage(file) {
           </div>
 
           {/* ── Photos ── */}
-          <div className="join-section">
+          {/* <div className="join-section">
             <h2 className="join-section__title">
               {lang === 'fr' ? 'Contenu visuel' : 'Visual content'}
             </h2>
@@ -1063,7 +1101,7 @@ async function compressImage(file) {
                 </>
               )}
             </div>
-          </div>
+          </div> */}
            </>
           )}
 

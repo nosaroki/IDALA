@@ -58,7 +58,7 @@ serve(async (req) => {
   const isFr = cand.langue_interface !== 'en'
   const token = crypto.randomUUID()
 
-  // 🔥 MODIF IMPORTANTE : normalisation email
+  // 🔥Normalisation email
   const normalizedEmail = cand.email?.trim().toLowerCase()
 
   const bio_fr = firstSentence(cand.bio_fr || cand.motivation || '')
@@ -79,7 +79,72 @@ serve(async (req) => {
     .in('slug', practiqueSlugs)
 
   // =========================================================
-  // 🔥 MODIF 1 : DETECTION PRATICIEN EXISTANT
+  // COPIE DES PHOTOS : candidatures/{uuid}/ -> praticiens/{slug}/
+  // =========================================================
+  const BUCKET = 'photos-praticiens'
+
+  // Genere le slug du praticien (meme logique que plus bas pour les nouveaux)
+  // Pour un praticien existant, on utilisera son slug actuel un peu plus bas
+  let praticienSlug = ''
+  
+  // // Recolte toutes les URLs de photos a copier
+  // // (photo_url, photos_urls, et les photo_url dans pratiques_details)
+  // const photoUrlsToCopy: { oldUrl: string, newPath: string, slug: string }[] = []
+  
+  // Photo principale et galerie
+  const galleryUrls = cand.photos_urls || []
+  if (cand.main_photo && !galleryUrls.includes(cand.main_photo)) {
+    galleryUrls.unshift(cand.main_photo)
+  }
+  
+  // Photos par pratique (depuis pratiques_details)
+  const photosPratiques: { [slug: string]: string } = {}
+  for (const pSlug of Object.keys(pratiquesDetails)) {
+    const photoUrl = pratiquesDetails[pSlug]?.photo_url
+    if (photoUrl) {
+      photosPratiques[pSlug] = photoUrl
+    }
+  }
+
+  // Fonction qui extrait le chemin Storage depuis une URL Supabase
+  function urlToStoragePath(url: string): string | null {
+    const marker = `/object/public/${BUCKET}/`
+    const idx = url.indexOf(marker)
+    if (idx === -1) return null
+    return url.substring(idx + marker.length).split('?')[0]
+  }
+
+  // Fonction qui copie une photo vers praticiens/{slug}/ et renvoie la nouvelle URL
+  async function copyPhotoToPraticien(oldUrl: string, praticienSlugLocal: string): Promise<string> {
+    const oldPath = urlToStoragePath(oldUrl)
+    if (!oldPath) return oldUrl // pas une URL Supabase, on laisse tel quel
+
+    // Nom du fichier (dernier segment du chemin)
+    const filename = oldPath.split('/').pop() || `photo-${Date.now()}.jpg`
+    const newPath = `praticiens/${praticienSlugLocal}/${filename}`
+
+    // Copie via l'API Storage de Supabase
+    const { error: copyError } = await supabase.storage
+      .from(BUCKET)
+      .copy(oldPath, newPath)
+
+    if (copyError) {
+      // Si le fichier existe deja a destination, c'est un succes (copie deja faite)
+      if (copyError.message?.includes('already exists')) {
+        const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(newPath)
+        return urlData.publicUrl
+      }
+      console.error(`Erreur copie ${oldPath} -> ${newPath}:`, copyError.message)
+      return oldUrl // autre type d'erreur : on garde l'ancienne URL
+    }
+
+    // Construit la nouvelle URL publique
+    const { data: urlData } = supabase.storage.from(BUCKET).getPublicUrl(newPath)
+    return urlData.publicUrl
+  }
+
+  // =========================================================
+  // 🔥DETECTION PRATICIEN EXISTANT 
   // =========================================================
   const { data: existingPraticien } = await supabase
     .from('praticiens')
@@ -94,50 +159,63 @@ serve(async (req) => {
     // CAS 1 : praticien déjà existant
     newPraticien = existingPraticien
     isExistingPraticien = true
+    praticienSlug = existingPraticien.slug
     console.log('✔ Praticien existant détecté:', existingPraticien.id)
 
   } else {
-    // CAS 2 : création nouveau praticien
-    const slug = generateSlug(prenom, nom)
+      // CAS 2 : création nouveau praticien
+      praticienSlug = generateSlug(prenom, nom)
 
-    const { data: created, error: insertError } = await supabase
-      .from('praticiens')
-      .insert({
-        prenom,
-        nom,
-        email: normalizedEmail,
-        telephone: cand.telephone,
-        siret: cand.siret || '',
-        ville: cand.ville,
-        pays: cand.pays,
-        langues: cand.langues,
-        mode_exercice: cand.mode_exercice,
-        bio_fr,
-        bio_complete_fr,
-        bio_en,
-        bio_complete_en,
-        photo_url,
-        photos_urls: cand.photos_urls || [],
-        slug,
-        onboarding_token: token,
-        actif: false,
-      })
-      .select()
-      .single()
+      // Copie de la photo principale et de la galerie vers praticiens/{slug}/
+      let newPhotoUrl = photo_url
+      const newPhotosUrls: string[] = []
+      
+      if (photo_url) {
+        newPhotoUrl = await copyPhotoToPraticien(photo_url, praticienSlug)
+      }
+      for (const oldUrl of (cand.photos_urls || [])) {
+        const newUrl = await copyPhotoToPraticien(oldUrl, praticienSlug)
+        newPhotosUrls.push(newUrl)
+      }
 
-    if (insertError) {
-      console.error('INSERT ERROR:', insertError)
-      return new Response(JSON.stringify({ error: insertError.message }), {
-        status: 500,
-        headers: corsHeaders
-      })
+      const { data: created, error: insertError } = await supabase
+        .from('praticiens')
+        .insert({
+          prenom,
+          nom,
+          email: normalizedEmail,
+          telephone: cand.telephone,
+          siret: cand.siret || '',
+          ville: cand.ville,
+          pays: cand.pays,
+          langues: cand.langues,
+          mode_exercice: cand.mode_exercice,
+          bio_fr,
+          bio_complete_fr,
+          bio_en,
+          bio_complete_en,
+          photo_url: newPhotoUrl,
+          photos_urls: newPhotosUrls,
+          slug: praticienSlug,
+          onboarding_token: token,
+          actif: false,
+        })
+        .select()
+        .single()
+
+      if (insertError) {
+        console.error('INSERT ERROR:', insertError)
+        return new Response(JSON.stringify({ error: insertError.message }), {
+          status: 500,
+          headers: corsHeaders
+        })
+      }
+
+      newPraticien = created
     }
 
-    newPraticien = created
-  }
-
   // =========================================================
-  // 🔥 MODIF 2 : AJOUT PRATIQUES (ANTI DOUBLON)
+  // 🔥AJOUT PRATIQUES (ANTI DOUBLON)
   // =========================================================
   if (pratiquesData && newPraticien) {
     for (const pratique of pratiquesData) {
@@ -156,6 +234,15 @@ serve(async (req) => {
         continue
       }
 
+      // Copie de la photo de cette pratique vers praticiens/{slug}/
+      let pratiquePhotoUrl = null
+      if (photosPratiques[pratique.slug]) {
+        pratiquePhotoUrl = await copyPhotoToPraticien(
+          photosPratiques[pratique.slug],
+          praticienSlug
+        )
+      }
+
       const { data: newPP } = await supabase
         .from('praticien_pratiques')
         .insert({
@@ -166,6 +253,7 @@ serve(async (req) => {
           public_cible: details.public_cible || '',
           type_seance: details.type_seance || '',
           mode_exercice: details.mode_exercice || '',
+          photo_url: pratiquePhotoUrl,
         })
         .select()
         .single()
@@ -211,32 +299,46 @@ serve(async (req) => {
       to: normalizedEmail,
       subject: isExistingPraticien
         ? 'Votre nouvelle pratique a été ajoutée à votre profil Idala'
-        : 'Bienvenue dans The Idala Family — Finalisez votre profil',
+        : 'Bienvenue dans The Idala Family | Finalisez votre profil',
 
-      html: `
+     html: `
         <div style="font-family: Georgia, serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; color: #281745;">
-          <p style="font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #9B6EBF;">The Idala Family</p>
+          <p style="font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: #9B6EBF; margin-bottom: 24px;">The Idala Family</p>
 
-          <h1 style="font-size: 28px; font-weight: 400;">
-            ${isExistingPraticien ? `Bonjour ${prenom}` : `Bienvenue ${prenom}`}
+          <h1 style="font-size: 28px; font-weight: 400; margin-bottom: 24px; line-height: 1.3;">
+            ${isExistingPraticien ? `Bonjour ${prenom},` : `Bienvenue ${prenom},`}
           </h1>
 
-          <p style="font-size: 15px; line-height: 1.8;">
-            ${
-              isExistingPraticien
-                ? "Votre nouvelle pratique a été ajoutée à votre profil."
-                : "Votre profil a été validé par notre équipe."
-            }
-          </p>
+          ${isExistingPraticien
+            ? `
+              <p style="font-size: 15px; line-height: 1.8; font-weight: 300; margin-bottom: 16px;">
+                Votre nouvelle pratique a bien été ajoutée à votre profil Idala.
+              </p>
+              <p style="font-size: 15px; line-height: 1.8; font-weight: 300; margin-bottom: 32px;">
+                Elle est désormais visible sur votre fiche et peut accueillir de nouvelles réservations.
+              </p>
+            `
+            : `
+              <p style="font-size: 15px; line-height: 1.8; font-weight: 300; margin-bottom: 16px;">
+                Nous avons le plaisir de vous accueillir au sein de The Idala Family. Votre profil a été validé par notre équipe.
+              </p>
+              <p style="font-size: 15px; line-height: 1.8; font-weight: 300; margin-bottom: 32px;">
+                Pour finaliser votre inscription et commencer à recevoir des réservations, veuillez compléter votre profil en cliquant sur le lien ci-dessous.
+              </p>
+            `
+          }
 
           <a href="${isExistingPraticien ? 'https://theidalafamily.com' : `https://theidalafamily.com/#/onboarding/${token}`}"
-            style="display:inline-block;padding:14px 32px;background:#3e295d;color:#fff;text-decoration:none;border-radius:8px;font-family:Jost,sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;border-radius:1em;">
-            ${
-              isExistingPraticien
-                ? "Voir le site"
-                : "Compléter mon profil"
-            }
+            style="display:inline-block;padding:14px 32px;background:#3e295d;color:#fff;text-decoration:none;font-family:Jost,sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;border-radius:1em;">
+            ${isExistingPraticien ? 'Voir mon profil' : 'Compléter mon profil'}
           </a>
+
+          <p style="font-size: 15px; line-height: 1.8; font-weight: 300; margin-top: 40px;">
+            Bien à vous,<br/>The Idala Family
+          </p>
+
+          <hr style="border: none; border-top: 1px solid #E4D8F5; margin: 32px 0 24px;" />
+          <p style="font-size: 11px; color: #9B6EBF; letter-spacing: 2px; text-transform: uppercase;">theidalafamily.com</p>
         </div>
       `,
     }),

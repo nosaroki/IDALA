@@ -281,6 +281,11 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
       const files = Array.from(e.target.files)
       if (!files.length) return
 
+      if (!form.slug?.trim()) {
+        alert('Veuillez d\'abord renseigner le slug du praticien avant d\'uploader des photos.')
+        return
+      }
+
       // Vérification taille : 10 MB max par fichier
       const maxSize = 10 * 1024 * 1024
       const oversized = files.filter(f => f.size > maxSize)
@@ -294,7 +299,7 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
       for (const file of files) {
         const compressed = await compressImage(file)
         const ext = 'jpg'
-        const filename = `candidatures/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+        const filename = `praticiens/${form.slug}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`        
         const { data, error } = await supabase.storage
           .from('photos-praticiens')
           .upload(filename, compressed, { upsert: true })
@@ -560,8 +565,13 @@ function handleSubmit(e) {
                         const file = e.target.files?.[0]
                         if (!file) return
 
+                        if (!form.slug?.trim()) {
+                        alert('Veuillez d\'abord renseigner le slug du praticien avant d\'uploader une photo.')
+                        return
+                      }
+
                         const ext = file.name.split('.').pop()
-                        const fileName = `pratiques/${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`
+                        const fileName = `praticiens/${form.slug}/${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`
                         
                         const { data, error } = await supabase.storage
                           .from('photos-praticiens')

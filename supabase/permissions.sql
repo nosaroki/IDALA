@@ -28,3 +28,36 @@ GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO anon;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO authenticated;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO service_role;
+
+-- ============================================================
+-- STORAGE : Permissions sur le bucket photos-praticiens
+-- ============================================================
+-- Ces policies controlent qui peut uploader, lire et gerer les
+-- photos dans le bucket. Si elles sautent, l'upload de candidature
+-- echoue (erreur 403) et les photos ne s'affichent plus.
+
+-- GRANT au niveau table (Storage utilise sa propre table objects)
+GRANT SELECT, INSERT ON storage.objects TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON storage.objects TO authenticated;
+
+-- Upload : public (formulaire candidature) + authenticated (admin)
+DROP POLICY IF EXISTS "upload photos praticiens" ON storage.objects;
+CREATE POLICY "upload photos praticiens"
+ON storage.objects FOR INSERT
+TO anon, authenticated
+WITH CHECK (bucket_id = 'photos-praticiens');
+
+-- Lecture publique des photos (pour affichage sur le site)
+DROP POLICY IF EXISTS "lecture photos praticiens" ON storage.objects;
+CREATE POLICY "lecture photos praticiens"
+ON storage.objects FOR SELECT
+TO anon, authenticated
+USING (bucket_id = 'photos-praticiens');
+
+-- Gestion complete pour l'admin (modifier, supprimer)
+DROP POLICY IF EXISTS "gestion photos praticiens" ON storage.objects;
+CREATE POLICY "gestion photos praticiens"
+ON storage.objects FOR ALL
+TO authenticated
+USING (bucket_id = 'photos-praticiens')
+WITH CHECK (bucket_id = 'photos-praticiens');
