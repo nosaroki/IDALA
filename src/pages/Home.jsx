@@ -8,18 +8,13 @@ import { useLang } from '../components/LangContext';
 import { Helmet } from 'react-helmet-async';
 import { useReveal } from '../hooks/useReveal';
 import Footer from '../components/Footer';
-
 import newlogo from '../assets/newlogo.png';
 import dianeRegard    from '../assets/dianeregard.png';
-// import soundHealing   from '../assets/soundhealing.jpg';
 import groupsound     from '../assets/groupsound.jpg';
 import groupyoga       from '../assets/groupyoga.jpg';
 import groupmedit      from '../assets/groupmedit.jpg';
-// import yogaPose       from '../assets/souplesserocher.png';
-// import breathwork     from '../assets/yogaplage.png';
 import meditation from '../assets/meditation.jpg';
 import sointbt from '../assets/sointbt.jpg';
-// import acu from '../assets/practitioners/acu.jpg';
 import marine_reiki from '../assets/practitioners/marine_reiki.JPG';
 import gobowl from '../assets/practitioners/gobowl.jpg';
 import taichilady from '../assets/practitioners/taichilady.jpg';
