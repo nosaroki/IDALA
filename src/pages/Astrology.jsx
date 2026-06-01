@@ -6,7 +6,7 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLang } from '../components/LangContext';
 import { Helmet } from 'react-helmet-async';
-import charte    from '../assets/chartecarre.jpg';
+import charte    from '../assets/chartecarre.webp';
 import Footer from '../components/Footer';
 import OptimizedImage from "../components/OptimizedImage"
 

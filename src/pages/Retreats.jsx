@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 import { Helmet } from 'react-helmet-async'
 import { LangCtx } from '../components/LangContext'
-import bannerRetraite from '../assets/banner/banner_retraite.jpg'
+import bannerRetraite from '../assets/banner/banner_retraite.webp'
 import Footer from '../components/Footer'
 
 

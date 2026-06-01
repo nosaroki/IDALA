@@ -7,7 +7,7 @@ import { useLang } from '../components/LangContext';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
-import chakras from '../assets/chakras.png';
+import chakras from '../assets/chakras.webp';
 import OptimizedImage from '../components/OptimizedImage'
 
 

@@ -1,7 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { useLang } from '../components/LangContext';
-import newlogo from '../assets/newlogo.png';
+import newlogo from '../assets/newlogo.webp';
 import OptimizedImage from "./OptimizedImage"
 
 const SERVICES = [

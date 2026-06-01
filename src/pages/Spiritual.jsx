@@ -1,7 +1,7 @@
 import { useLang } from '../components/LangContext';
 import { Helmet } from 'react-helmet-async';
 import Footer from '../components/Footer';
-import tarotOrb from '../assets/tarot2.jpg'
+import tarotOrb from '../assets/tarot2.webp'
 import OptimizedImage from '../components/OptimizedImage'
 
 

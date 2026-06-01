@@ -15,3 +15,17 @@ export default function OptimizedImage({ src, alt, style, className, onClick }) 
     />
   )
 }
+
+// export default function OptimizedImage({ src, alt, style, className, onClick }) {
+//   if (!src) return null
+
+//   return (
+//     <img 
+//       src={src}
+//       alt={alt}
+//       style={style}
+//       className={className}
+//       onClick={onClick}
+//     />
+//   )
+// }

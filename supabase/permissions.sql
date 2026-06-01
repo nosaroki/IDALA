@@ -20,6 +20,10 @@ GRANT ALL ON public.praticien_pratiques TO authenticated;
 GRANT ALL ON public.praticien_offres TO authenticated;
 GRANT ALL ON public.candidatures TO authenticated;
 
+-- Lecture publique des praticiens actifs (pour affichage sur le site)
+DROP POLICY IF EXISTS "lecture publique praticiens" ON public.praticiens;
+CREATE POLICY "lecture publique praticiens" ON public.praticiens FOR SELECT TO anon, authenticated USING (actif = true);
+
 -- Service role : accès total (edge functions)
 GRANT ALL ON ALL TABLES IN SCHEMA public TO service_role;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO service_role;

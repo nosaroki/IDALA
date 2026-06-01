@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────
 
 import { useLang } from '../components/LangContext'; 
-// import newlogo from '../assets/newlogo.png';
+// import newlogo from '../assets/newlogo.webp';
 // import OptimizedImage from '../components/OptimizedImage'
 
 

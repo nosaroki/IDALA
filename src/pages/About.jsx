@@ -6,8 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { useLang } from '../components/LangContext';
 import { Helmet } from 'react-helmet-async';
 import Footer from '../components/Footer';
-import dianeRegard from '../assets/dianeregard.png';
-import idaPingala  from '../assets/idapingala.png';
+import dianeRegard from '../assets/dianeregard.webp';
+import idaPingala  from '../assets/idapingala.webp';
 import OptimizedImage from "../components/OptimizedImage"
 
 function About() {

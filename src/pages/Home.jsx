@@ -8,21 +8,21 @@ import { useLang } from '../components/LangContext';
 import { Helmet } from 'react-helmet-async';
 import { useReveal } from '../hooks/useReveal';
 import Footer from '../components/Footer';
-import newlogo from '../assets/newlogo.png';
-import dianeRegard    from '../assets/dianeregard.png';
-import groupsound     from '../assets/groupsound.jpg';
-import groupyoga       from '../assets/groupyoga.jpg';
-import groupmedit      from '../assets/groupmedit.jpg';
-import meditation from '../assets/meditation.jpg';
-import sointbt from '../assets/sointbt.jpg';
-import marine_reiki from '../assets/practitioners/marine_reiki.JPG';
-import gobowl from '../assets/practitioners/gobowl.jpg';
-import taichilady from '../assets/practitioners/taichilady.jpg';
-import gogong from '../assets/practitioners/gogong.jpg';
-import ladyyoga from '../assets/practitioners/ladyyoga.jpg';
-import breathwork from '../assets/practitioners/breathwrk.jpg';
-import facemedit from '../assets/practitioners/meditt.jpg';
-import yogabeige from '../assets/yogabeige.jpg'
+import newlogo from '../assets/newlogo.webp';
+import dianeRegard    from '../assets/dianeregard.webp';
+import groupsound     from '../assets/groupsound.webp';
+import groupyoga       from '../assets/groupyoga.webp';
+import groupmedit      from '../assets/groupmedit.webp';
+import meditation from '../assets/meditation.webp';
+import sointbt from '../assets/sointbt.webp';
+import marine_reiki from '../assets/practitioners/marine_reiki.webp';
+import gobowl from '../assets/practitioners/gobowl.webp';
+import taichilady from '../assets/practitioners/taichilady.webp';
+import gogong from '../assets/practitioners/gogong.webp';
+import ladyyoga from '../assets/practitioners/ladyyoga.webp';
+import breathwork from '../assets/practitioners/breathwrk.webp';
+import facemedit from '../assets/practitioners/meditt.webp';
+import yogabeige from '../assets/yogabeige.webp'
 import OptimizedImage from "../components/OptimizedImage"
 
 // const TESTIMONIALS = [
