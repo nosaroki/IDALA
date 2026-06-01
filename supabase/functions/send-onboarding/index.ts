@@ -337,8 +337,13 @@ serve(async (req) => {
             Bien à vous,<br/>The Idala Family
           </p>
 
-          <hr style="border: none; border-top: 1px solid #E4D8F5; margin: 32px 0 24px;" />
-          <p style="font-size: 11px; color: #9B6EBF; letter-spacing: 2px; text-transform: uppercase;">theidalafamily.com</p>
+          <hr style="border: none; border-top: 1px solid #E4D8F5; margin: 40px 0 24px;" />
+          <div style="text-align: center;">
+            <img src="https://theidalafamily.com/newlogo.png" alt="The Idala Family" style="width: 80px; height: auto; margin-bottom: 12px;" />
+            <p style="font-size: 11px; color: #9B6EBF; letter-spacing: 2px; text-transform: uppercase; margin: 0;">
+              <a href="https://theidalafamily.com" style="color: #9B6EBF; text-decoration: none;">theidalafamily.com</a>
+            </p>
+          </div>
         </div>
       `,
     }),

@@ -217,17 +217,6 @@ export default function Candidatures() {
                     <div key={slug} className="cand-pratique-block">
                       <h4 className="cand-pratique-title">{PRATIQUES.find(p => p.value === slug)?.fr || slug}</h4>
 
-                      <div className="cand-grid" style={{ marginBottom: '16px' }}>
-                        <div>
-                          <span>Description FR</span>
-                          <p style={{ whiteSpace: 'pre-wrap' }}>{details.bio_fr || '—'}</p>
-                        </div>
-                        <div>
-                          <span>Description EN</span>
-                          <p style={{ whiteSpace: 'pre-wrap' }}>{details.bio_en || '—'}</p>
-                        </div>
-                      </div>
-
                       {details.offres?.length > 0 && (
                         <div>
                           <span className="cand-label">Offres</span>
