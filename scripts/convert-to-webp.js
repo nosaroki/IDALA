@@ -5,7 +5,7 @@ import sharp from 'sharp'
 
 const ASSETS_DIR = 'src/assets'
 const QUALITY = 80          // 80 = excellent compromis qualite/poids
-const MAX_WIDTH = 1600       // redimensionne si plus large que 1600px
+const MAX_WIDTH = 800       // redimensionne si plus large que 800px
 const EXTENSIONS = ['.jpg', '.jpeg', '.png']
 
 function listFiles(dir, files = []) {
