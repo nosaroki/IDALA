@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { HashRouter, Routes, Route, Outlet } from 'react-router-dom';
+import { HashRouter, Routes, Route, Outlet, useLocation } from 'react-router-dom';
 import { LangCtx } from './components/LangContext';
 import TopBar      from './components/TopBar';        
 import Loader      from './components/Loader';
@@ -22,15 +22,28 @@ import PracticePage from './pages/practices/[slug]';
 import PractitionerPage from './pages/practices/PractitionerPage'
 import Candidatures from './pages/admin/Candidatures'
 import Onboarding from './pages/Onboarding'
+import DiagnosticBubble from './components/DiagnosticBubble';
+import Reservation from './pages/Reservation';
+import ReservationConfirmation from './pages/ReservationConfirmation';
+import CancelReservation from './pages/CancelReservation';
 
 import { HelmetProvider } from 'react-helmet-async';
 import './styles.css';
 
 function Layout() {
+  const location = useLocation();
+  const path = location.pathname;
+
+  // Masquer le DiagnosticBubble sur : détail praticien, réservation, confirmation
+  const hideBubble =
+    /^\/practices\/[^/]+\/[^/]+$/.test(path) ||   // détail praticien (2 segments après /practices)
+    path.startsWith('/reservation');               // réservation + confirmation
+
   return (
     <>
       <TopBar />
       <Outlet />
+      {!hideBubble && <DiagnosticBubble />}
     </>
   );
 }
@@ -69,6 +82,8 @@ export default function App() {
 
             {/* Route onboarding publique */}
                <Route path="/onboarding/:token" element={<Onboarding />} />
+               <Route path="/annulation/:token" element={<CancelReservation />} />
+
 
             <Route element={<Layout />}>
               <Route path="/"              element={<Home />} />
@@ -81,6 +96,8 @@ export default function App() {
               <Route path="/astrology"     element={<Astrology />} />
               <Route path="/about"         element={<About />} />
               <Route path="/join" element={<JoinUs />} />
+              <Route path="/reservation/confirmation" element={<ReservationConfirmation />} />
+              <Route path="/reservation/:praticienSlug/:pratiqueSlug" element={<Reservation />} />
               <Route path="*" element={<NotFound />} />
             </Route>
           </Routes>

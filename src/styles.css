@@ -494,6 +494,194 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   }
 }
 
+/* ============================================
+   DIAGNOSTIC BUBBLE (bouton flottant sonar)
+   ============================================ */
+
+.diagnostic-bubble {
+  position: fixed;
+  bottom: calc(25vh + env(safe-area-inset-bottom, 0px));
+  right: calc(24px + env(safe-area-inset-right, 0px));
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-direction: row-reverse;
+}
+
+.diagnostic-bubble__trigger-wrap {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+}
+
+.diagnostic-bubble__ripple {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--violet-mid);
+  border-radius: 1em;
+  opacity: 0;
+  pointer-events: none;
+  animation: diagnostic-ripple 2.8s ease-out infinite;
+}
+
+.diagnostic-bubble__ripple--delayed {
+  animation-delay: 1.4s;
+}
+
+@keyframes diagnostic-ripple {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.65;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+.diagnostic-bubble.is-open .diagnostic-bubble__ripple {
+  animation-play-state: paused;
+  opacity: 0;
+}
+
+.diagnostic-bubble__trigger {
+  width: 56px;
+  height: 56px;
+  border-radius: 1em;
+  border: none;
+  background: var(--violet-dark);
+  color: var(--pale);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+  position: relative;
+  z-index: 2;
+  padding: 0;
+  
+}
+
+.diagnostic-bubble__trigger:hover,
+.diagnostic-bubble__trigger:focus-visible {
+  transform: scale(1.06);
+  background: var(--violet-dark);
+  color: var(--pale);
+  box-shadow: var(--shadow-lg);
+  outline: none;
+}
+
+.diagnostic-bubble__panel {
+  background: var(--root-bg2);
+  border-radius: 1em;
+  border: 0.5px solid var(--pale);
+  padding: 20px 22px;
+  width: 280px;
+  max-width: calc(100vw - 100px);
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  transform: translateX(12px) scale(0.96);
+  transform-origin: bottom right;
+  transition: opacity var(--transition), transform var(--transition);
+  pointer-events: none;
+  margin-bottom: 4px;
+}
+
+.diagnostic-bubble.is-open .diagnostic-bubble__panel {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  pointer-events: auto;
+}
+
+.diagnostic-bubble__title {
+  margin: 0 0 6px 0;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.diagnostic-bubble__subtitle {
+  margin: 0 0 14px 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-light);
+}
+
+.diagnostic-bubble__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.diagnostic-bubble__cta {
+  display: block;
+  text-align: center;
+  padding: 10px 14px;
+  border-radius: 1em;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: background var(--transition), color var(--transition);
+}
+
+.diagnostic-bubble__cta--primary {
+  background: var(--pale);
+  color: var(--violet-dark);
+}
+
+.diagnostic-bubble__cta--primary:hover,
+.diagnostic-bubble__cta--primary:focus-visible {
+  background: var(--violet-dark);
+  color: var(--pale);
+  outline: none;
+}
+
+.diagnostic-bubble__cta--secondary {
+  background: transparent;
+  color: var(--violet-dark);
+  border: 1px solid var(--violet-dark);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.diagnostic-bubble__cta--secondary:hover,
+.diagnostic-bubble__cta--secondary:focus-visible {
+  background: var(--violet-dark);
+  color: var(--root-bg);
+  outline: none;
+}
+
+@media (max-width: 600px) {
+  .diagnostic-bubble {
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    right: calc(16px + env(safe-area-inset-right, 0px));
+  }
+
+  .diagnostic-bubble__trigger-wrap,
+  .diagnostic-bubble__trigger {
+    width: 52px;
+    height: 52px;
+  }
+
+  .diagnostic-bubble__panel {
+    width: 260px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .diagnostic-bubble__ripple {
+    animation: none;
+    opacity: 0;
+  }
+  .diagnostic-bubble__trigger,
+  .diagnostic-bubble__panel,
+  .diagnostic-bubble__cta {
+    transition: none;
+  }
+}
+
 /* ─────────────────────────────────────────
    HOME — CONCEPT
 ───────────────────────────────────────── */
@@ -2786,6 +2974,562 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 .footer-link:hover {
   color: var(--violet-mid);
+}
+
+/* ─────────────────────────────────────────
+   RÉSERVATION
+───────────────────────────────────────── */
+
+.resa-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: calc(var(--topbar-h) + 3rem) var(--px) 6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.resa-loading,
+.resa-cal-loading {
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-light);
+  text-align: center;
+  padding: 2rem 0;
+}
+
+/* ── En-tête récap prestation ── */
+.resa-header {
+  text-align: center;
+  border-bottom: 1px solid var(--pale);
+  padding-bottom: 2rem;
+}
+
+.resa-header__eyebrow {
+  font-family: 'Jost', sans-serif;
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--violet-mid);
+  margin: 0 0 1rem;
+}
+
+.resa-header__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  font-weight: 400;
+  color: var(--violet-bg);
+  margin: 0 0 0.5rem;
+  letter-spacing: 0.02em;
+}
+
+.resa-header__prat {
+  font-family: 'Jost', sans-serif;
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--text-light);
+  margin: 0 0 1.25rem;
+}
+
+.resa-header__meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text);
+}
+
+.resa-header__dot { color: var(--violet-light); }
+
+.resa-header__price {
+  font-weight: 500;
+  color: var(--violet-mid);
+}
+
+/* ── Sections en étapes ── */
+.resa-section {
+  background: var(--root-bg2);
+  border: 1px solid var(--pale);
+  border-radius: 12px;
+  padding: clamp(1.5rem, 4vw, 2.25rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.resa-section__title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: var(--violet-bg);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.resa-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--violet-mid);
+  color: white;
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  flex-shrink: 0;
+}
+
+/* ── Calendrier ── */
+.resa-calendar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.resa-cal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.resa-cal-month {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  color: var(--violet-bg);
+  letter-spacing: 0.02em;
+}
+
+.resa-cal-nav {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--violet-light);
+  background: white;
+  color: var(--violet-mid);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.resa-cal-nav:hover:not(:disabled) {
+  border-color: var(--violet-mid);
+  background: var(--pale);
+}
+
+.resa-cal-nav:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.resa-cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.35rem;
+  text-align: center;
+}
+
+.resa-cal-weekdays span {
+  font-family: 'Jost', sans-serif;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--violet-mid);
+}
+
+.resa-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.35rem;
+}
+
+.resa-cal-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text-light);
+  cursor: default;
+  transition: all var(--transition);
+}
+
+.resa-cal-cell--empty {
+  border: none;
+  background: none;
+}
+
+.resa-cal-cell--available {
+  background: white;
+  border-color: var(--violet-light);
+  color: var(--violet-bg);
+  cursor: pointer;
+  font-weight: 400;
+}
+
+.resa-cal-cell--available:hover {
+  border-color: var(--violet-mid);
+  background: var(--pale);
+}
+
+.resa-cal-cell--active {
+  background: var(--violet-mid);
+  border-color: var(--violet-mid);
+  color: white;
+}
+
+.resa-cal-cell:disabled {
+  cursor: not-allowed;
+}
+
+/* ── Créneaux du jour ── */
+.resa-slots {
+  margin-top: 0.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--pale);
+}
+
+.resa-slots__label {
+  font-family: 'Jost', sans-serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--violet-mid);
+  margin: 0 0 0.75rem;
+}
+
+.resa-slots__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+  gap: 0.5rem;
+}
+
+.resa-slot {
+  padding: 10px 8px;
+  border: 1px solid var(--violet-light);
+  border-radius: 8px;
+  background: white;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--violet-bg);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.resa-slot:hover {
+  border-color: var(--violet-mid);
+  background: var(--pale);
+}
+
+.resa-slot--selected {
+  background: var(--violet-mid);
+  border-color: var(--violet-mid);
+  color: white;
+}
+
+/* ── Champs client ── */
+.resa-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.resa-field label {
+  font-family: 'Jost', sans-serif;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--violet-mid);
+}
+
+.resa-field input {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text);
+  background: white;
+  border: 1px solid var(--violet-light);
+  border-radius: 8px;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.resa-field input:focus {
+  border-color: var(--violet-mid);
+}
+
+/* ── CGV ── */
+.resa-cgv {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.resa-cgv input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--violet-mid);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.resa-cgv__link {
+  color: var(--violet-mid);
+  text-decoration: none;
+  border-bottom: 1px solid var(--violet-light);
+  transition: color var(--transition);
+}
+
+.resa-cgv__link:hover { color: var(--violet-dark); }
+
+/* ── Récap paiement ── */
+.resa-recap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  background: var(--pale);
+  border-radius: 8px;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--violet-bg);
+}
+
+.resa-recap strong {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* ── Paiement Stripe ── */
+.resa-payment {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.resa-pay-btn {
+  width: 100%;
+}
+
+/* ── Erreurs & états ── */
+.resa-error {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  color: #c0392b;
+  margin: 0;
+}
+
+.resa-state-card {
+  text-align: center;
+  max-width: 440px;
+  margin: 4rem auto;
+  background: var(--root-bg2);
+  border: 1px solid var(--pale);
+  border-radius: 12px;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.resa-state-card__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.6rem;
+  color: var(--violet-bg);
+  margin: 0;
+}
+
+.resa-state-card__text {
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-light);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* Rappel du créneau en étape 2 */
+.resa-slot-recap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--pale);
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+
+.resa-slot-recap__label {
+  font-family: 'Jost', sans-serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--violet-mid);
+  margin: 0 0 0.25rem;
+}
+
+.resa-slot-recap__value {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  color: var(--violet-bg);
+  margin: 0;
+  text-transform: capitalize;
+}
+
+.resa-slot-recap__edit {
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--violet-mid);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background var(--transition);
+}
+
+.resa-slot-recap__edit:hover {
+  background: white;
+  color: var(--violet-dark);
+}
+
+.resa-hint {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text-light);
+  font-style: italic;
+  margin: 0;
+}
+
+.resa-payment-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding-top: 0.5rem;
+}
+
+/* Transition douce entre les étapes de réservation */
+@keyframes resaFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.resa-section {
+  animation: resaFadeIn 0.45s ease;
+}
+/* ─────────────────────────────────────────
+   PAGE DE CONFIRMATION DE RÉSERVATION
+───────────────────────────────────────── */
+.resa-confirm {
+  max-width: 520px;
+  margin: 4rem auto;
+  text-align: center;
+  background: var(--root-bg2);
+  border: 1px solid var(--pale);
+  border-radius: 12px;
+  padding: 3rem 2.5rem;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.resa-confirm__icon {
+  font-size: 2rem;
+  color: var(--violet-mid);
+  margin: 0;
+}
+
+.resa-confirm__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 400;
+  color: var(--violet-bg);
+  margin: 0;
+}
+
+.resa-confirm__text {
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-light);
+  line-height: 1.8;
+  margin: 0;
+}
+
+.resa-confirm__recap {
+  width: 100%;
+  background: var(--root-bg);
+  border: 1px solid var(--pale);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.resa-confirm__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+}
+
+.resa-confirm__row span {
+  font-weight: 300;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 9px;
+  color: var(--violet-mid);
+}
+
+.resa-confirm__row strong {
+  font-weight: 400;
+  color: var(--violet-bg);
+  text-align: right;
+}
+
+.resa-state-card__icon {
+  font-size: 1.8rem;
+  color: var(--violet-mid);
+  margin: 0;
 }
 
 /* ─────────────────────────────────────────

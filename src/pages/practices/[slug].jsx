@@ -53,6 +53,9 @@ export default function PracticePage() {
       const { data: praticiensData } = await supabase
         .rpc('get_praticiens_by_pratique', { p_pratique_id: pratiqueData.id })
 
+        console.log('RPC RAW:', praticiensData)  
+
+
       setPratique(pratiqueData)
       setPraticiens(praticiensData || [])
       setLoading(false)

@@ -164,13 +164,13 @@ const practiceName = pratiqueFromConst
                     : praticien.localisation}
                 </p>
               )}
-              {(praticien.prix || praticien.duree_seance) && (
+              {/* {(praticien.prix || praticien.duree_seance) && (
                   <p className="pract-profile__session-info">
                     {praticien.duree_seance && <span>{praticien.duree_seance}</span>}
                     {praticien.duree_seance && praticien.prix && <span> · </span>}
                     {praticien.prix && <span>{praticien.prix} €</span>}
                   </p>
-                )}
+                )} */}
               {praticien.langues && (
                 <p className="pract-profile__langues">{praticien.langues}</p>
               )}
@@ -230,19 +230,17 @@ const practiceName = pratiqueFromConst
                 </div>
               )}
 
-            {praticien.lien_reservation ? (
-              
-               <a href={praticien.lien_reservation}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn--violet-mid"
+            {praticien.supersaas_schedule_id && praticien.charges_enabled ? (
+              <button
+                onClick={() => navigate(`/reservation/${praticien.slug}/${practiceSlug}`)}
+                className="btn btn--violet-mid btn--sm"
               >
-                {lang === 'fr' ? 'Réserver une séance' : 'Book a session'}
-              </a>
+                {lang === 'fr' ? 'Réserver' : 'Book a session'}
+              </button>
             ) : (
-              <p className="pract-card__coming-soon">
+              <span className="pract-card__coming-soon">
                 {lang === 'fr' ? 'Bientôt disponible' : 'Coming soon'}
-              </p>
+              </span>
             )}
           </div>
 

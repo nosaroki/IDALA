@@ -1,7 +1,3 @@
-// ─────────────────────────────────────────
-//  PRACTITIONERS
-// ─────────────────────────────────────────
-
 import { useState } from 'react';
 import { useLang } from '../components/LangContext';
 import { Helmet } from 'react-helmet-async';
