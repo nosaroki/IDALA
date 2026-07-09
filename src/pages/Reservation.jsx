@@ -329,8 +329,8 @@ export default function Reservation() {
               />
               <span>
                 {lang === 'fr'
-                  ? <>J'accepte les <Link to="/cgv" className="resa-cgv__link">conditions générales de vente</Link>.</>
-                  : <>I accept the <Link to="/cgv" className="resa-cgv__link">terms and conditions</Link>.</>}
+                  ? <>J'accepte les <Link to="/cgu" className="resa-cgv__link">conditions générales de vente</Link>.</>
+                  : <>I accept the <Link to="/cgu" className="resa-cgv__link">terms and conditions</Link>.</>}
               </span>
             </label>
 

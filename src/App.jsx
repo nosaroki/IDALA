@@ -26,6 +26,8 @@ import DiagnosticBubble from './components/DiagnosticBubble';
 import Reservation from './pages/Reservation';
 import ReservationConfirmation from './pages/ReservationConfirmation';
 import CancelReservation from './pages/CancelReservation';
+import CGU from './pages/CGU';
+import Diagnostic from './pages/Diagnostic';
 
 import { HelmetProvider } from 'react-helmet-async';
 import './styles.css';
@@ -83,6 +85,7 @@ export default function App() {
             {/* Route onboarding publique */}
                <Route path="/onboarding/:token" element={<Onboarding />} />
                <Route path="/annulation/:token" element={<CancelReservation />} />
+               <Route path="/diagnostic" element={<Diagnostic />} />
 
 
             <Route element={<Layout />}>
@@ -99,6 +102,7 @@ export default function App() {
               <Route path="/reservation/confirmation" element={<ReservationConfirmation />} />
               <Route path="/reservation/:praticienSlug/:pratiqueSlug" element={<Reservation />} />
               <Route path="*" element={<NotFound />} />
+              <Route path="/cgu" element={<CGU />} />
             </Route>
           </Routes>
         </HashRouter>

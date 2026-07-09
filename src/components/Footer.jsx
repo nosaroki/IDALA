@@ -20,46 +20,47 @@ function Footer() {
   return (
     <footer className="site-footer">
 
-      {/* Ligne 1 — brand gauche, instagram droite */}
+      {/* Haut : marque + instagram */}
       <div className="footer-top">
         <div className="footer-brand">THE IDALA FAMILY</div>
-        
-          <a href="https://www.instagram.com/the.idala.family/"
+        <a href="https://www.instagram.com/the.idala.family/"
           target="_blank"
           rel="noreferrer"
           className="footer-instagram"
-          aria-label="Instagram | The Idala Family"
+          aria-label="Instagram"
         >
           <span className="footer-instagram__label">
-            {lang === 'fr' ? 'Suivez-nous sur Instagram' : 'Follow us on Instagram'}
+            {lang === 'fr' ? 'Suivez-nous' : 'Follow us'}
           </span>
           <InstagramIcon />
         </a>
-        <div className="footer-links">
-        <button onClick={() => navigate('/join')} className="footer-link">
-          {lang === 'fr' ? 'Rejoindre The Idala Family · Devenir praticien' : 'Be part of the Idala Family · Become a practitioner'}
-        </button>
       </div>
-      </div>
-      
 
-      {/* Ligne 2 — liens */}
-      {/* <div className="footer-links">
+      {/* Milieu : liens de navigation */}
+      <nav className="footer-nav" aria-label={lang === 'fr' ? 'Liens de bas de page' : 'Footer links'}>
         <button onClick={() => navigate('/join')} className="footer-link">
-          {lang === 'fr' ? 'Rejoindre The Idala Family · Devenir praticien' : 'Be part of the Idala Family · Become a practitioner'}
+          {lang === 'fr' ? 'Devenir praticien' : 'Become a practitioner'}
         </button>
-      </div> */}
+        <span className="footer-sep">·</span>
+        <button onClick={() => navigate('/cgu')} className="footer-link">
+          {lang === 'fr' ? 'Conditions générales' : 'Terms of use'}
+        </button>
+        <span className="footer-sep">·</span>
+        <a href="mailto:contact@theidalafamily.com" className="footer-link">
+          Contact
+        </a>
+      </nav>
 
-      {/* Ligne 3 — copyright */}
-      {/* <div className="footer-bottom">
+      {/* Bas : copyright */}
+      <div className="footer-bottom">
         <div className="footer-copy">
           {lang === 'fr' ? (
-            <>© Tous droits réservés. Développé par <a href="https://nod-consulting.com/" target="_blank" rel="noreferrer" style={{ color: 'var(--violet-mid)', textDecoration: 'none' }}>NOD Consulting</a></>
+            <>© {new Date().getFullYear()} The Idala Family · Développé par <a href="https://nod-consulting.com/" target="_blank" rel="noreferrer" className="footer-nod">NOD Consulting</a></>
           ) : (
-            <>© All rights reserved. Developed by <a href="https://nod-consulting.com/" target="_blank" rel="noreferrer" style={{ color: 'var(--violet-mid)', textDecoration: 'none' }}>NOD Consulting</a></>
+            <>© {new Date().getFullYear()} The Idala Family · Developed by <a href="https://nod-consulting.com/" target="_blank" rel="noreferrer" className="footer-nod">NOD Consulting</a></>
           )}
         </div>
-      </div> */}
+      </div>
 
     </footer>
   );
