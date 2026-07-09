@@ -3767,6 +3767,198 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .coming-soon__credit { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); font-size: 9px; letter-spacing: 3px; text-transform: uppercase; color: rgba(65,52,89,.4); white-space: nowrap; z-index: 1; }
 
 /* ─────────────────────────────────────────
+   PAGE SÉANCE (visioconférence brandée)
+───────────────────────────────────────── */
+
+.seance-page {
+  min-height: 100vh;
+  background: var(--root-bg);
+  display: flex;
+  flex-direction: column;
+  padding: clamp(16px, 3vw, 32px);
+  gap: clamp(16px, 2vw, 24px);
+}
+
+/* En-tête */
+.seance-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--pale);
+}
+
+.seance-header__brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 13px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--violet-mid);
+  font-weight: 600;
+}
+
+.seance-header__info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  font-weight: 300;
+  color: var(--text-light);
+  flex-wrap: wrap;
+}
+
+.seance-header__practice {
+  color: var(--violet-bg);
+  font-weight: 400;
+}
+
+.seance-header__dot {
+  color: var(--violet-light);
+}
+
+/* Scène : contient le lobby ou la vidéo */
+.seance-stage {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+/* Lobby (avant / après la visio) */
+.seance-lobby {
+  text-align: center;
+  max-width: 460px;
+  background: var(--root-bg2);
+  border: 1px solid var(--pale);
+  border-radius: 14px;
+  padding: clamp(2rem, 5vw, 3rem);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.seance-lobby__icon {
+  font-size: 1.8rem;
+  color: var(--violet-mid);
+  margin: 0;
+}
+
+.seance-lobby__title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+  font-weight: 400;
+  color: var(--violet-bg);
+  margin: 0;
+  letter-spacing: 0.02em;
+}
+
+.seance-lobby__text {
+  font-family: 'Jost', sans-serif;
+  font-size: 14px;
+  font-weight: 300;
+  color: var(--text-light);
+  line-height: 1.8;
+  margin: 0;
+}
+
+.seance-lobby__text strong {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.seance-lobby__hint {
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--violet-mid);
+  margin: 0 0 0.5rem;
+}
+
+/* Cadre vidéo */
+.seance-video {
+  display: none;
+  width: 100%;
+  height: 100%;
+  min-height: 70vh;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--violet-light);
+  box-shadow: var(--shadow-lg);
+  background: var(--violet-bg);
+}
+
+.seance-video--active {
+  display: block;
+}
+
+/* Bandeau de reconnexion */
+.seance-reconnect {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--violet-bg);
+  color: white;
+  font-family: 'Jost', sans-serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+  padding: 10px 18px;
+  border-radius: 100px;
+  box-shadow: var(--shadow-md);
+  z-index: 10;
+}
+
+.seance-reconnect__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--violet-light);
+  animation: seance-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes seance-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Pied de page */
+.seance-footer {
+  text-align: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 12px;
+  font-style: italic;
+  color: var(--violet-mid);
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+/* Boutons empilés dans le lobby */
+.seance-lobby .btn + .btn {
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 600px) {
+  .seance-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .seance-video {
+    min-height: 60vh;
+  }
+}
+
+/* ─────────────────────────────────────────
    PAGES LÉGALES (CGU)
 ───────────────────────────────────────── */
 

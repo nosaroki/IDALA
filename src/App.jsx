@@ -28,6 +28,7 @@ import ReservationConfirmation from './pages/ReservationConfirmation';
 import CancelReservation from './pages/CancelReservation';
 import CGU from './pages/CGU';
 import Diagnostic from './pages/Diagnostic';
+import Seance from './pages/Seance';
 
 import { HelmetProvider } from 'react-helmet-async';
 import './styles.css';
@@ -86,6 +87,7 @@ export default function App() {
                <Route path="/onboarding/:token" element={<Onboarding />} />
                <Route path="/annulation/:token" element={<CancelReservation />} />
                <Route path="/diagnostic" element={<Diagnostic />} />
+               <Route path="/seance/:sessionId" element={<Seance />} />
 
 
             <Route element={<Layout />}>
