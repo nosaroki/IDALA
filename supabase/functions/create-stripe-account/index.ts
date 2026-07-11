@@ -6,8 +6,6 @@ const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 const SITE_URL = 'https://theidalafamily.com';
-const RETURN_URL = `${SITE_URL}/onboarding-paiement/retour`;
-const REFRESH_URL = `${SITE_URL}/onboarding-paiement/refresh`;
 
 const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2024-06-20',
@@ -34,10 +32,10 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // ---- Lire le praticien ----
+    // ---- Lire le praticien (avec son onboarding_token) ----
     const { data: praticien, error: pErr } = await supabase
       .from('praticiens')
-      .select('id, prenom, nom, email')
+      .select('id, prenom, nom, email, onboarding_token')
       .eq('id', praticien_id)
       .single();
 
@@ -47,6 +45,20 @@ Deno.serve(async (req) => {
     if (!praticien.email) {
       return jsonResponse({ error: 'Le praticien n\'a pas d\'email' }, 400);
     }
+
+    // ---- Token pour identifier le praticien au retour de Stripe ----
+    // On réutilise l'onboarding_token existant, ou on en génère un si absent
+    let token = praticien.onboarding_token;
+    if (!token) {
+      token = crypto.randomUUID();
+      await supabase
+        .from('praticiens')
+        .update({ onboarding_token: token })
+        .eq('id', praticien.id);
+    }
+
+    const returnUrl = `${SITE_URL}/#/onboarding-paiement/retour?token=${token}`;
+    const refreshUrl = `${SITE_URL}/#/onboarding-paiement/refresh?token=${token}`;
 
     // ---- Compte Stripe déjà existant ? ----
     const { data: existing } = await supabase
@@ -58,15 +70,18 @@ Deno.serve(async (req) => {
     let accountId: string;
 
     if (existing?.stripe_account_id) {
-      // Réutiliser le compte existant
       accountId = existing.stripe_account_id;
     } else {
-      // ---- Créer un nouveau compte Express ----
       const account = await stripe.accounts.create({
-        type: 'express',
         country: 'FR',
         email: praticien.email,
         business_type: 'individual',
+        controller: {
+          stripe_dashboard: { type: 'express' },
+          fees: { payer: 'application' },
+          losses: { payments: 'application' },
+          requirement_collection: 'stripe',
+        },
         capabilities: {
           card_payments: { requested: true },
           transfers: { requested: true },
@@ -83,7 +98,6 @@ Deno.serve(async (req) => {
 
       accountId = account.id;
 
-      // Enregistrer dans stripe_accounts
       const { error: insErr } = await supabase
         .from('stripe_accounts')
         .insert({
@@ -103,8 +117,8 @@ Deno.serve(async (req) => {
     // ---- Générer le lien d'onboarding ----
     const accountLink = await stripe.accountLinks.create({
       account: accountId,
-      refresh_url: REFRESH_URL,
-      return_url: RETURN_URL,
+      refresh_url: refreshUrl,
+      return_url: returnUrl,
       type: 'account_onboarding',
     });
 

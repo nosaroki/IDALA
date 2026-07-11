@@ -6,15 +6,13 @@ import { LangCtx } from '../components/LangContext'
 import Footer from '../components/Footer'
 
 export default function Onboarding() {
-  const { token }               = useParams()
-  const { lang }                = useContext(LangCtx)
+  const { token }                 = useParams()
+  const { lang }                  = useContext(LangCtx)
   const [praticien, setPraticien] = useState(null)
-  const [loading, setLoading]   = useState(true)
-  const [notFound, setNotFound] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [saving, setSaving]     = useState(false)
-  const [iban, setIban]         = useState('')
-  const [error, setError]       = useState(null)
+  const [loading, setLoading]     = useState(true)
+  const [notFound, setNotFound]   = useState(false)
+  const [redirecting, setRedirecting] = useState(false)
+  const [error, setError]         = useState(null)
 
   useEffect(() => {
     async function fetchPraticien() {
@@ -31,19 +29,24 @@ export default function Onboarding() {
     fetchPraticien()
   }, [token])
 
-  async function handleSubmit(e) {
-    e.preventDefault()
-    const ibanClean = iban.replace(/\s/g, '').toUpperCase()
-    if (!/^[A-Z]{2}\d{2}[A-Z0-9]{1,30}$/.test(ibanClean)) {
-      setError(lang === 'fr' ? 'Format IBAN invalide.' : 'Invalid IBAN format.')
+  async function handleStartStripe() {
+    setRedirecting(true)
+    setError(null)
+
+    const { data, error } = await supabase.functions.invoke('create-stripe-account', {
+      body: { praticien_id: praticien.id }
+    })
+
+    if (error || !data?.onboarding_url) {
+      setError(lang === 'fr'
+        ? 'Une erreur est survenue. Merci de réessayer dans un instant.'
+        : 'Something went wrong. Please try again in a moment.')
+      setRedirecting(false)
       return
     }
-    setSaving(true)
-    const { error } = await supabase.functions.invoke('complete-onboarding', {
-      body: { token, iban: ibanClean }
-    })
-    if (!error) setSubmitted(true)
-    setSaving(false)
+
+    // Redirection vers l'onboarding Stripe hébergé
+    window.location.href = data.onboarding_url
   }
 
   if (loading) return <div style={{ minHeight: '60vh', background: 'var(--root-bg)' }} />
@@ -59,22 +62,6 @@ export default function Onboarding() {
           {lang === 'fr'
             ? 'Ce lien est invalide ou a déjà été utilisé.'
             : 'This link is invalid or has already been used.'}
-        </p>
-      </div>
-    </div>
-  )
-
-  if (submitted) return (
-    <div className="join-success">
-      <div className="join-success__card">
-        <p className="join-success__icon">✦</p>
-        <h1 className="join-success__title">
-          {lang === 'fr' ? 'Inscription finalisée !' : 'Registration complete!'}
-        </h1>
-        <p className="join-success__text">
-          {lang === 'fr'
-            ? 'Votre profil sera mis en ligne très prochainement. Bienvenue dans la famille !'
-            : 'Your profile will be published very soon. Welcome to the family!'}
         </p>
       </div>
     </div>
@@ -99,34 +86,29 @@ export default function Onboarding() {
           <div className="join-hero__body">
             <p>
               {lang === 'fr'
-                ? 'Votre profil a été retenu pour rejoindre la famille IDALA. Pour finaliser votre inscription et mettre votre profil en ligne, veuillez renseigner votre IBAN ci-dessous. Vos informations sont sécurisées et ne seront jamais partagées.'
-                : 'Your profile has been selected to join the IDALA family. To complete your registration and publish your profile, please enter your IBAN below. Your information is secure and will never be shared.'}
+                ? 'Votre profil a été retenu pour rejoindre la famille Idala. Dernière étape avant la mise en ligne : configurer vos paiements. Cette étape sécurisée vous permet de recevoir vos honoraires directement après chaque séance.'
+                : 'Your profile has been selected to join the Idala family. One last step before going live: setting up your payments. This secure step lets you receive your fees directly after each session.'}
+            </p>
+            <p style={{ marginTop: '1rem' }}>
+              {lang === 'fr'
+                ? 'Vous serez redirigé vers notre partenaire de paiement Stripe pour renseigner votre identité et vos coordonnées bancaires. Vos informations sont traitées et sécurisées par Stripe, jamais stockées par Idala.'
+                : 'You will be redirected to our payment partner Stripe to provide your identity and bank details. Your information is handled and secured by Stripe, never stored by Idala.'}
             </p>
           </div>
         </section>
 
-        <form onSubmit={handleSubmit} className="join-form">
-          <div className="join-section">
-            <div className="join-field">
-              <label>IBAN *</label>
-              <input
-                required
-                value={iban}
-                placeholder="FR76..."
-                onChange={e => { setIban(e.target.value); setError(null) }}
-              />
-              {error && <p className="join-error">{error}</p>}
-            </div>
-          </div>
-
-          <div className="join-submit" style={{ paddingBottom: '3rem' }}>
-            <button type="submit" className="btn btn--violet-mid" disabled={saving}>
-              {saving
-                ? (lang === 'fr' ? 'Envoi...' : 'Sending...')
-                : (lang === 'fr' ? 'Confirmer mon inscription' : 'Confirm my registration')}
-            </button>
-          </div>
-        </form>
+        <div className="join-submit" style={{ paddingBottom: '3rem', textAlign: 'center' }}>
+          {error && <p className="join-error" style={{ marginBottom: '1rem' }}>{error}</p>}
+          <button
+            onClick={handleStartStripe}
+            className="btn btn--violet-mid"
+            disabled={redirecting}
+          >
+            {redirecting
+              ? (lang === 'fr' ? 'Redirection...' : 'Redirecting...')
+              : (lang === 'fr' ? 'Configurer mes paiements' : 'Set up my payments')}
+          </button>
+        </div>
       </div>
       <Footer />
     </>
