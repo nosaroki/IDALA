@@ -44,7 +44,7 @@ export default function OnboardingPaymentReturn() {
 
         if (done) {
           setStatus('complete')
-        } else if (attemptsRef.current < 3) {
+        } else if (attemptsRef.current < 5) {
           attemptsRef.current += 1
           setTimeout(poll, 2000)
         } else {
@@ -84,15 +84,23 @@ export default function OnboardingPaymentReturn() {
 
             {status === 'checking' && (
               <>
-                <p className="join-success__icon">✦</p>
                 <h1 className="join-success__title">
-                  {lang === 'fr' ? 'Vérification en cours...' : 'Verifying...'}
+                  {lang === 'fr' ? 'Vérification en cours' : 'Verifying'}
                 </h1>
                 <p className="join-success__text">
                   {lang === 'fr'
                     ? <>Nous confirmons la configuration de vos paiements. <br/>Un instant.</>
                     : <>We are confirming your payment setup. <br/>One moment.</>}
                 </p>
+                <div className="onboarding-dots">
+                  <span className="onboarding-dots__dot" style={{ background: 'var(--c1)' }} />
+                  <span className="onboarding-dots__dot" style={{ background: 'var(--c2)' }} />
+                  <span className="onboarding-dots__dot" style={{ background: 'var(--c3)' }} />
+                  <span className="onboarding-dots__dot" style={{ background: 'var(--c4)' }} />
+                  <span className="onboarding-dots__dot" style={{ background: 'var(--c5)' }} />
+                  <span className="onboarding-dots__dot" style={{ background: 'var(--c6)' }} />
+                  <span className="onboarding-dots__dot" style={{ background: 'var(--c7)' }} />
+                </div>
               </>
             )}
 

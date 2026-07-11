@@ -73,7 +73,8 @@ export default function Onboarding() {
         <title>{lang === 'fr' ? 'Finaliser mon inscription — The Idala Family' : 'Complete my registration — The Idala Family'}</title>
       </Helmet>
 
-      <div className="join-page">
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <div className="join-page" style={{ flex: 1 }}>
         <section className="join-hero">
           <p className="join-hero__eyebrow">
             {lang === 'fr' ? 'Bienvenue' : 'Welcome'}
@@ -110,6 +111,7 @@ export default function Onboarding() {
           </button>
         </div>
       </div>
+    </div>
       <Footer />
     </>
   )

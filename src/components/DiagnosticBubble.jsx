@@ -53,13 +53,15 @@ export default function DiagnosticBubble() {
   }, [isOpen]);
 
   return (
-    <div
+   <div
       ref={bubbleRef}
       className={`diagnostic-bubble ${isOpen ? 'is-open' : ''}`}
-      onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >
-      <div className="diagnostic-bubble__trigger-wrap">
+      <div
+        className="diagnostic-bubble__trigger-wrap"
+        onMouseEnter={() => setIsOpen(true)}
+      >
         <span className="diagnostic-bubble__ripple" aria-hidden="true"></span>
         <span className="diagnostic-bubble__ripple diagnostic-bubble__ripple--delayed" aria-hidden="true"></span>
         <button

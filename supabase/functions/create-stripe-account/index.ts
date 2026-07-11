@@ -87,9 +87,11 @@ Deno.serve(async (req) => {
           transfers: { requested: true },
         },
         business_profile: {
-          name: `${praticien.prenom} ${praticien.nom}`,
-          product_description: 'Séances de bien-être et accompagnement personnalisé via la plateforme Idala.',
-        },
+        name: `${praticien.prenom} ${praticien.nom}`,
+        product_description: 'Séances de bien-être et accompagnement personnalisé via la plateforme Idala.',
+        mcc: '8099',
+        support_email: 'contact@theidalafamily.com',
+      },
         metadata: {
           praticien_id: praticien.id,
           platform: 'idala',
