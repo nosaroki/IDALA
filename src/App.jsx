@@ -29,6 +29,8 @@ import CancelReservation from './pages/CancelReservation';
 import CGU from './pages/CGU';
 import Diagnostic from './pages/Diagnostic';
 import Seance from './pages/Seance';
+import OnboardingPaymentReturn from './pages/OnboardingPaymentReturn'
+import OnboardingPaymentRefresh from './pages/OnboardingPaymentRefresh'
 
 import { HelmetProvider } from 'react-helmet-async';
 import './styles.css';
@@ -85,6 +87,8 @@ export default function App() {
 
             {/* Route onboarding publique */}
                <Route path="/onboarding/:token" element={<Onboarding />} />
+               <Route path="/onboarding-paiement/retour" element={<OnboardingPaymentReturn />} />
+               <Route path="/onboarding-paiement/refresh" element={<OnboardingPaymentRefresh />} />
                <Route path="/annulation/:token" element={<CancelReservation />} />
                <Route path="/diagnostic" element={<Diagnostic />} />
                <Route path="/seance/:sessionId" element={<Seance />} />
