@@ -51,32 +51,34 @@ export default function OnboardingPaymentRefresh() {
         <title>{lang === 'fr' ? 'Reprise en cours — The Idala Family' : 'Resuming — The Idala Family'}</title>
       </Helmet>
 
-      <div className="join-success">
-        <div className="join-success__card">
-          <p className="join-success__icon">✦</p>
-          {!failed ? (
-            <>
-              <h1 className="join-success__title">
-                {lang === 'fr' ? 'Reprise en cours...' : 'Resuming...'}
-              </h1>
-              <p className="join-success__text">
-                {lang === 'fr'
-                  ? 'Nous vous redirigeons vers la configuration de vos paiements. Un instant.'
-                  : 'We are redirecting you to your payment setup. One moment.'}
-              </p>
-            </>
-          ) : (
-            <>
-              <h1 className="join-success__title">
-                {lang === 'fr' ? 'Lien invalide' : 'Invalid link'}
-              </h1>
-              <p className="join-success__text">
-                {lang === 'fr'
-                  ? 'Ce lien est invalide ou a expiré. Merci de reprendre depuis le mail que vous avez reçu.'
-                  : 'This link is invalid or has expired. Please start again from the email you received.'}
-              </p>
-            </>
-          )}
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <div className="join-success" style={{ flex: 1, minHeight: 'auto' }}>
+          <div className="join-success__card">
+            <p className="join-success__icon">✦</p>
+            {!failed ? (
+              <>
+                <h1 className="join-success__title">
+                  {lang === 'fr' ? 'Reprise en cours...' : 'Resuming...'}
+                </h1>
+                <p className="join-success__text">
+                  {lang === 'fr'
+                    ? <>≈Nous vous redirigeons vers la configuration de vos paiements. <br/>Un instant.</>
+                    : <>We are redirecting you to your payment setup. <br/>One moment.</>}
+                </p>
+              </>
+            ) : (
+              <>
+                <h1 className="join-success__title">
+                  {lang === 'fr' ? 'Lien invalide' : 'Invalid link'}
+                </h1>
+                <p className="join-success__text">
+                  {lang === 'fr'
+                    ? <>Ce lien est invalide ou a expiré. <br />Merci de reprendre depuis le mail que vous avez reçu.</>
+                    : <>This link is invalid or has expired. <br />Please start again from the email you received.</>}
+                </p>
+              </>
+            )}
+          </div>
         </div>
       </div>
       <Footer />

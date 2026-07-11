@@ -78,77 +78,79 @@ export default function OnboardingPaymentReturn() {
         <title>{lang === 'fr' ? 'Configuration des paiements — The Idala Family' : 'Payment setup — The Idala Family'}</title>
       </Helmet>
 
-      <div className="join-success">
-        <div className="join-success__card">
+       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <div className="join-success" style={{ flex: 1, minHeight: 'auto' }}>
+          <div className="join-success__card">
 
-          {status === 'checking' && (
-            <>
-              <p className="join-success__icon">✦</p>
-              <h1 className="join-success__title">
-                {lang === 'fr' ? 'Vérification en cours...' : 'Verifying...'}
-              </h1>
-              <p className="join-success__text">
-                {lang === 'fr'
-                  ? 'Nous confirmons la configuration de vos paiements. Un instant.'
-                  : 'We are confirming your payment setup. One moment.'}
-              </p>
-            </>
-          )}
+            {status === 'checking' && (
+              <>
+                <p className="join-success__icon">✦</p>
+                <h1 className="join-success__title">
+                  {lang === 'fr' ? 'Vérification en cours...' : 'Verifying...'}
+                </h1>
+                <p className="join-success__text">
+                  {lang === 'fr'
+                    ? <>Nous confirmons la configuration de vos paiements. <br/>Un instant.</>
+                    : <>We are confirming your payment setup. <br/>One moment.</>}
+                </p>
+              </>
+            )}
 
-          {status === 'complete' && (
-            <>
-              <p className="join-success__icon">✦</p>
-              <h1 className="join-success__title">
-                {lang === 'fr'
-                  ? `C'est fait${praticien ? ', ' + praticien.prenom : ''} !`
-                  : `All set${praticien ? ', ' + praticien.prenom : ''}!`}
-              </h1>
-              <p className="join-success__text">
-                {lang === 'fr'
-                  ? 'Vos paiements sont configurés et votre profil est désormais actif sur Idala. Vous pouvez commencer à recevoir des réservations.'
-                  : 'Your payments are set up and your profile is now active on Idala. You can start receiving bookings.'}
-              </p>
-            </>
-          )}
+            {status === 'complete' && (
+              <>
+                <p className="join-success__icon">✦</p>
+                <h1 className="join-success__title">
+                  {lang === 'fr'
+                    ? `C'est fait${praticien ? ', ' + praticien.prenom : ''} !`
+                    : `All set${praticien ? ', ' + praticien.prenom : ''}!`}
+                </h1>
+                <p className="join-success__text">
+                  {lang === 'fr'
+                    ? <>Vos paiements sont configurés et votre profil est désormais actif sur Idala. <br/>Vous pouvez commencer à recevoir des réservations.</>
+                    : <>Your payments are set up and your profile is now active on Idala. <br/>You can start receiving bookings.</>}
+                </p>
+              </>
+            )}
 
-          {status === 'incomplete' && (
-            <>
-              <p className="join-success__icon">✦</p>
-              <h1 className="join-success__title">
-                {lang === 'fr' ? 'Presque terminé' : 'Almost there'}
-              </h1>
-              <p className="join-success__text">
-                {lang === 'fr'
-                  ? 'Il semble qu\'il manque encore quelques informations pour finaliser la configuration de vos paiements. Vous pouvez reprendre là où vous vous êtes arrêté.'
-                  : 'It looks like some information is still needed to complete your payment setup. You can pick up where you left off.'}
-              </p>
-              <button
-                onClick={handleRetry}
-                className="btn btn--violet-mid"
-                disabled={retrying}
-                style={{ marginTop: '1.5rem' }}
-              >
-                {retrying
-                  ? (lang === 'fr' ? 'Redirection...' : 'Redirecting...')
-                  : (lang === 'fr' ? 'Reprendre la configuration' : 'Resume setup')}
-              </button>
-            </>
-          )}
+            {status === 'incomplete' && (
+              <>
+                <p className="join-success__icon">✦</p>
+                <h1 className="join-success__title">
+                  {lang === 'fr' ? 'Presque terminé' : 'Almost there'}
+                </h1>
+                <p className="join-success__text">
+                  {lang === 'fr'
+                    ? <>Il semble qu'il manque encore quelques informations pour finaliser la configuration de vos paiements. <br/>Vous pouvez reprendre là où vous vous êtes arrêté</>
+                    : <>It looks like some information is still needed to complete your payment setup. <br/>You can pick up where you left off.</>}
+                </p>
+                <button
+                  onClick={handleRetry}
+                  className="btn btn--violet-mid"
+                  disabled={retrying}
+                  style={{ marginTop: '1.5rem' }}
+                >
+                  {retrying
+                    ? (lang === 'fr' ? 'Redirection...' : 'Redirecting...')
+                    : (lang === 'fr' ? 'Reprendre la configuration' : 'Resume setup')}
+                </button>
+              </>
+            )}
 
-          {status === 'error' && (
-            <>
-              <p className="join-success__icon">✦</p>
-              <h1 className="join-success__title">
-                {lang === 'fr' ? 'Lien invalide' : 'Invalid link'}
-              </h1>
-              <p className="join-success__text">
-                {lang === 'fr'
-                  ? 'Ce lien est invalide ou a expiré. Merci de reprendre depuis le mail que vous avez reçu.'
-                  : 'This link is invalid or has expired. Please start again from the email you received.'}
-              </p>
-            </>
-          )}
+            {status === 'error' && (
+              <>
+                <p className="join-success__icon">✦</p>
+                <h1 className="join-success__title">
+                  {lang === 'fr' ? 'Lien invalide' : 'Invalid link'}
+                </h1>
+                <p className="join-success__text">
+                  {lang === 'fr'
+                    ? <>Ce lien est invalide ou a expiré. <br />Merci de reprendre depuis le mail que vous avez reçu.</>
+                    : <>This link is invalid or has expired. <br />Please start again from the email you received.</>}
+                </p>
+              </>
+            )}
 
+          </div>
         </div>
       </div>
       <Footer />
