@@ -31,6 +31,7 @@ import Diagnostic from './pages/Diagnostic';
 import Seance from './pages/Seance';
 import OnboardingPaymentReturn from './pages/OnboardingPaymentReturn'
 import OnboardingPaymentRefresh from './pages/OnboardingPaymentRefresh'
+import ModifyReservation from './pages/ModifyReservation'
 
 import { HelmetProvider } from 'react-helmet-async';
 import './styles.css';
@@ -92,6 +93,7 @@ export default function App() {
                <Route path="/annulation/:token" element={<CancelReservation />} />
                <Route path="/diagnostic" element={<Diagnostic />} />
                <Route path="/seance/:sessionId" element={<Seance />} />
+               <Route path="/modifier/:token" element={<ModifyReservation />} />
 
 
             <Route element={<Layout />}>

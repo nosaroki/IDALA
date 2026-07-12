@@ -107,7 +107,7 @@ Deno.serve(async (req) => {
     const priceCents = parseInt(m.price_cents || '0', 10);
     const feeCents = parseInt(m.fee_cents || '0', 10);
 
-    const { error: rErr } = await supabase
+    const { data: newResa, error: rErr } = await supabase
       .from('reservations')
       .insert({
         session_id: sessionId,
@@ -122,12 +122,16 @@ Deno.serve(async (req) => {
         currency: 'eur',
         stripe_payment_intent_id: pi.id,
         stripe_charge_id: typeof pi.latest_charge === 'string' ? pi.latest_charge : null,
-      });
+      })
+      .select('cancel_token')
+      .single();
 
     if (rErr) {
       console.error('Erreur création réservation:', rErr.message);
       return ok();
     }
+
+    const cancelToken = newResa?.cancel_token ?? null;
 
     // ---- Charger le nom de la pratique (réutilisé pour SuperSaaS ET les mails) ----
     let pratiqueNom = 'Séance';
@@ -344,6 +348,34 @@ Deno.serve(async (req) => {
 
       const clientLang = (m.lang === 'en') ? 'en' : 'fr';
 
+      const SITE_URL = 'https://theidalafamily.com';
+      const modifyUrl = `${SITE_URL}/#/modifier/${cancelToken}`;
+      const cancelUrl = `${SITE_URL}/#/annulation/${cancelToken}`;
+
+      const clientActionsFr = cancelToken ? `
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid #E4D8F5;">
+          <p style="font-size:12px;color:#9B6EBF;letter-spacing:1px;text-transform:uppercase;margin:0 0 12px;text-align:center;">Besoin de changer ?</p>
+          <p style="font-size:13px;color:#413459;line-height:1.7;margin:0 0 16px;text-align:center;">
+            Vous pouvez modifier ou annuler votre rendez-vous jusqu'à 24h avant la séance.
+          </p>
+          <div style="text-align:center;">
+            <a href="${modifyUrl}" style="display:inline-block;margin:0 6px 8px;padding:11px 22px;background:#9B6EBF;color:#fff;text-decoration:none;font-size:11px;letter-spacing:2px;text-transform:uppercase;border-radius:8px;">Modifier</a>
+            <a href="${cancelUrl}" style="display:inline-block;margin:0 6px 8px;padding:11px 22px;background:transparent;color:#9B6EBF;text-decoration:none;font-size:11px;letter-spacing:2px;text-transform:uppercase;border:1px solid #C9A8E0;border-radius:8px;">Annuler</a>
+          </div>
+        </div>` : '';
+
+      const clientActionsEn = cancelToken ? `
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid #E4D8F5;">
+          <p style="font-size:12px;color:#9B6EBF;letter-spacing:1px;text-transform:uppercase;margin:0 0 12px;text-align:center;">Need to change ?</p>
+          <p style="font-size:13px;color:#413459;line-height:1.7;margin:0 0 16px;text-align:center;">
+            You can reschedule or cancel your appointment up to 24h before the session.
+          </p>
+          <div style="text-align:center;">
+            <a href="${modifyUrl}" style="display:inline-block;margin:0 6px 8px;padding:11px 22px;background:#9B6EBF;color:#fff;text-decoration:none;font-size:11px;letter-spacing:2px;text-transform:uppercase;border-radius:8px;">Reschedule</a>
+            <a href="${cancelUrl}" style="display:inline-block;margin:0 6px 8px;padding:11px 22px;background:transparent;color:#9B6EBF;text-decoration:none;font-size:11px;letter-spacing:2px;text-transform:uppercase;border:1px solid #C9A8E0;border-radius:8px;">Cancel</a>
+          </div>
+        </div>` : '';
+
       const praticienLangues = (praticienData?.langues || '').toLowerCase();
       const praticienLang =
         (praticienLangues.includes('franç') || praticienLangues.includes('french') || praticienLangues === '')
@@ -407,7 +439,8 @@ Deno.serve(async (req) => {
         </p>
         <p style="font-size:13px;color:#413459;line-height:1.7;margin:16px 0 0;">
           Pour toute question, écrivez-nous à <a href="mailto:contact@theidalafamily.com" style="color:#9B6EBF;">contact@theidalafamily.com</a>.
-        </p>`;
+        </p>
+        ${clientActionsFr}`;
 
       const clientBodyEn = `
         <p style="font-size:15px;color:#413459;line-height:1.7;margin:0 0 8px;text-align:center;">
@@ -421,7 +454,8 @@ Deno.serve(async (req) => {
         </p>
         <p style="font-size:13px;color:#413459;line-height:1.7;margin:16px 0 0;">
           For any question, email us at <a href="mailto:contact@theidalafamily.com" style="color:#9B6EBF;">contact@theidalafamily.com</a>.
-        </p>`;
+        </p>
+        ${clientActionsEn}`;
 
       const clientSubject = clientLang === 'en'
         ? 'Your session is confirmed : The Idala Family'
