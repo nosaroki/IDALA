@@ -48,8 +48,8 @@ export default function PaymentForm({ clientName, clientEmail, cgvAccepted, onEr
       const msg = error.type === 'card_error' || error.type === 'validation_error'
         ? error.message
         : (lang === 'fr'
-            ? 'Le paiement n\'a pas abouti. Veuillez réessayer.'
-            : 'The payment could not be completed. Please try again.')
+            ? <>Le paiement n'a pas abouti. <br/>Veuillez réessayer.</>
+            : <>The payment could not be completed. <br/>Please try again.</>)
       setLocalError(msg)
       if (onError) onError(msg)
       setProcessing(false)

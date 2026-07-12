@@ -4,6 +4,8 @@ import Stripe from 'https://esm.sh/stripe@14?target=deno';
 const STRIPE_SECRET_KEY = Deno.env.get('STRIPE_SECRET_KEY')!;
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const SUPERSAAS_API_KEY = Deno.env.get('SUPERSAAS_API_KEY')!;
+const SUPERSAAS_ACCOUNT = Deno.env.get('SUPERSAAS_ACCOUNT')!;
 
 // Commission Idala : 15%
 const PLATFORM_FEE_PERCENT = 15;
@@ -77,15 +79,56 @@ Deno.serve(async (req) => {
       }, 403);
     }
 
+    // ---- 2bis. Vérifier que le CRÉNEAU est toujours LIBRE ----
+    // Évite qu'un client paie un créneau réservé entre-temps par quelqu'un d'autre.
+    const { data: prat } = await supabase
+      .from('praticiens')
+      .select('supersaas_schedule_id')
+      .eq('id', praticien_id)
+      .single();
+
+    if (prat?.supersaas_schedule_id) {
+      const durationMin = pp.duree_seance ? parseInt(String(pp.duree_seance), 10) : 60;
+      const wantedTime = new Date(scheduled_at).getTime();
+      const fromCheck = new Date(wantedTime - 60 * 1000);
+
+      const params = new URLSearchParams({
+        account: SUPERSAAS_ACCOUNT,
+        api_key: SUPERSAAS_API_KEY,
+        schedule_id: prat.supersaas_schedule_id,
+        from: toSuperSaasDate(fromCheck),
+        maxresults: '50',
+      });
+      if (durationMin) params.set('length', String(durationMin));
+
+      try {
+        const freeRes = await fetch(
+          `https://www.supersaas.com/api/free/${prat.supersaas_schedule_id}.json?${params.toString()}`
+        );
+        if (freeRes.ok) {
+          const freeData = await freeRes.json();
+          const freeSlots = (freeData.slots || []) as { start: string }[];
+          const isFree = freeSlots.some(
+            s => Math.abs(new Date(s.start).getTime() - wantedTime) < 60 * 1000
+          );
+          if (!isFree) {
+            return jsonResponse({ error: 'SLOT_TAKEN' }, 409);
+          }
+        }
+        // Si l'appel SuperSaaS échoue, on n'empêche pas le paiement :
+        // le webhook a sa propre protection anti-collision (session full).
+      } catch (e) {
+        console.error('Erreur vérification créneau SuperSaaS:', String(e));
+      }
+    }
+
     // ---- 3. Créer le PaymentIntent en DIRECT CHARGE + application_fee ----
-    // Le paiement va directement sur le compte du praticien,
-    // Idala prélève sa commission via application_fee_amount.
     const paymentIntent = await stripe.paymentIntents.create(
       {
         amount: priceCents,
         currency: 'eur',
         application_fee_amount: feeCents,
-        automatic_payment_methods: { enabled: true }, // CB + Apple Pay + Google Pay auto
+        automatic_payment_methods: { enabled: true },
         metadata: {
           praticien_id,
           pratique_id,
@@ -102,12 +145,10 @@ Deno.serve(async (req) => {
         },
       },
       {
-        // C'est CE paramètre qui fait le "direct charge" sur le compte du praticien
         stripeAccount: stripeAccount.stripe_account_id,
       }
     );
 
-    // ---- 4. Renvoyer le client_secret (pour afficher les champs de carte) ----
     return jsonResponse({
       client_secret: paymentIntent.client_secret,
       amount: priceCents,
@@ -120,6 +161,11 @@ Deno.serve(async (req) => {
     return jsonResponse({ error: 'Erreur serveur', details: String(err) }, 500);
   }
 });
+
+function toSuperSaasDate(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
 
 function jsonResponse(body: unknown, status: number) {
   return new Response(JSON.stringify(body), {
