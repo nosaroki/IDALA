@@ -277,6 +277,40 @@ Deno.serve(async (req) => {
     }
 
     // ============================================================
+    //  FRAIS STRIPE RÉELS (pour le récap Idala)
+    // ============================================================
+    let stripeFeeCents = 0;
+    try {
+      const chargeId = typeof pi.latest_charge === 'string' ? pi.latest_charge : null;
+      if (chargeId) {
+        // Récupérer le stripe_account_id du praticien (direct charge = compte connecté)
+        const { data: stripeAcc } = await supabase
+          .from('stripe_accounts')
+          .select('stripe_account_id')
+          .eq('praticien_id', m.praticien_id)
+          .single();
+
+        if (stripeAcc?.stripe_account_id) {
+          const charge = await stripe.charges.retrieve(
+            chargeId,
+            { expand: ['balance_transaction'] },
+            { stripeAccount: stripeAcc.stripe_account_id }
+          );
+          const bt = charge.balance_transaction;
+          if (bt && typeof bt !== 'string') {
+            // Sur un direct charge, bt.fee = frais Stripe réels + application fee (commission Idala).
+            // On soustrait l'application fee pour isoler les VRAIS frais de traitement Stripe.
+            const applicationFeeCents = parseInt(m.fee_cents || '0', 10);
+            stripeFeeCents = Math.max(0, (bt.fee ?? 0) - applicationFeeCents);
+          }
+        }
+      }
+    } catch (e) {
+      console.error('Erreur récupération frais Stripe:', String(e));
+      // On continue sans planter : le mail affichera les frais comme indisponibles
+    }
+
+    // ============================================================
     //  EMAILS DE CONFIRMATION (client + praticien)
     // ============================================================
     try {
@@ -453,6 +487,11 @@ Deno.serve(async (req) => {
       const commissionEuros = feeCentsMail ? (feeCentsMail / 100) : 0;
       const partPraticienEuros = (prixEuros !== null) ? (prixEuros - commissionEuros) : null;
 
+      const stripeFeeEuros = stripeFeeCents / 100;
+      const commissionNetteEuros = commissionEuros - stripeFeeEuros;
+
+      const fmtEur = (n: number) => n.toFixed(2).replace('.', ',') + ' €';
+
       const idalaRecap = `
         <table style="width:100%;border-collapse:collapse;margin:8px 0 24px;">
           ${row('Séance', pratiqueNom)}
@@ -462,9 +501,11 @@ Deno.serve(async (req) => {
           ${row('Date', fmtDate('fr-FR'))}
           ${row('Heure', fmtTime('fr-FR'))}
           ${row('Format', modeFr)}
-          ${prixEuros !== null ? row('Montant payé', `${prixEuros} €`) : ''}
-          ${row('Commission Idala', `${commissionEuros} €`)}
-          ${partPraticienEuros !== null ? row('Part praticien', `${partPraticienEuros} €`) : ''}
+          ${prixEuros !== null ? row('Montant payé', fmtEur(prixEuros)) : ''}
+          ${partPraticienEuros !== null ? row('Part praticien (85%)', fmtEur(partPraticienEuros)) : ''}
+          ${row('Commission Idala (15%)', fmtEur(commissionEuros))}
+          ${stripeFeeCents > 0 ? row('Frais Stripe (à charge Idala)', `- ${fmtEur(stripeFeeEuros)}`) : ''}
+          ${stripeFeeCents > 0 ? row('Commission Idala nette', fmtEur(commissionNetteEuros)) : ''}
         </table>`;
 
       const idalaBody = `

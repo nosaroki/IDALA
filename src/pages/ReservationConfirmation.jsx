@@ -166,8 +166,8 @@ export default function ReservationConfirmation() {
           </h1>
           <p className="resa-confirm__text">
             {lang === 'fr'
-              ? 'Merci, votre séance est réservée. Un email de confirmation vous a été envoyé avec tous les détails.'
-              : 'Thank you, your session is booked. A confirmation email with all the details has been sent to you.'}
+              ? <>Merci, votre séance est réservée. <br/>Un email de confirmation vous a été envoyé avec tous les détails.</>
+              : <>Thank you, your session is booked. <br/>A confirmation email with all the details has been sent to you.</>}
           </p>
 
           {reservation && (prat || session) && (

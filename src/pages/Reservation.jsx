@@ -344,7 +344,17 @@ export default function Reservation() {
             )}
 
             {infosValid && preparingPayment && !clientSecret && (
-              <p className="resa-hint">{lang === 'fr' ? 'Préparation du paiement...' : 'Preparing payment...'}</p>
+              <p className="resa-hint">{lang === 'fr' ? 'Préparation du paiement...' : 'Preparing payment...'}
+              <div className="onboarding-dots">
+                  <span className="onboarding-dots__dot" style={{ background: 'var(--c1)' }} />
+                  <span className="onboarding-dots__dot" style={{ background: 'var(--c2)' }} />
+                  <span className="onboarding-dots__dot" style={{ background: 'var(--c3)' }} />
+                  <span className="onboarding-dots__dot" style={{ background: 'var(--c4)' }} />
+                  <span className="onboarding-dots__dot" style={{ background: 'var(--c5)' }} />
+                  <span className="onboarding-dots__dot" style={{ background: 'var(--c6)' }} />
+                  <span className="onboarding-dots__dot" style={{ background: 'var(--c7)' }} />
+                </div></p>
+              
             )}
 
             {payError && <p className="resa-error">{payError}</p>}
