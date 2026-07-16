@@ -14,6 +14,14 @@ const DAILY_API_BASE = 'https://api.daily.co/v1';
 const OPEN_BEFORE_MIN = 15;
 const MARGIN_AFTER_MIN = 60;
 
+// Traduction convention modes.jsx (visio / home / in-person) vers la convention
+// stockée dans la table sessions (visio / domicile / cabinet).
+const MODE_TO_SESSION: Record<string, string> = {
+  visio: 'visio',
+  home: 'domicile',
+  'in-person': 'cabinet',
+};
+
 const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2024-06-20',
   httpClient: Stripe.createFetchHttpClient(),
@@ -55,9 +63,17 @@ Deno.serve(async (req) => {
 
     const durationMin = parseInt(m.duree_seance || '60', 10) || 60;
     const maxParticipants = parseInt(m.max_participants || '1', 10) || 1;
-    const modeSeance = m.mode_seance || 'visio';
 
-    // Session existante (groupe) ou nouvelle
+    // mode_seance en convention modes.jsx (visio / home / in-person).
+    // Défaut prudent : 'in-person' (jamais 'visio' par défaut, pour ne pas créer
+    // de room Daily inutile si une métadonnée était absente).
+    const modeSeance = m.mode_seance || 'in-person';
+    // Valeur traduite pour la table sessions (visio / domicile / cabinet).
+    const modeSession = MODE_TO_SESSION[modeSeance] || modeSeance;
+
+    // Session existante (groupe) ou nouvelle.
+    // On matche aussi sur le mode traduit : deux modes différents au même créneau
+    // ne doivent pas être fusionnés dans la même session.
     let sessionId: string;
     let sessionScheduledAt: string = m.scheduled_at;
     let sessionRoomName: string | null = null;
@@ -68,6 +84,7 @@ Deno.serve(async (req) => {
       .eq('praticien_id', m.praticien_id)
       .eq('pratique_id', m.pratique_id)
       .eq('scheduled_at', m.scheduled_at)
+      .eq('mode_seance', modeSession)
       .maybeSingle();
 
     if (existingSession) {
@@ -88,7 +105,7 @@ Deno.serve(async (req) => {
           scheduled_at: m.scheduled_at,
           duration_minutes: durationMin,
           max_participants: maxParticipants,
-          mode_seance: modeSeance,
+          mode_seance: modeSession,
           status: 'open',
         })
         .select('id, scheduled_at')
@@ -171,7 +188,7 @@ Deno.serve(async (req) => {
           return `${get('year')}-${get('month')}-${get('day')} ${hour}:${get('minute')}:${get('second')}`;
         };
 
-        const libelle = `${pratiqueNom} ${modeSeance} - ${m.client_name}`;
+        const libelle = `${pratiqueNom} ${modeSession} - ${m.client_name}`;
 
         const params = new URLSearchParams({
           account: SUPERSAAS_ACCOUNT,
@@ -233,7 +250,8 @@ Deno.serve(async (req) => {
       })
       .eq('id', sessionId);
 
-    // Créer la room Daily.co DIRECTEMENT (si visio et pas déjà créée)
+    // Créer la room Daily.co DIRECTEMENT (si visio et pas déjà créée).
+    // home / in-person = pas de room : séance en présentiel.
     if (modeSeance === 'visio' && !sessionRoomName) {
       try {
         const scheduledAt = new Date(sessionScheduledAt);
@@ -338,13 +356,14 @@ Deno.serve(async (req) => {
           hour: '2-digit', minute: '2-digit',
         }).format(startDate);
 
+      // Clé en convention sessions (visio / domicile / cabinet), on consulte avec modeSession.
       const modeMap: Record<string, { fr: string; en: string }> = {
         visio:    { fr: 'En visioconférence', en: 'Online (video)' },
         domicile: { fr: 'À domicile',          en: 'At home' },
         cabinet:  { fr: 'En cabinet',          en: 'At the practice' },
       };
-      const modeFr = modeMap[modeSeance]?.fr || modeSeance;
-      const modeEn = modeMap[modeSeance]?.en || modeSeance;
+      const modeFr = modeMap[modeSession]?.fr || modeSession;
+      const modeEn = modeMap[modeSession]?.en || modeSession;
 
       const clientLang = (m.lang === 'en') ? 'en' : 'fr';
 

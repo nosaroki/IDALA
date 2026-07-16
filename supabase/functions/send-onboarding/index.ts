@@ -270,6 +270,8 @@ serve(async (req) => {
             description_en: offre.description_en || '',
             prix: offre.prix ? parseFloat(offre.prix) : null,
             duree: offre.duree || '',
+            mode_seance: offre.mode_seance || null,
+            max_participants: offre.max_participants ? parseInt(offre.max_participants, 10) : 1,
             ordre: i,
           })
         }

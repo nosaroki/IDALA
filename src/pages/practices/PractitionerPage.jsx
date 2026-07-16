@@ -57,16 +57,28 @@ export default function PractitionerPage() {
           data: allPP?.find(pp => pp.pratiques?.slug === practiceSlug) || null
         }))
 
-        // Charger les offres de cette pratique
-        let offres = []
-        if (ppData?.id) {
-          const { data: offresData } = await supabase
-            .from('praticien_offres')
-            .select('*')
-            .eq('praticien_pratique_id', ppData.id)
-            .order('ordre')
-          offres = offresData || []
-        }
+      // Charger les offres de cette pratique
+      let offres = []
+      if (ppData?.id) {
+        const { data: offresData } = await supabase
+          .from('praticien_offres')
+          .select('*')
+          .eq('praticien_pratique_id', ppData.id)
+          .order('ordre')
+        offres = offresData || []
+      }
+
+      // charges_enabled vit dans stripe_accounts, protégé par RLS côté anon.
+      // On passe par la MÊME fonction SQL que la liste (get_praticiens_by_pratique),
+      // qui tourne avec des droits élevés : source identique à celle de la carte.
+      let chargesEnabled = false
+      const pratiqueId = ppData?.pratiques?.id
+      if (pratiqueId) {
+        const { data: rpcRows } = await supabase
+          .rpc('get_praticiens_by_pratique', { p_pratique_id: pratiqueId })
+        const me = (rpcRows || []).find(r => r.id === data.id)
+        chargesEnabled = me?.charges_enabled === true
+      }
 
       setPraticien({
         ...data,
@@ -82,6 +94,7 @@ export default function PractitionerPage() {
         type_seance: ppData?.type_seance || '',
         public_cible: ppData?.public_cible || '',
         offres,
+        charges_enabled: chargesEnabled,
       })
       setPratique(ppData?.pratiques || data.pratiques)
       setLoading(false)
@@ -109,6 +122,8 @@ const pratiqueFromConst = PRATIQUES.find(p => p.value === pratiqueSlug)
 const practiceName = pratiqueFromConst
   ? (lang === 'fr' ? pratiqueFromConst.fr : pratiqueFromConst.en)
   : pratique?.nom
+
+const praticienOnboarded = praticien.supersaas_schedule_id && praticien.charges_enabled
 
   return (
     <>
@@ -187,7 +202,7 @@ const practiceName = pratiqueFromConst
           {/* Séparateur */}
           <div className="pract-profile__divider" />
 
-          {/* Bloc bas : bios + bouton sur toute la largeur */}
+          {/* Bloc bas : bios + offres avec bouton par offre */}
           <div className="pract-profile__content">
             {(praticien.bio_fr || praticien.bio_en || praticien.bio) && (
               <p className="pract-profile__bio pract-profile__bio--intro">
@@ -209,35 +224,46 @@ const practiceName = pratiqueFromConst
                   <p className="pract-profile__offres-title">
                     {lang === 'fr' ? 'Offres & tarifs' : 'Offers & pricing'}
                   </p>
-                  {praticien.offres.map((offre, i) => (
-                    <div key={i} className="pract-profile__offre">
-                      <div className="pract-profile__offre-header">
-                        <h4 className="pract-profile__offre-titre">
-                          {lang === 'fr' ? offre.titre_fr : offre.titre_en}
-                        </h4>
-                        <div className="pract-profile__offre-meta">
-                          {offre.duree && <span>{offre.duree} {lang === 'fr' ? 'min' : 'min'}</span>}
-                          {offre.prix && <span>{offre.prix} €</span>}
+                  {praticien.offres.map((offre) => {
+                    const offreReservable = praticienOnboarded && offre.prix && offre.mode_seance
+                    return (
+                      <div key={offre.id} className="pract-profile__offre">
+                        <div className="pract-profile__offre-main">
+                          <h4 className="pract-profile__offre-titre">
+                            {lang === 'fr' ? offre.titre_fr : offre.titre_en}
+                          </h4>
+                          {(lang === 'fr' ? offre.description_fr : offre.description_en) && (
+                            <p className="pract-profile__offre-desc">
+                              {lang === 'fr' ? offre.description_fr : offre.description_en}
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="pract-profile__offre-side">
+                          <div className="pract-profile__offre-meta">
+                            {offre.duree && <span>{offre.duree} min</span>}
+                            {offre.prix && <span>{offre.prix} €</span>}
+                          </div>
+                          {offreReservable ? (
+                            <button
+                              onClick={() => navigate(`/reservation/${praticien.slug}/${practiceSlug}/${offre.id}`)}
+                              className="btn btn--violet-mid btn--sm pract-profile__offre-cta"
+                            >
+                              {lang === 'fr' ? 'Réserver' : 'Book a session'}
+                            </button>
+                          ) : (
+                            <span className="pract-card__coming-soon pract-profile__offre-soon">
+                              {lang === 'fr' ? 'Bientôt disponible' : 'Coming soon'}
+                            </span>
+                          )}
                         </div>
                       </div>
-                      {(lang === 'fr' ? offre.description_fr : offre.description_en) && (
-                        <p className="pract-profile__offre-desc">
-                          {lang === 'fr' ? offre.description_fr : offre.description_en}
-                        </p>
-                      )}
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
 
-            {praticien.supersaas_schedule_id && praticien.charges_enabled ? (
-              <button
-                onClick={() => navigate(`/reservation/${praticien.slug}/${practiceSlug}`)}
-                className="btn btn--violet-mid btn--sm"
-              >
-                {lang === 'fr' ? 'Réserver' : 'Book a session'}
-              </button>
-            ) : (
+            {(!praticien.offres || praticien.offres.length === 0) && (
               <span className="pract-card__coming-soon">
                 {lang === 'fr' ? 'Bientôt disponible' : 'Coming soon'}
               </span>

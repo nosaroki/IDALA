@@ -217,8 +217,8 @@ async function compressImage(file) {
                 : 'Please select a format for each specialty.'
             }
             for (const offre of details.offres) {
-              if (!offre.titre_fr?.trim() || !offre.titre_en?.trim() || !offre.duree) {
-                return lang === 'fr'
+            if (!offre.titre_fr?.trim() || !offre.titre_en?.trim() || !offre.duree || !offre.mode_seance) {
+                  return lang === 'fr'
                   ? 'Veuillez compléter le titre (FR/EN) et la durée pour chaque offre.'
                   : 'Please complete title (FR/EN) and duration for each offer.'
               }
@@ -277,8 +277,8 @@ async function compressImage(file) {
           : `Please add at least one offer per specialty.`
       }
       for (const offre of details.offres) {
-        if (!offre.titre_fr?.trim() || !offre.titre_en?.trim() || !offre.duree) {
-          return lang === 'fr'
+      if (!offre.titre_fr?.trim() || !offre.titre_en?.trim() || !offre.duree || !offre.mode_seance) {
+            return lang === 'fr'
             ? 'Veuillez compléter le titre (FR/EN) et la durée pour chaque offre.'
             : 'Please complete title (FR/EN) and duration for each offer.'
         }
@@ -800,7 +800,7 @@ async function compressImage(file) {
                         </div>
 
                         {/* Mode d'exercice */}
-                        <div className="join-field">
+                        {/* <div className="join-field">
                           <label>{lang === 'fr' ? 'Format *' : 'Format *'}</label>
                           <div className="join-checkboxes join-checkboxes--row">
                             {MODES_EXERCICE.map(opt => {
@@ -829,7 +829,7 @@ async function compressImage(file) {
                               )
                             })}
                           </div>
-                        </div>
+                        </div> */}
 
                         {/* Offres */}
                         <p className="join-offres-label">
@@ -924,6 +924,37 @@ async function compressImage(file) {
                                   })} />
                               </div>
                             </div>
+                            <div className="join-row">
+                              <div className="join-field">
+                                <label>{lang === 'fr' ? 'Mode de séance *' : 'Session mode *'}</label>
+                                <select
+                                  value={offre.mode_seance || ''}
+                                  required
+                                  onChange={e => setForm(f => {
+                                    const offres = [...f.pratiques_details[slug].offres]
+                                    offres[i] = { ...offres[i], mode_seance: e.target.value }
+                                    return { ...f, pratiques_details: { ...f.pratiques_details, [slug]: { ...f.pratiques_details[slug], offres } } }
+                                  })}>
+                                  <option value="">{lang === 'fr' ? 'Choisir...' : 'Select...'}</option>
+                                  <option value="visio">{lang === 'fr' ? 'En visio' : 'Online'}</option>
+                                  <option value="home">{lang === 'fr' ? 'À domicile' : 'Home visit'}</option>
+                                  <option value="in-person">{lang === 'fr' ? 'Au cabinet' : 'In-person'}</option>
+                                </select>
+                              </div>
+                              <div className="join-field">
+                                <label>{lang === 'fr' ? 'Participants max' : 'Max participants'}</label>
+                                <input
+                                  type="number"
+                                  min="1"
+                                  value={offre.max_participants || 1}
+                                  placeholder="1"
+                                  onChange={e => setForm(f => {
+                                    const offres = [...f.pratiques_details[slug].offres]
+                                    offres[i] = { ...offres[i], max_participants: parseInt(e.target.value, 10) || 1 }
+                                    return { ...f, pratiques_details: { ...f.pratiques_details, [slug]: { ...f.pratiques_details[slug], offres } } }
+                                  })} />
+                              </div>
+                            </div>
                           </div>
                         ))}
 
@@ -934,8 +965,7 @@ async function compressImage(file) {
                               ...f.pratiques_details,
                               [slug]: {
                                 ...f.pratiques_details[slug],
-                                offres: [...(f.pratiques_details[slug]?.offres || []), { titre_fr: '', titre_en: '', description_fr: '', description_en: '', prix: '', duree: '' }]
-                              }
+                                offres: [...(f.pratiques_details[slug]?.offres || []), { titre_fr: '', titre_en: '', description_fr: '', description_en: '', prix: '', duree: '', mode_seance: '', max_participants: 1 }]                                     }
                             }
                           }))}>
                           {lang === 'fr' ? '+ Ajouter une offre' : '+ Add an offer'}
@@ -966,64 +996,6 @@ async function compressImage(file) {
 
             </div>
 
-          {/* ── Offres & séances ── */}
-          {/* {!existingPraticien && (
-          <>
-          <div className="join-section">
-            <h2 className="join-section__title">
-              {lang === 'fr' ? 'Offres & séances' : 'Offers & sessions'}
-            </h2>
-
-            <div className="join-field">
-              <label>{lang === 'fr' ? 'Type de séance *' : 'Session type *'}</label>
-              <div className="join-checkboxes join-checkboxes--row">
-                {TYPE_SEANCE.map(t => (
-                  <label key={t.value} className="join-checkbox">
-                    <input
-                      type="radio"
-                      name="type_seance"
-                      value={t.value}
-                      checked={form.type_seance === t.value}
-                      onChange={() => setForm({ ...form, type_seance: t.value })}
-                    />
-                    {lang === 'fr' ? t.fr : t.en}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div className="join-field">
-              <label>{lang === 'fr' ? 'Format *' : 'Format *'}</label>
-              <div className="join-checkboxes join-checkboxes--row">
-                {[
-                  { value: 'in-person', fr: 'Au cabinet', en: 'In-person' },
-                  { value: 'home', fr: 'À domicile', en: 'Home visit' },
-                  { value: 'visio', fr: 'En visio', en: 'Online' },
-                ].map(opt => {
-                  const current = form.mode_exercice ? form.mode_exercice.split(',').map(s => s.trim()) : []
-                  const checked = current.includes(opt.value)
-                  return (
-                    <label key={opt.value} className="join-checkbox">
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => {
-                          const updated = checked
-                            ? current.filter(v => v !== opt.value)
-                            : [...current, opt.value]
-                          setForm(f => ({ ...f, mode_exercice: updated.join(', ') }))
-                        }}
-                      />
-                      {lang === 'fr' ? opt.fr : opt.en}
-                    </label>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
-           </>
-        )} */}
-
           {/* ── Présence en ligne ── */}
           {!existingPraticien && (
           <>
@@ -1046,62 +1018,6 @@ async function compressImage(file) {
               </div>
             </div>
           </div>
-
-          {/* ── Photos ── */}
-          {/* <div className="join-section">
-            <h2 className="join-section__title">
-              {lang === 'fr' ? 'Contenu visuel' : 'Visual content'}
-            </h2>
-            <div className="join-field">
-              <label>
-                {lang === 'fr'
-                  ? 'Photos * (portrait + en situation, minimum 2)'
-                  : 'Photos * (portrait + in action, minimum 2)'}
-              </label>
-              <input
-                id="photo-upload"
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handlePhotos}
-                style={{ display: 'none' }}
-              />
-              <label htmlFor="photo-upload" className="join-file-btn">
-                {uploading
-                  ? (lang === 'fr' ? 'Upload en cours...' : 'Uploading...')
-                  : (lang === 'fr' ? 'Choisir des photos' : 'Choose photos')}
-              </label>
-              {form.photos.length > 0 && (
-                <>
-                  <p className="join-hint">
-                    {lang === 'fr'
-                      ? form.photos.length === 1
-                        ? 'Cette photo est automatiquement définie comme photo de profil principale. Ajoutez-en d\'autres pour pouvoir choisir.'
-                        : 'Cliquez sur une photo pour la définir comme photo de profil principale'
-                      : form.photos.length === 1
-                        ? 'This photo is automatically set as your main profile picture. Add more to be able to choose.'
-                        : 'Click on a photo to set it as your main profile picture'}
-                  </p>
-                  <div className="join-photos-select">
-                    {form.photos.map((url, i) => (
-                      <div
-                        key={i}
-                        className={`join-photo-item ${form.main_photo === url ? 'join-photo-item--selected' : ''}`}
-                        onClick={() => setForm(f => ({ ...f, main_photo: url }))}
-                      >
-                        <OptimizedImage src={url} alt={`Photo ${i + 1}/${form.photos.length}`} />
-                        {form.main_photo === url && (
-                          <div className="join-photo-item__badge">
-                            {lang === 'fr' ? 'Principale' : 'Main'}
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-          </div> */}
            </>
           )}
 

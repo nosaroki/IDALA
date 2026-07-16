@@ -571,7 +571,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   outline: none;
 }
 
-.diagnostic-bubble__panel {
+/* .diagnostic-bubble__panel {
   background: var(--root-bg2);
   border-radius: 1em;
   border: 0.5px solid var(--pale);
@@ -585,6 +585,34 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   transition: opacity var(--transition), transform var(--transition);
   pointer-events: none;
   margin-bottom: 4px;
+} */
+
+.diagnostic-bubble__panel {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  right: 0;
+  background: var(--root-bg2);
+  border-radius: 1em;
+  border: 0.5px solid var(--pale);
+  padding: 20px 22px;
+  width: 280px;
+  max-width: calc(100vw - 100px);
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(12px) scale(0.96);
+  transform-origin: bottom right;
+  transition: opacity var(--transition), transform var(--transition), visibility var(--transition);
+  pointer-events: none;
+  max-height: calc(100vh - 25vh - 80px);
+  overflow-y: auto;
+}
+
+.diagnostic-bubble:hover .diagnostic-bubble__panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0) scale(1);
+  pointer-events: auto;
 }
 
 .diagnostic-bubble.is-open .diagnostic-bubble__panel {
@@ -1628,8 +1656,9 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   border-radius: 10px;
   padding: 1.25rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
 }
 
 .pract-profile__offre-header {
@@ -1666,6 +1695,48 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   color: var(--text-light);
   line-height: 1.7;
   margin: 0;
+}
+
+.pract-profile__offre-body {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.pract-profile__offre-body .pract-profile__offre-desc {
+  flex: 1;
+}
+
+.pract-profile__offre-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.pract-profile__offre-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.pract-profile__offre-cta {
+  width: fit-content;
+  margin: 0;
+}
+
+@media (max-width: 520px) {
+  .pract-profile__offre {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .pract-profile__offre-side {
+    align-items: center;
+  }
 }
 
 .pract-profile__lang-warning {

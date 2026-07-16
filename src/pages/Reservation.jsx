@@ -12,14 +12,14 @@ const SUPABASE_FN = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 const MODE_LABELS = {
-  visio:    { fr: 'En visio', en: 'Online' },
-  domicile: { fr: 'À domicile', en: 'At home' },
-  cabinet:  { fr: 'En cabinet', en: 'At the practice' },
+  visio:       { fr: 'En visio', en: 'Online' },
+  home:        { fr: 'À domicile', en: 'At home' },
+  'in-person': { fr: 'En cabinet', en: 'At the practice' },
 }
 
 export default function Reservation() {
   const { lang } = useContext(LangCtx)
-  const { praticienSlug, pratiqueSlug } = useParams()
+  const { praticienSlug, pratiqueSlug, offreId } = useParams()
 
   const [praticien, setPraticien] = useState(null)
   const [pratique, setPratique] = useState(null)
@@ -41,7 +41,7 @@ export default function Reservation() {
   const [payError, setPayError] = useState(null)
   const [slotTakenMsg, setSlotTakenMsg] = useState(null)
 
-  // Charger praticien + prestation
+  // Charger praticien + pratique + offre
   useEffect(() => {
     let cancelled = false
     async function load() {
@@ -67,17 +67,17 @@ export default function Reservation() {
           return
         }
 
-        const { data: pp } = await supabase
-          .from('praticien_pratiques')
-          .select('prix, duree_seance, mode_seance, max_participants')
-          .eq('praticien_id', prat.id)
-          .eq('pratique_id', prq.id)
+        // Source unique de l'offre réservable : praticien_offres, via l'id passé dans l'URL
+        const { data: offreData } = await supabase
+          .from('praticien_offres')
+          .select('id, prix, duree, mode_seance, max_participants')
+          .eq('id', offreId)
           .single()
 
         if (cancelled) return
         setPraticien(prat)
         setPratique(prq)
-        setOffre(pp)
+        setOffre(offreData)
       } catch (e) {
         if (!cancelled) setLoadError(
           lang === 'fr' ? 'Erreur de chargement.' : 'Loading error.'
@@ -88,10 +88,10 @@ export default function Reservation() {
     }
     load()
     return () => { cancelled = true }
-  }, [praticienSlug, pratiqueSlug, lang])
+  }, [praticienSlug, pratiqueSlug, offreId, lang])
 
   const durationMin = useMemo(() => {
-    return offre?.duree_seance ? parseInt(offre.duree_seance, 10) : 60
+    return offre?.duree ? parseInt(offre.duree, 10) : 60
   }, [offre])
 
   // Instance Stripe liée au compte connecté du praticien
@@ -124,6 +124,7 @@ export default function Reservation() {
           body: JSON.stringify({
             praticien_id: praticien.id,
             pratique_id: pratique.id,
+            offre_id: offreId,
             scheduled_at: selectedSlot.start,
             client_name: clientName,
             client_email: clientEmail,

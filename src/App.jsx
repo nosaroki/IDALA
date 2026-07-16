@@ -108,7 +108,7 @@ export default function App() {
               <Route path="/about"         element={<About />} />
               <Route path="/join" element={<JoinUs />} />
               <Route path="/reservation/confirmation" element={<ReservationConfirmation />} />
-              <Route path="/reservation/:praticienSlug/:pratiqueSlug" element={<Reservation />} />
+              <Route path="/reservation/:praticienSlug/:pratiqueSlug/:offreId" element={<Reservation />} />
               <Route path="*" element={<NotFound />} />
               <Route path="/cgu" element={<CGU />} />
             </Route>

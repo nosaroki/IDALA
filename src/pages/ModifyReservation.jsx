@@ -51,6 +51,7 @@ export default function ModifyReservation() {
     if (!selectedSlot) return
     setProcessing(true)
     setSlotError(null)
+    console.log('SLOT BRUT:', selectedSlot.start)
     try {
       const res = await fetch(`${SUPABASE_FN}/functions/v1/modify-reservation`, {
         method: 'POST',

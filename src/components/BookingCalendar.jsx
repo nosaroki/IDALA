@@ -76,6 +76,8 @@ export default function BookingCalendar({ praticienId, scheduleId, lengthMinutes
           }),
         })
         const data = await res.json()
+        console.log('SLOTS BRUTS SUPERSAAS:', data.slots?.slice(0, 2))
+        
         if (cancelled) return
         if (data.slots) {
           setSlotsByDay(groupByDay(data.slots))

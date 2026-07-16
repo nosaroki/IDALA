@@ -185,6 +185,8 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
                 description_en: o.description_en || '',
                 prix: o.prix || '',
                 duree: o.duree || '',
+                mode_seance: o.mode_seance || '',
+                max_participants: o.max_participants || 1,
               }))
             }
           }))
@@ -331,6 +333,13 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
 
 function handleSubmit(e) {
   e.preventDefault()
+  const offreSansMode = form.pratiques_associees
+    .flatMap(p => p.offres || [])
+    .find(o => o.prix && !o.mode_seance)
+  if (offreSansMode) {
+    alert('Chaque offre avec un prix doit avoir un mode de séance.')
+    return
+  }
   onSave(form)
 }
 
@@ -513,7 +522,7 @@ function handleSubmit(e) {
                 
                 {/* Bio spécifique */}
                 <div className="admin-form__row">
-                  <label>Bio FR
+                  {/* <label>Bio FR
                     <textarea rows={3} value={pa.bio_fr || ''}
                       placeholder="Description spécifique à cette pratique en français"
                       onChange={e => updatePratiqueDetail(pa.pratique_id, 'bio_fr', e.target.value)} />
@@ -522,7 +531,7 @@ function handleSubmit(e) {
                     <textarea rows={3} value={pa.bio_en || ''}
                       placeholder="Practice-specific description in English"
                       onChange={e => updatePratiqueDetail(pa.pratique_id, 'bio_en', e.target.value)} />
-                  </label>
+                  </label> */}
 
                 {/* Photo spécifique à cette pratique */}
                   <div style={{ marginTop: '16px' }}>
@@ -841,6 +850,39 @@ function handleSubmit(e) {
                           }} onWheel={(e) => e.target.blur()} />
                       </label>
                     </div>
+                    <div className="admin-form__row">
+                      <label>Mode de séance
+                        <select value={offre.mode_seance || ''}
+                          onChange={e => {
+                            const updated = form.pratiques_associees.map(p =>
+                              p.pratique_id === pa.pratique_id
+                                ? { ...p, offres: p.offres.map((o, j) => j === i ? { ...o, mode_seance: e.target.value } : o) }
+                                : p
+                            )
+                            setForm(f => ({ ...f, pratiques_associees: updated }))
+                          }}>
+                          <option value="">Choisir un mode</option>
+                          <option value="in-person">Au cabinet</option>
+                          <option value="home">À domicile</option>
+                          <option value="visio">En visio</option>
+                        </select>
+                      </label>
+                      <label>Participants max
+                        <input
+                          type="number"
+                          min="1"
+                          value={offre.max_participants || ''}
+                          placeholder="ex: 1"
+                          onChange={e => {
+                            const updated = form.pratiques_associees.map(p =>
+                              p.pratique_id === pa.pratique_id
+                                ? { ...p, offres: p.offres.map((o, j) => j === i ? { ...o, max_participants: e.target.value } : o) }
+                                : p
+                            )
+                            setForm(f => ({ ...f, pratiques_associees: updated }))
+                          }} onWheel={(e) => e.target.blur()} />
+                      </label>
+                    </div>
                   </div>
                     </SortableOffre>
                 ))}
@@ -851,7 +893,7 @@ function handleSubmit(e) {
                   onClick={() => {
                     const updated = form.pratiques_associees.map(p =>
                       p.pratique_id === pa.pratique_id
-                        ? { ...p, offres: [...(p.offres || []), { titre_fr: '', titre_en: '', description_fr: '', description_en: '', prix: '', duree: '' }] }
+                        ? { ...p, offres: [...(p.offres || []), { titre_fr: '', titre_en: '', description_fr: '', description_en: '', prix: '', duree: '', mode_seance: '', max_participants: 1 }] }
                         : p
                     )
                     setForm(f => ({ ...f, pratiques_associees: updated }))

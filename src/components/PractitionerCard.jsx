@@ -23,9 +23,6 @@ function ModeTags({ mode, lang }) {
 export default function PractitionerCard({ praticien, practiceSlug }) {
   const { lang } = useContext(LangCtx)
   const navigate = useNavigate()
-  console.log('DIANE CHECK:', praticien.prenom, '| schedule:', praticien.supersaas_schedule_id, '| charges:', praticien.charges_enabled)
-  console.log('PRATICIEN COMPLET:', praticien)
-
   const handleLearnMore = () => {
     navigate(`/practices/${practiceSlug}/${praticien.slug}`)
   }
@@ -84,7 +81,7 @@ export default function PractitionerCard({ praticien, practiceSlug }) {
           )}
           {praticien.supersaas_schedule_id && praticien.charges_enabled ? (
             <button
-              onClick={() => navigate(`/reservation/${praticien.slug}/${practiceSlug}`)}
+              onClick={() => navigate(`/practices/${practiceSlug}/${praticien.slug}`)}
               className="btn btn--violet-mid btn--sm"
             >
               {lang === 'fr' ? 'Réserver' : 'Book a session'}
