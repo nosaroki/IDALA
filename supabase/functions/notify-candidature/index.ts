@@ -1,5 +1,10 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 
+// Le format découle des modes des offres, la saisie manuelle du format a été retirée.
+function modesFromOffres(offres) {
+  return [...new Set((offres || []).map((o) => o.mode_seance).filter(Boolean))].join(', ')
+}
+
 serve(async (req) => {
   const { record } = await req.json()
 
@@ -87,8 +92,8 @@ const emailCandidat = await fetch('https://api.resend.com/emails', {
           <!-- Bio générale -->
           ${(candidat.bio_fr || candidat.bio_en) ? `
             <p style="font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9B6EBF; margin-bottom: 12px;">Bio générale</p>
-            ${candidat.bio_fr ? `<p style="font-size: 14px; font-weight: 300; line-height: 1.7; margin-bottom: 12px;"><span style="color: #6B5B7E; font-size: 11px; letter-spacing: 1px;">FR — </span>${candidat.bio_fr}</p>` : ''}
-            ${candidat.bio_en ? `<p style="font-size: 14px; font-weight: 300; line-height: 1.7; margin-bottom: 24px;"><span style="color: #6B5B7E; font-size: 11px; letter-spacing: 1px;">EN — </span>${candidat.bio_en}</p>` : ''}
+            ${candidat.bio_fr ? `<p style="font-size: 14px; font-weight: 300; line-height: 1.7; margin-bottom: 12px;"><span style="color: #6B5B7E; font-size: 11px; letter-spacing: 1px;">FR : </span>${candidat.bio_fr}</p>` : ''}
+            ${candidat.bio_en ? `<p style="font-size: 14px; font-weight: 300; line-height: 1.7; margin-bottom: 24px;"><span style="color: #6B5B7E; font-size: 11px; letter-spacing: 1px;">EN : </span>${candidat.bio_en}</p>` : ''}
           ` : ''}
 
           <hr style="border: none; border-top: 1px solid #E4D8F5; margin: 24px 0;" />
@@ -104,6 +109,7 @@ const emailCandidat = await fetch('https://api.resend.com/emails', {
             }
             return slugs.map(slug => {
               const d = details[slug] || {}
+              const formatDeduit = modesFromOffres(d.offres)
               const offres = (d.offres || []).map((o, i) => `
                 <div style="margin-top: 12px; padding-left: 12px; border-left: 2px solid #E4D8F5;">
                   <p style="font-size: 13px; font-weight: 400; margin-bottom: 4px;">${o.titre_fr || 'Sans titre'} ${o.titre_en && o.titre_en !== o.titre_fr ? `<span style="color: #9B6EBF; font-size: 11px;">(EN: ${o.titre_en})</span>` : ''}</p>
@@ -118,7 +124,7 @@ const emailCandidat = await fetch('https://api.resend.com/emails', {
                   <table style="width: 100%; border-collapse: collapse; font-size: 13px; font-weight: 300;">
                     <tr><td style="padding: 4px 0; color: #6B5B7E; width: 120px;">Public cible</td><td style="padding: 4px 0;">${d.public_cible || '—'}</td></tr>
                     <tr><td style="padding: 4px 0; color: #6B5B7E;">Type de séance</td><td style="padding: 4px 0;">${d.type_seance || '—'}</td></tr>
-                    <tr><td style="padding: 4px 0; color: #6B5B7E;">Format</td><td style="padding: 4px 0;">${d.mode_exercice || '—'}</td></tr>
+                    <tr><td style="padding: 4px 0; color: #6B5B7E;">Format</td><td style="padding: 4px 0;">${formatDeduit || '—'}</td></tr>
                   </table>
                   ${offres ? `
                     <p style="font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #9B6EBF; margin: 16px 0 4px;">Offres</p>

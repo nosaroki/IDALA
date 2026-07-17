@@ -3,7 +3,6 @@ import { supabase } from '../lib/supabaseClient'
 import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { arrayMove, SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import IbanField from './IbanField'
 import PhotoPositioner from './PhotoPositioner'
 import OptimizedImage from "./OptimizedImage"
 
@@ -70,13 +69,13 @@ function SortableOffre({ index, pa, children }) {
 export default function AdminPractitionerForm({ initial, pratiques, onSave, onCancel }) {
 
   const emptyForm = {
-    prenom: '', nom: '', 
+    prenom: '', nom: '',
     email: '', telephone: '', localisation: '',
-    lien_reservation: '', actif: true,
+    actif: true,
     photo_url: '', photos_urls: [], slug: '',
     photo_position: 'center center',
-    mode_exercice: 'in-person',
-    iban: '', langues: '', ville: '', region: '', pays: '',
+    mode_exercice: '',
+    langues: '', ville: '', region: '', pays: '',
     bio_fr: '', bio_en: '',
     pratiques_associees: [],
     instagram: '', site_web: '',
@@ -85,7 +84,7 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
 
   const [langDropOpen, setLangDropOpen] = useState(false)
   const [langues_list, setLanguesList] = useState(
-    initial?.langues ? initial.langues.split(', ').map(l => 
+    initial?.langues ? initial.langues.split(', ').map(l =>
       LANGUAGES.find(lang => lang.label === l)?.code
     ).filter(Boolean) : []
   )
@@ -158,7 +157,7 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
           .from('praticien_pratiques')
           .select('*, pratiques(id, nom, slug)')
           .eq('praticien_id', initial.id)
-        
+
         base.pratiques_associees = await Promise.all((data || []).map(async pp => {
             const { data: offres } = await supabase
               .from('praticien_offres')
@@ -175,7 +174,6 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
               pp_id: pp.id,
               public_cible: pp.public_cible || '',
               type_seance: pp.type_seance || '',
-              mode_exercice: pp.mode_exercice || '',
               photo_url: pp.photo_url || null,
               photo_position: pp.photo_position || 'center center',
               offres: (offres || []).map(o => ({
@@ -233,7 +231,10 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
           pratique_id: pratique.id,
           pratique_nom: pratique.nom,
           pratique_slug: pratique.slug,
-          bio_fr: '', bio_en: '', prix: '', duree_seance: ''
+          bio_fr: '', bio_en: '',
+          public_cible: '', type_seance: '',
+          photo_url: null, photo_position: 'center center',
+          offres: [],
         }]
       }))
     }
@@ -301,7 +302,7 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
       for (const file of files) {
         const compressed = await compressImage(file)
         const ext = 'jpg'
-        const filename = `praticiens/${form.slug}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`        
+        const filename = `praticiens/${form.slug}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
         const { data, error } = await supabase.storage
           .from('photos-praticiens')
           .upload(filename, compressed, { upsert: true })
@@ -340,7 +341,24 @@ function handleSubmit(e) {
     alert('Chaque offre avec un prix doit avoir un mode de séance.')
     return
   }
-  onSave(form)
+
+  // Le format (mode d'exercice) n'est plus saisi à la main : on le déduit des modes
+  // des offres. Chaque pratique reçoit les modes distincts de ses offres, et le
+  // niveau praticien reçoit l'union de tous les modes. Les colonnes existantes
+  // restent alimentées, donc tous les affichages en aval continuent de fonctionner.
+  const pratiquesAvecMode = form.pratiques_associees.map(pa => {
+    const modes = [...new Set((pa.offres || []).map(o => o.mode_seance).filter(Boolean))]
+    return { ...pa, mode_exercice: modes.join(', ') }
+  })
+  const modesGlobaux = [...new Set(
+    pratiquesAvecMode.flatMap(pa => pa.mode_exercice ? pa.mode_exercice.split(', ') : [])
+  )]
+
+  onSave({
+    ...form,
+    mode_exercice: modesGlobaux.join(', '),
+    pratiques_associees: pratiquesAvecMode,
+  })
 }
 
 
@@ -453,18 +471,6 @@ function handleSubmit(e) {
 </label>
       </div>
 
-      <label>Lien de réservation
-        <input value={form.lien_reservation || ''}
-          onChange={e => setForm({ ...form, lien_reservation: e.target.value })} />
-      </label>
-
-      <label>IBAN
-        <IbanField
-          iban={form.iban}
-          onChange={(value) => setForm({ ...form, iban: value })}
-        />
-      </label>
-
       <div className="admin-form__row">
         <label>Instagram
           <input value={form.instagram || ''}
@@ -519,19 +525,8 @@ function handleSubmit(e) {
             {(form.pratiques_associees || []).map(pa => (
               <div key={pa.pratique_id} className="admin-pratique-block">
                 <p className="admin-pratique-block__title">{pa.pratique_nom}</p>
-                
-                {/* Bio spécifique */}
+
                 <div className="admin-form__row">
-                  {/* <label>Bio FR
-                    <textarea rows={3} value={pa.bio_fr || ''}
-                      placeholder="Description spécifique à cette pratique en français"
-                      onChange={e => updatePratiqueDetail(pa.pratique_id, 'bio_fr', e.target.value)} />
-                  </label>
-                  <label>Bio EN
-                    <textarea rows={3} value={pa.bio_en || ''}
-                      placeholder="Practice-specific description in English"
-                      onChange={e => updatePratiqueDetail(pa.pratique_id, 'bio_en', e.target.value)} />
-                  </label> */}
 
                 {/* Photo spécifique à cette pratique */}
                   <div style={{ marginTop: '16px' }}>
@@ -581,7 +576,7 @@ function handleSubmit(e) {
 
                         const ext = file.name.split('.').pop()
                         const fileName = `praticiens/${form.slug}/${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`
-                        
+
                         const { data, error } = await supabase.storage
                           .from('photos-praticiens')
                           .upload(fileName, file)
@@ -596,23 +591,23 @@ function handleSubmit(e) {
                           .from('photos-praticiens')
                           .getPublicUrl(data.path)
 
-                        const updated = form.pratiques_associees.map(p => 
-                          p.pratique_id === pa.pratique_id 
+                        const updated = form.pratiques_associees.map(p =>
+                          p.pratique_id === pa.pratique_id
                             ? { ...p, photo_url: publicUrl, photo_position: 'center center' }
                             : p
                         )
                         setForm({ ...form, pratiques_associees: updated })
                       }}
                     />
-                    
+
                     {pa.photo_url && (
                       <div style={{ marginTop: '16px' }}>
                         <PhotoPositioner
                           src={pa.photo_url}
                           position={pa.photo_position || 'center center'}
                           onChange={(value) => {
-                            const updated = form.pratiques_associees.map(p => 
-                              p.pratique_id === pa.pratique_id 
+                            const updated = form.pratiques_associees.map(p =>
+                              p.pratique_id === pa.pratique_id
                                 ? { ...p, photo_position: value }
                                 : p
                             )
@@ -622,10 +617,10 @@ function handleSubmit(e) {
                         <img
                           src={pa.photo_url}
                           alt="Photo pratique"
-                          style={{ 
-                            width: 80, 
-                            height: 80, 
-                            objectFit: 'cover', 
+                          style={{
+                            width: 80,
+                            height: 80,
+                            objectFit: 'cover',
                             borderRadius: 4,
                             objectPosition: pa.photo_position || 'center center',
                             marginTop: '8px'
@@ -634,8 +629,8 @@ function handleSubmit(e) {
                         <button
                           type="button"
                           onClick={() => {
-                            const updated = form.pratiques_associees.map(p => 
-                              p.pratique_id === pa.pratique_id 
+                            const updated = form.pratiques_associees.map(p =>
+                              p.pratique_id === pa.pratique_id
                                 ? { ...p, photo_url: null, photo_position: 'center center' }
                                 : p
                             )
@@ -709,36 +704,6 @@ function handleSubmit(e) {
                         ))}
                       </div>
                     </div>
-
-                    {/* Mode d'exercice */}
-                    <div style={{ marginTop: '12px' }}>
-                      <label>Format</label>
-                      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '4px' }}>
-                        {[
-                          { value: 'in-person', label: 'Au cabinet' },
-                          { value: 'home', label: 'À domicile' },
-                          { value: 'visio', label: 'En visio' },
-                        ].map(opt => {
-                          const current = pa.mode_exercice ? pa.mode_exercice.split(',').map(s => s.trim()) : []
-                          const checked = current.includes(opt.value)
-                          return (
-                            <label key={opt.value} className="admin-pratique-check">
-                              <input
-                                type="checkbox"
-                                checked={checked}
-                                onChange={() => {
-                                  const updated = checked
-                                    ? current.filter(v => v !== opt.value)
-                                    : [...current, opt.value]
-                                  updatePratiqueDetail(pa.pratique_id, 'mode_exercice', updated.join(', '))
-                                }}
-                              />
-                              {opt.label}
-                            </label>
-                          )
-                        })}
-                      </div>
-                    </div>
                 </div>
 
                 {/* Offres */}
@@ -770,7 +735,9 @@ function handleSubmit(e) {
                           setForm(f => ({ ...f, pratiques_associees: updated }))
                         }}>✕</button>
                     </div>
-                    
+
+                    {/* Intitulé */}
+                    <p className="admin-hint" style={{ marginTop: '4px', marginBottom: '4px' }}>Intitulé</p>
                     <div className="admin-form__row">
                       <label>Titre FR
                         <input value={offre.titre_fr || ''}
@@ -797,6 +764,9 @@ function handleSubmit(e) {
                           }} />
                       </label>
                     </div>
+
+                    {/* Descriptions */}
+                    <p className="admin-hint" style={{ marginTop: '12px', marginBottom: '4px' }}>Descriptions</p>
                     <div className="admin-form__row">
                       <label>Description FR
                         <textarea rows={2} value={offre.description_fr || ''}
@@ -821,6 +791,9 @@ function handleSubmit(e) {
                           }} />
                       </label>
                     </div>
+
+                    {/* Tarif et durée */}
+                    <p className="admin-hint" style={{ marginTop: '12px', marginBottom: '4px' }}>Tarif et durée</p>
                     <div className="admin-form__row">
                       <label>Prix (€)
                         <input type="number" min="0" value={offre.prix || ''}
@@ -850,6 +823,9 @@ function handleSubmit(e) {
                           }} onWheel={(e) => e.target.blur()} />
                       </label>
                     </div>
+
+                    {/* Modalités */}
+                    <p className="admin-hint" style={{ marginTop: '12px', marginBottom: '4px' }}>Modalités</p>
                     <div className="admin-form__row">
                       <label>Mode de séance
                         <select value={offre.mode_seance || ''}
@@ -905,7 +881,7 @@ function handleSubmit(e) {
           </>
         )}
       </div>
-      
+
 
       {/* Photos */}
       <div className="admin-photos-section">

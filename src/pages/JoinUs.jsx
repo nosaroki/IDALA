@@ -4,7 +4,6 @@ import { supabase } from '../lib/supabaseClient'
 import { LangCtx } from '../components/LangContext'
 import { PRATIQUES } from '../constants/pratiques'
 import { PUBLIC_CIBLE, TYPE_SEANCE } from '../constants/audiences'
-import { MODES_EXERCICE } from '../constants/modes'
 import OptimizedImage from "../components/OptimizedImage"
 
 const LANGUAGES = [
@@ -30,11 +29,8 @@ const emptyForm = {
   langues: '', langues_list: [],
   specialites: [],
   pratiques_details: {},
-  public_cible: [],
   certifications: '', experience: '',
   bio_fr: '', bio_en: '',
-  type_seance: '',
-  mode_exercice: '',
   instagram: '', site_web: '',
   photos: [], main_photo: '',
 }
@@ -196,26 +192,6 @@ async function compressImage(file) {
                 ? 'Veuillez sélectionner un type de séance pour chaque spécialité.'
                 : 'Please select a session type for each specialty.'
             }
-            if (!details.mode_exercice) {
-              return lang === 'fr'
-                ? 'Veuillez sélectionner un format pour chaque spécialité.'
-                : 'Please select a format for each specialty.'
-            }
-            if (!details.public_cible) {
-              return lang === 'fr'
-                ? 'Veuillez sélectionner un public cible pour chaque spécialité.'
-                : 'Please select a target audience for each specialty.'
-            }
-            if (!details.type_seance) {
-              return lang === 'fr'
-                ? 'Veuillez sélectionner un type de séance pour chaque spécialité.'
-                : 'Please select a session type for each specialty.'
-            }
-            if (!details.mode_exercice) {
-              return lang === 'fr'
-                ? 'Veuillez sélectionner un format pour chaque spécialité.'
-                : 'Please select a format for each specialty.'
-            }
             for (const offre of details.offres) {
             if (!offre.titre_fr?.trim() || !offre.titre_en?.trim() || !offre.duree || !offre.mode_seance) {
                   return lang === 'fr'
@@ -248,8 +224,8 @@ async function compressImage(file) {
 
    // SIRET
     if (!form.siret || form.siret.replace(/\s/g, '').length !== 14) {
-      return lang === 'fr' 
-        ? 'Veuillez entrer un numéro SIRET valide (14 chiffres).' 
+      return lang === 'fr'
+        ? 'Veuillez entrer un numéro SIRET valide (14 chiffres).'
         : 'Please enter a valid SIRET number (14 digits).'
     }
 
@@ -268,7 +244,7 @@ async function compressImage(file) {
       return lang === 'fr' ? 'Veuillez sélectionner au moins une spécialité.' : 'Please select at least one specialty.'
     }
 
-    // Détails par pratique : descriptions FR/EN + au moins une offre complète
+    // Détails par pratique : au moins une offre complète + photo
     for (const slug of form.specialites) {
       const details = form.pratiques_details[slug] || {}
       if (!details.offres || details.offres.length === 0) {
@@ -291,15 +267,6 @@ async function compressImage(file) {
       }
     }
 
-    // if (form.photos.length < 2) {
-    //   return lang === 'fr' ? 'Veuillez uploader au moins 2 photos.' : 'Please upload at least 2 photos.'
-    // }
-
-    // // Photo principale sélectionnée
-    // if (!form.main_photo) {
-    //   return lang === 'fr' ? 'Veuillez sélectionner une photo principale.' : 'Please select a main photo.'
-    // }
-
     return null
   }
 
@@ -313,6 +280,32 @@ async function compressImage(file) {
     setLoading(true)
     setError(null)
 
+    // Praticien déjà validé : ajout immédiat de pratiques à son profil, sans passer
+    // par une candidature ni par la validation admin. La fonction add-practice écrit
+    // directement dans praticien_pratiques et praticien_offres et envoie les mails d'ajout.
+    if (existingPraticien) {
+      const { data, error: addError } = await supabase.functions.invoke('add-practice', {
+        body: {
+          praticien_id: existingPraticien.id,
+          pratiques_details: form.pratiques_details,
+          lang,
+        }
+      })
+      if (addError || data?.error) {
+        console.log('ERREUR ADD PRACTICE:', addError || data?.error)
+        setError(lang === 'fr'
+          ? 'Une erreur est survenue. Veuillez réessayer.'
+          : 'An error occurred. Please try again.')
+        setLoading(false)
+        return
+      }
+      setSubmitted(true)
+      setLoading(false)
+      return
+    }
+
+    // Nouveau praticien : candidature classique. Le trigger notify-candidature envoie
+    // les mails d'accusé au candidat et de notification à Idala.
     const firstSlug = form.specialites[0]
     const fallbackPhoto = form.pratiques_details[firstSlug]?.photo_url || ''
 
@@ -327,17 +320,11 @@ async function compressImage(file) {
       langues:            form.langues,
       pratique:           form.specialites.join(', '),
       pratiques_details:  form.pratiques_details,
-      public_cible:       form.public_cible.join(', '),
       certifications:     form.certifications,
       experience:         form.experience,
-      motivation: form.bio_fr,
-      bio_fr: form.bio_fr,
-      bio_en: form.bio_en,
-      type_seance:        form.type_seance,
-      description_seance: form.description_seance,
-      duree_seance:       form.duree_seance,
-      prix:               parseFloat(form.prix) || null,
-      mode_exercice:      form.mode_exercice,
+      motivation:         form.bio_fr,
+      bio_fr:             form.bio_fr,
+      bio_en:             form.bio_en,
       instagram:          form.instagram,
       site_web:           form.site_web,
       photos_urls: form.specialites.map(s => form.pratiques_details[s]?.photo_url).filter(Boolean),
@@ -346,7 +333,7 @@ async function compressImage(file) {
       langue_interface: lang
     })
 
-    if (error) {     
+    if (error) {
       console.log('ERREUR INSERT CANDIDATURE:', error)
       setError(lang === 'fr'
         ? 'Une erreur est survenue. Veuillez réessayer.'
@@ -364,27 +351,35 @@ async function compressImage(file) {
         <div className="join-success__card">
           <p className="join-success__icon">✦</p>
           <h1 className="join-success__title">
-            {lang === 'fr' ? 'Candidature envoyée' : 'Application received'}
+            {existingPraticien
+              ? (lang === 'fr' ? 'Pratique ajoutée' : 'Practice added')
+              : (lang === 'fr' ? 'Candidature envoyée' : 'Application received')}
           </h1>
           <p className="join-success__text">
-            {lang === 'fr'
-              ? <>Merci pour votre intérêt. <br />Nous examinerons votre profil avec soin et reviendrons vers vous dans les meilleurs délais.</>
-              : <>Thank you for your interest.<br /> We will carefully review your profile and get back to you as soon as possible.</>
+            {existingPraticien
+              ? (lang === 'fr'
+                  ? <>Votre nouvelle pratique est désormais en ligne sur votre profil et ouverte à la réservation.</>
+                  : <>Your new practice is now live on your profile and open for bookings.</>)
+              : (lang === 'fr'
+                  ? <>Merci pour votre intérêt. <br />Nous examinerons votre profil avec soin et reviendrons vers vous dans les meilleurs délais.</>
+                  : <>Thank you for your interest.<br /> We will carefully review your profile and get back to you as soon as possible.</>)
             }
           </p>
-          <button
-            type="button"
-            className="btn btn--violet-mid"
-            onClick={() => {
-              setForm(emptyForm)
-              setSubmitted(false)
-              setError(null)
-              window.scrollTo({ top: 0, behavior: 'smooth' })
-            }}
-            style={{ marginTop: '24px' }}
-          >
-            {lang === 'fr' ? 'Soumettre une autre candidature' : 'Submit another application'}
-          </button>
+          {!existingPraticien && (
+            <button
+              type="button"
+              className="btn btn--violet-mid"
+              onClick={() => {
+                setForm(emptyForm)
+                setSubmitted(false)
+                setError(null)
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              }}
+              style={{ marginTop: '24px' }}
+            >
+              {lang === 'fr' ? 'Soumettre une autre candidature' : 'Submit another application'}
+            </button>
+          )}
         </div>
       </div>
     )
@@ -486,7 +481,7 @@ async function compressImage(file) {
                   }}
                 />
               </div>
-              
+
                 <div className="join-field">
                   <label>{lang === 'fr' ? 'Numéro SIRET' : 'SIRET number'}</label>
                   <input required
@@ -612,10 +607,10 @@ async function compressImage(file) {
                 </div>
               )}
             </div>
-           </>  
+           </>
         )}
           </div>
-     
+
 
           {/* ── Profil & expertise ── */}
             <div className="join-section">
@@ -658,7 +653,7 @@ async function compressImage(file) {
                             : [...form.specialites, p.value]
                           const newDetails = { ...form.pratiques_details }
                           if (!updated.includes(p.value)) delete newDetails[p.value]
-                          else if (!newDetails[p.value]) newDetails[p.value] = { bio_fr: '', bio_en: '', prix: '', duree: '' }
+                          else if (!newDetails[p.value]) newDetails[p.value] = { public_cible: '', type_seance: '', offres: [] }
                           setForm(f => ({ ...f, specialites: updated, pratiques_details: newDetails }))
                         }}
                       />
@@ -673,7 +668,7 @@ async function compressImage(file) {
                 <div className="join-pratiques-details">
                   {form.specialites.map(slug => {
                     const pratique = PRATIQUES.find(p => p.value === slug)
-                    const details = form.pratiques_details[slug] || { bio_fr: '', bio_en: '', offres: [] }
+                    const details = form.pratiques_details[slug] || { public_cible: '', type_seance: '', offres: [] }
                     return (
                       <div key={slug} className="join-pratique-block">
                         <h3 className="join-pratique-block__title">
@@ -711,36 +706,6 @@ async function compressImage(file) {
                             </div>
                           )}
                         </div>
-
-                        {/* Bio spécifique */}
-                        {/* <div className="join-row">
-                          <div className="join-field">
-                            <label>{lang === 'fr' ? 'Description FR *' : 'Description FR *'}</label>
-                            <textarea rows={3}
-                              value={details.bio_fr || ''}
-                              placeholder={lang === 'fr' ? '2-3 phrases en français' : '2-3 sentences in French'}
-                              onChange={e => setForm(f => ({
-                                ...f,
-                                pratiques_details: {
-                                  ...f.pratiques_details,
-                                  [slug]: { ...f.pratiques_details[slug], bio_fr: e.target.value }
-                                }
-                              }))} />
-                          </div>
-                          <div className="join-field">
-                            <label>{lang === 'fr' ? 'Description EN *' : 'Description EN *'}</label>
-                            <textarea rows={3}
-                              value={details.bio_en || ''}
-                              placeholder={lang === 'fr' ? '2-3 phrases en anglais' : '2-3 sentences in English'}
-                              onChange={e => setForm(f => ({
-                                ...f,
-                                pratiques_details: {
-                                  ...f.pratiques_details,
-                                  [slug]: { ...f.pratiques_details[slug], bio_en: e.target.value }
-                                }
-                              }))} />
-                          </div>
-                        </div> */}
 
                         {/* Public cible */}
                         <div className="join-field">
@@ -799,38 +764,6 @@ async function compressImage(file) {
                           </div>
                         </div>
 
-                        {/* Mode d'exercice */}
-                        {/* <div className="join-field">
-                          <label>{lang === 'fr' ? 'Format *' : 'Format *'}</label>
-                          <div className="join-checkboxes join-checkboxes--row">
-                            {MODES_EXERCICE.map(opt => {
-                              const current = details.mode_exercice ? details.mode_exercice.split(',').map(s => s.trim()) : []
-                              const checked = current.includes(opt.value)
-                              return (
-                                <label key={opt.value} className="join-checkbox">
-                                  <input
-                                    type="checkbox"
-                                    checked={checked}
-                                    onChange={() => {
-                                      const updated = checked
-                                        ? current.filter(v => v !== opt.value)
-                                        : [...current, opt.value]
-                                      setForm(f => ({
-                                        ...f,
-                                        pratiques_details: {
-                                          ...f.pratiques_details,
-                                          [slug]: { ...f.pratiques_details[slug], mode_exercice: updated.join(', ') }
-                                        }
-                                      }))
-                                    }}
-                                  />
-                                  {lang === 'fr' ? opt.fr : opt.en}
-                                </label>
-                              )
-                            })}
-                          </div>
-                        </div> */}
-
                         {/* Offres */}
                         <p className="join-offres-label">
                           {lang === 'fr' ? 'Offres & tarifs' : 'Offers & pricing'}
@@ -854,6 +787,11 @@ async function compressImage(file) {
                                 ✕
                               </button>
                             </div>
+
+                            {/* Intitulé */}
+                            <p className="join-hint" style={{ marginTop: '4px', marginBottom: '4px' }}>
+                              {lang === 'fr' ? 'Intitulé' : 'Title'}
+                            </p>
                             <div className="join-row">
                               <div className="join-field">
                                 <label>{lang === 'fr' ? 'Titre FR *' : 'Title FR *'}</label>
@@ -876,6 +814,11 @@ async function compressImage(file) {
                                   })} />
                               </div>
                             </div>
+
+                            {/* Descriptions */}
+                            <p className="join-hint" style={{ marginTop: '12px', marginBottom: '4px' }}>
+                              {lang === 'fr' ? 'Descriptions' : 'Descriptions'}
+                            </p>
                             <div className="join-row">
                               <div className="join-field">
                                 <label>{lang === 'fr' ? 'Description FR' : 'Description FR'}</label>
@@ -889,7 +832,7 @@ async function compressImage(file) {
                               </div>
                               <div className="join-field">
                                 <label>{lang === 'fr' ? 'Description EN' : 'Description EN'}</label>
-                                <textarea rows={2} value={offre.description_en || ''} 
+                                <textarea rows={2} value={offre.description_en || ''}
                                 placeholder={lang === 'fr' ? '2-3 phrases en anglais' : '2-3 sentences in English'}
                                   onChange={e => setForm(f => {
                                     const offres = [...f.pratiques_details[slug].offres]
@@ -898,6 +841,11 @@ async function compressImage(file) {
                                   })} />
                               </div>
                             </div>
+
+                            {/* Tarif et durée */}
+                            <p className="join-hint" style={{ marginTop: '12px', marginBottom: '4px' }}>
+                              {lang === 'fr' ? 'Tarif et durée' : 'Price and duration'}
+                            </p>
                             <div className="join-row">
                               <div className="join-field">
                                 <label>{lang === 'fr' ? 'Prix (€)' : 'Price (€)'}</label>
@@ -924,6 +872,11 @@ async function compressImage(file) {
                                   })} />
                               </div>
                             </div>
+
+                            {/* Modalités */}
+                            <p className="join-hint" style={{ marginTop: '12px', marginBottom: '4px' }}>
+                              {lang === 'fr' ? 'Modalités' : 'Details'}
+                            </p>
                             <div className="join-row">
                               <div className="join-field">
                                 <label>{lang === 'fr' ? 'Mode de séance *' : 'Session mode *'}</label>
@@ -972,12 +925,12 @@ async function compressImage(file) {
                         </button>
                       </div>
                     )
-                      
+
                   })}
                 </div>
               )}
             {!existingPraticien && (
-             <>     
+             <>
               <div className="join-field">
                 <label>{lang === 'fr' ? 'Diplômes & certifications *' : 'Diplomas & certifications *'}</label>
                 <textarea required rows={3} value={form.certifications}

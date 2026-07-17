@@ -24,6 +24,13 @@ function formatList(value, source, lang = 'fr') {
     .join(', ')
 }
 
+// Format déduit des modes des offres d'une pratique (le format n'est plus saisi à part).
+function formatPratique(details) {
+  const modes = [...new Set((details?.offres || []).map(o => o.mode_seance).filter(Boolean))]
+  if (modes.length === 0) return '—'
+  return formatList(modes.join(', '), MODES_EXERCICE)
+}
+
 export default function Candidatures() {
   const [candidatures, setCandidatures] = useState([])
   const [selected, setSelected]         = useState(null)
@@ -201,7 +208,6 @@ export default function Candidatures() {
                 <h3>Profil & expertise</h3>
                 <div className="cand-grid">
                   <div><span>Spécialités</span><p>{formatList(selected.pratique, PRATIQUES)}</p></div>
-                  <div><span>Public cible</span><p>{formatList(selected.public_cible, PUBLIC_CIBLE)}</p></div>
                   <div><span>Expérience</span><p>{selected.experience || '—'}</p></div>
                 </div>
                 <div><span className="cand-label">Certifications</span><p className="cand-text">{selected.certifications || '—'}</p></div>
@@ -216,6 +222,12 @@ export default function Candidatures() {
                   {Object.entries(selected.pratiques_details).map(([slug, details]) => (
                     <div key={slug} className="cand-pratique-block">
                       <h4 className="cand-pratique-title">{PRATIQUES.find(p => p.value === slug)?.fr || slug}</h4>
+
+                      <div className="cand-grid" style={{ marginBottom: '8px' }}>
+                        <div><span>Public cible</span><p>{formatList(details.public_cible, PUBLIC_CIBLE)}</p></div>
+                        <div><span>Type de séance</span><p>{TYPE_SEANCE.find(t => t.value === details.type_seance)?.fr || '—'}</p></div>
+                        <div><span>Format</span><p>{formatPratique(details)}</p></div>
+                      </div>
 
                       {details.offres?.length > 0 && (
                         <div>
@@ -254,15 +266,6 @@ export default function Candidatures() {
                   ))}
                 </div>
               )}
-
-              {/* Offres & séances (général) */}
-              <div className="cand-section">
-                <h3>Offres & séances</h3>
-                <div className="cand-grid">
-                  <div><span>Type de séance</span><p>{TYPE_SEANCE.find(t => t.value === selected.type_seance)?.fr || '—'}</p></div>
-                  <div><span>Format</span><p>{formatList(selected.mode_exercice, MODES_EXERCICE)}</p></div>
-                </div>
-              </div>
 
               {/* Présence en ligne */}
               {(selected.instagram || selected.site_web) && (

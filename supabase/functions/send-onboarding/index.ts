@@ -29,6 +29,12 @@ function generateSlug(prenom: string, nom: string): string {
     .replace(/^-|-$/g, '')
 }
 
+// Déduit le format (mode d'exercice) à partir des modes des offres.
+// Le format n'est plus saisi à la main : il découle des offres, seule source de vérité.
+function modesFromOffres(offres: any[]): string {
+  return [...new Set((offres || []).map((o: any) => o.mode_seance).filter(Boolean))].join(', ')
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -73,6 +79,11 @@ serve(async (req) => {
     ? Object.keys(pratiquesDetails)
     : [cand.pratique?.split(',')[0]?.trim() || ''].filter(Boolean)
 
+  // Format global du praticien : union des modes de toutes les offres de la candidature.
+  const candidatureModes = [...new Set(
+    Object.values(pratiquesDetails).flatMap((d: any) => (d?.offres || []).map((o: any) => o.mode_seance).filter(Boolean))
+  )] as string[]
+
   const { data: pratiquesData } = await supabase
     .from('pratiques')
     .select('id, slug')
@@ -86,17 +97,13 @@ serve(async (req) => {
   // Genere le slug du praticien (meme logique que plus bas pour les nouveaux)
   // Pour un praticien existant, on utilisera son slug actuel un peu plus bas
   let praticienSlug = ''
-  
-  // // Recolte toutes les URLs de photos a copier
-  // // (photo_url, photos_urls, et les photo_url dans pratiques_details)
-  // const photoUrlsToCopy: { oldUrl: string, newPath: string, slug: string }[] = []
-  
+
   // Photo principale et galerie
   const galleryUrls = cand.photos_urls || []
   if (cand.main_photo && !galleryUrls.includes(cand.main_photo)) {
     galleryUrls.unshift(cand.main_photo)
   }
-  
+
   // Photos par pratique (depuis pratiques_details)
   const photosPratiques: { [slug: string]: string } = {}
   for (const pSlug of Object.keys(pratiquesDetails)) {
@@ -169,7 +176,7 @@ serve(async (req) => {
       // Copie de la photo principale et de la galerie vers praticiens/{slug}/
       let newPhotoUrl = photo_url
       const newPhotosUrls: string[] = []
-      
+
       if (photo_url) {
         newPhotoUrl = await copyPhotoToPraticien(photo_url, praticienSlug)
       }
@@ -189,7 +196,7 @@ serve(async (req) => {
           ville: cand.ville,
           pays: cand.pays,
           langues: cand.langues,
-          mode_exercice: cand.mode_exercice,
+          mode_exercice: candidatureModes.join(', '),
           bio_fr,
           bio_complete_fr,
           bio_en,
@@ -252,7 +259,7 @@ serve(async (req) => {
           bio_en: details.bio_en || '',
           public_cible: details.public_cible || '',
           type_seance: details.type_seance || '',
-          mode_exercice: details.mode_exercice || '',
+          mode_exercice: modesFromOffres(details.offres),
           photo_url: pratiquePhotoUrl,
         })
         .select()
@@ -277,6 +284,22 @@ serve(async (req) => {
         }
       }
     }
+  }
+
+  // =========================================================
+  // MAJ format global du praticien EXISTANT
+  // Un praticien existant qui ajoute une pratique voit son format global enrichi
+  // des nouveaux modes, au lieu de rester figé sur son ancienne valeur.
+  // =========================================================
+  if (isExistingPraticien && newPraticien && candidatureModes.length > 0) {
+    const anciens = existingPraticien.mode_exercice
+      ? String(existingPraticien.mode_exercice).split(', ').filter(Boolean)
+      : []
+    const fusionnes = [...new Set([...anciens, ...candidatureModes])]
+    await supabase
+      .from('praticiens')
+      .update({ mode_exercice: fusionnes.join(', ') })
+      .eq('id', newPraticien.id)
   }
 
   // =========================================================
