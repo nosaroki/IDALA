@@ -9,7 +9,7 @@ const SUPABASE_FN = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export default function Seance() {
-  const { lang } = useContext(LangCtx)
+  const { lang, setLang } = useContext(LangCtx)
   const { sessionId } = useParams()
   const [searchParams] = useSearchParams()
 
@@ -17,13 +17,19 @@ export default function Seance() {
   const reservationId = searchParams.get('r')
   const praticienSecret = searchParams.get('p')
 
-  const [state, setState] = useState('loading') // loading | ready | joined | error | too_early | ended | denied
+  const [state, setState] = useState('loading') // loading | ready | connecting | joined | error | too_early | ended | denied
   const [errorMsg, setErrorMsg] = useState(null)
   const [sessionInfo, setSessionInfo] = useState(null)
   const [reconnecting, setReconnecting] = useState(false)
 
   const callFrameRef = useRef(null)
   const containerRef = useRef(null)
+  // Verrou anti-double-clic : empeche deux joinCall en parallele.
+  const joiningRef = useRef(false)
+  // Vrai uniquement quand on a reellement rejoint la visio.
+  // Sert a distinguer un vrai depart de seance d'un left-meeting emis
+  // pendant une destruction interne du frame.
+  const inCallRef = useRef(false)
 
   // ─── Messages d'erreur bilingues ───
   const ERROR_MESSAGES = {
@@ -58,7 +64,23 @@ export default function Seance() {
     return lang === 'fr' ? entry.fr : entry.en
   }
 
-  // ─── Charger les infos de la séance ───
+  // Destruction propre et attendue de tout frame existant.
+  // On coupe d'abord inCallRef pour que le left-meeting declenche par
+  // la destruction ne soit PAS interprete comme une fin de seance.
+  async function destroyFrame() {
+    const frame = callFrameRef.current
+    callFrameRef.current = null
+    inCallRef.current = false
+    if (frame) {
+      try {
+        await frame.destroy()
+      } catch (e) {
+        // Frame deja detruit ou en cours de destruction : sans consequence.
+      }
+    }
+  }
+
+  // ─── Charger les infos de la séance (via RPC SECURITY DEFINER) ───
   useEffect(() => {
     let cancelled = false
 
@@ -70,33 +92,34 @@ export default function Seance() {
       }
 
       try {
-        const { data: session } = await supabase
-          .from('sessions')
-          .select(`
-            id, scheduled_at, duration_minutes, mode_seance, daily_room_url, status,
-            praticiens ( prenom, nom ),
-            pratiques ( nom ),
-            reservations ( client_name, status )
-          `)
-          .eq('id', sessionId)
-          .maybeSingle()
+        const { data, error } = await supabase.rpc('get_seance_display', {
+          p_session_id: sessionId,
+          p_reservation_id: reservationId,
+          p_praticien_secret: praticienSecret,
+        })
 
         if (cancelled) return
 
-        if (!session) {
+        if (error || !data || data.ok === false) {
           setState('denied')
           setErrorMsg(msg('INVALID_ACCESS'))
           return
         }
 
-        if (!session.daily_room_url) {
+        if (!data.daily_room_url) {
           setState('error')
           setErrorMsg(msg('NO_ROOM'))
           return
         }
 
-        setSessionInfo(session)
-        setSessionInfo(session)
+        setSessionInfo({
+          scheduled_at: data.scheduled_at,
+          mode_seance: data.mode_seance,
+          daily_room_url: data.daily_room_url,
+          praticiens: { prenom: data.praticien_prenom, nom: data.praticien_nom },
+          pratiques: { nom: data.pratique_nom },
+          clientName: data.client_name || null,
+        })
         setState('ready')
       } catch (e) {
         if (!cancelled) {
@@ -136,14 +159,20 @@ export default function Seance() {
 
   // ─── Rejoindre la visio ───
   async function joinCall() {
+    // Verrou : si un join est deja en cours, on ignore le clic.
+    if (joiningRef.current) return
+    joiningRef.current = true
     setErrorMsg(null)
+    // Passe en connexion : affiche le loader ET rend la zone video visible,
+    // condition necessaire pour que Daily finalise l'entree dans la room.
+    setState('connecting')
+
     try {
       const token = await fetchToken()
 
-      if (callFrameRef.current) {
-        callFrameRef.current.destroy()
-        callFrameRef.current = null
-      }
+      // Toujours repartir d'un etat propre : on detruit et on attend
+      // la fin de destruction de tout frame precedent avant d'en creer un.
+      await destroyFrame()
 
       const frame = DailyIframe.createFrame(containerRef.current, {
         showLeaveButton: true,
@@ -183,18 +212,43 @@ export default function Seance() {
 
       frame.on('error', () => {
         setReconnecting(false)
+        // Une erreur du frame ne doit pas laisser d'instance zombie.
+        inCallRef.current = false
         setState('error')
         setErrorMsg(msg('GENERIC'))
       })
 
+      // Daily a fini de charger son interface (prejoin ou visio) :
+      // on retire notre loader et on laisse la main a Daily. Sans ca,
+      // notre loader recouvre le bouton du prejoin et bloque l'entree.
+      frame.on('loaded', () => {
+        setState('joined')
+      })
+
+      // Entree confirmee dans la seance.
+      frame.on('joined-meeting', () => {
+        inCallRef.current = true
+        setState('joined')
+      })
+
+      // On ne bascule sur "terminee" QUE si on etait reellement en seance.
+      // Un left-meeting emis pendant une destruction interne est ignore.
       frame.on('left-meeting', () => {
-        setState('ended')
+        if (inCallRef.current) {
+          inCallRef.current = false
+          setState('ended')
+        }
       })
 
       await frame.join({ url: sessionInfo.daily_room_url, token })
+      // Filet de securite si joined-meeting n'a pas encore bascule l'etat.
+      inCallRef.current = true
       setState('joined')
 
     } catch (err) {
+      // Le join a echoue : pas d'instance active, on nettoie.
+      await destroyFrame()
+
       const code = String(err.message || '')
       if (code.includes('TOO_EARLY')) {
         setState('too_early')
@@ -212,15 +266,24 @@ export default function Seance() {
         setState('error')
         setErrorMsg(msg('GENERIC'))
       }
+    } finally {
+      joiningRef.current = false
     }
   }
 
-  // ─── Nettoyage ───
+  // ─── Nettoyage au démontage ───
   useEffect(() => {
     return () => {
-      if (callFrameRef.current) {
-        callFrameRef.current.destroy()
-        callFrameRef.current = null
+      // On coupe le drapeau avant de detruire pour ne pas declencher "ended".
+      inCallRef.current = false
+      const frame = callFrameRef.current
+      callFrameRef.current = null
+      if (frame) {
+        try {
+          frame.destroy()
+        } catch (e) {
+          // Sans consequence si deja detruit.
+        }
       }
     }
   }, [])
@@ -229,10 +292,10 @@ export default function Seance() {
   const prat = sessionInfo?.praticiens
   const prq = sessionInfo?.pratiques
   const isPraticien = Boolean(praticienSecret)
-  const reservations = sessionInfo?.reservations || []
-  const clientName = Array.isArray(reservations)
-    ? (reservations.find(r => r.status === 'confirmed')?.client_name || null)
-    : (reservations?.client_name || null)
+  const clientName = sessionInfo?.clientName || null
+
+  // Le conteneur video doit etre visible pendant la connexion ET la seance.
+  const videoActive = state === 'connecting' || state === 'joined'
 
   let dateStr = '', timeStr = ''
   if (sessionInfo?.scheduled_at) {
@@ -245,8 +308,6 @@ export default function Seance() {
     })
   }
 
- 
-
   return (
     <>
       <Helmet>
@@ -258,23 +319,37 @@ export default function Seance() {
         {/* En-tête brandé */}
         <header className="seance-header">
           <span className="seance-header__brand">THE IDALA FAMILY</span>
-          {sessionInfo && (
-            <div className="seance-header__info">
-              <span className="seance-header__practice">{prq?.nom}</span>
-              {prat && (
-                <>
-                  <span className="seance-header__dot">·</span>
-                  <span>{prat.prenom} {prat.nom?.charAt(0)}.</span>
-                </>
-              )}
-              {dateStr && (
-                <>
-                  <span className="seance-header__dot">·</span>
-                  <span>{dateStr} {timeStr}</span>
-                </>
-              )}
+          <div className="seance-header__right">
+            {sessionInfo && (
+              <div className="seance-header__info">
+                <span className="seance-header__practice">{prq?.nom}</span>
+                {prat && (prat.prenom || prat.nom) && (
+                  <>
+                    <span className="seance-header__dot">·</span>
+                    <span>{prat.prenom} {prat.nom?.charAt(0)}.</span>
+                  </>
+                )}
+                {dateStr && (
+                  <>
+                    <span className="seance-header__dot">·</span>
+                    <span>{dateStr} {timeStr}</span>
+                  </>
+                )}
+              </div>
+            )}
+            <div className="lang-toggle">
+              <button
+                type="button"
+                className={`lang-btn${lang === 'fr' ? ' active' : ''}`}
+                onClick={() => setLang('fr')}
+              >FR</button>
+              <button
+                type="button"
+                className={`lang-btn${lang === 'en' ? ' active' : ''}`}
+                onClick={() => setLang('en')}
+              >EN</button>
             </div>
-          )}
+          </div>
         </header>
 
         {/* Zone principale */}
@@ -312,12 +387,30 @@ export default function Seance() {
             </div>
           )}
 
-          {/* Conteneur de la visio (toujours monté quand on rejoint) */}
+          {/* Conteneur de la visio (toujours monté, visible en connexion + séance) */}
           <div
             ref={containerRef}
-            className={`seance-video ${state === 'joined' ? 'seance-video--active' : ''}`}
+            className={`seance-video ${videoActive ? 'seance-video--active' : ''}`}
             aria-label={lang === 'fr' ? 'Visioconférence' : 'Video call'}
           />
+
+          {/* Loader de connexion, par-dessus la zone vidéo */}
+          {state === 'connecting' && (
+            <div className="seance-connecting" role="status" aria-live="polite">
+              <div className="onboarding-dots">
+                <span className="onboarding-dots__dot" style={{ background: 'var(--c1)' }} />
+                <span className="onboarding-dots__dot" style={{ background: 'var(--c2)' }} />
+                <span className="onboarding-dots__dot" style={{ background: 'var(--c3)' }} />
+                <span className="onboarding-dots__dot" style={{ background: 'var(--c4)' }} />
+                <span className="onboarding-dots__dot" style={{ background: 'var(--c5)' }} />
+                <span className="onboarding-dots__dot" style={{ background: 'var(--c6)' }} />
+                <span className="onboarding-dots__dot" style={{ background: 'var(--c7)' }} />
+              </div>
+              <p className="seance-connecting__text">
+                {lang === 'fr' ? 'Connexion à votre séance...' : 'Connecting to your session...'}
+              </p>
+            </div>
+          )}
 
           {/* Bandeau de reconnexion */}
           {reconnecting && (
@@ -327,7 +420,7 @@ export default function Seance() {
             </div>
           )}
 
-          {/* États d'erreur / fin */}
+          {/* États de chargement / erreur / fin */}
           {(state === 'loading') && (
             <div className="seance-lobby">
               <p className="seance-lobby__text">{lang === 'fr' ? 'Chargement...' : 'Loading...'}</p>

@@ -3981,19 +3981,45 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 /* Cadre vidéo */
 .seance-video {
-  display: none;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
-  min-height: 70vh;
   border-radius: 14px;
   overflow: hidden;
   border: 1px solid var(--violet-light);
   box-shadow: var(--shadow-lg);
   background: var(--violet-bg);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity .35s ease;
+}
+.seance-video--active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
-.seance-video--active {
-  display: block;
+.seance-connecting {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  background: var(--root-bg2);
+  border-radius: 14px;
+  z-index: 5;
+}
+.seance-connecting__text {
+  font-family: 'Jost', sans-serif;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--violet-mid);
+  margin: 0;
+  letter-spacing: 0.5px;
 }
 
 /* Bandeau de reconnexion */
@@ -4052,6 +4078,18 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   }
   .seance-video {
     min-height: 60vh;
+  }
+}
+.seance-header__right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+@media (max-width: 600px) {
+  .seance-header__right {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 6px;
   }
 }
 

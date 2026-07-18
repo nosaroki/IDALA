@@ -55,7 +55,7 @@ function Layout() {
 }
 
 export default function App() {
-  const [lang, setLangState] = useState(() => localStorage.getItem('idala-lang') || 'en');
+  const [lang, setLangState] = useState(() => localStorage.getItem('idala-lang') || 'fr');
   const setLang = (l) => { setLangState(l); localStorage.setItem('idala-lang', l); };
   const [showLoader, setShowLoader] = useState(true);   
   const [fading, setFading]         = useState(false);  
