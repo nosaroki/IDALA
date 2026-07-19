@@ -1,12 +1,28 @@
 import { useLang } from '../components/LangContext';
-import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';import { Helmet } from 'react-helmet-async';
 import Footer from '../components/Footer';
 import tarotOrb from '../assets/tarot2.webp'
 import OptimizedImage from '../components/OptimizedImage'
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabaseClient'
 
 
 function Spiritual() {
   const { lang } = useLang();
+  const navigate = useNavigate();
+
+  const [dianeReservable, setDianeReservable] = useState(false)
+
+  useEffect(() => {
+    async function checkDiane() {
+      const { data } = await supabase.rpc('praticien_reservable', {
+        p_slug: 'diane-emmanuelle-tho',
+      })
+      setDianeReservable(data === true)
+    }
+    checkDiane()
+  }, [])
+ 
 
   return (
     <>
@@ -117,9 +133,18 @@ function Spiritual() {
                     : 'Ideal for a quick, clear answer focused on a specific topic.'}
                 </p>
                 <div className="spiritual-card__cta">
-                  <span className="pract-card__coming-soon">
-                    {lang === 'fr' ? 'Bientôt disponible' : 'Coming soon'}
-                  </span>
+                  {dianeReservable ? (
+                    <button
+                      className="btn btn--violet-mid"
+                      onClick={() => navigate('/reservation/diane-emmanuelle-tho/guidance/4e7c4d7d-d46b-45ef-8cb7-d9d5bd5f166e')}
+                    >
+                      {lang === 'fr' ? 'Réserver' : 'Book a session'}
+                    </button>
+                  ) : (
+                    <span className="pract-card__coming-soon">
+                      {lang === 'fr' ? 'Bientôt disponible' : 'Coming soon'}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -168,9 +193,18 @@ function Spiritual() {
                     : 'Recommended to step back on a life period and benefit from more complete support.'}
                 </p>
                 <div className="spiritual-card__cta">
-                  <span className="pract-card__coming-soon">
-                    {lang === 'fr' ? 'Bientôt disponible' : 'Coming soon'}
-                  </span>
+                  {dianeReservable ? (
+                    <button
+                      className="btn btn--violet-mid"
+                      onClick={() => navigate('/reservation/diane-emmanuelle-tho/guidance/22b102b5-d120-40dc-bd1f-403f852d2285')}
+                    >
+                      {lang === 'fr' ? 'Réserver' : 'Book a session'}
+                    </button>
+                  ) : (
+                    <span className="pract-card__coming-soon">
+                      {lang === 'fr' ? 'Bientôt disponible' : 'Coming soon'}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>

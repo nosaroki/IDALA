@@ -2,8 +2,11 @@
 //  ASTROLOGY
 // ─────────────────────────────────────────
 
+// DÉCOMMENTER NAVIGATE POUR ACTIVER LE BOUTON "RÉSERVER UNE SÉANCE" À LA FIN DU THÈME ASTRAL
+
+
 import { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { useLang } from '../components/LangContext';
 import { Helmet } from 'react-helmet-async';
 import charte    from '../assets/chartecarre.webp';
@@ -180,7 +183,7 @@ const CHAKRA_COLORS = {
 // ─── Main Component ──────────────────────
 function Astrology() {
   const { lang }   = useLang();
-  const navigate   = useNavigate();
+  // const navigate   = useNavigate();
   const [dob, setDob] = useState('');
   const [tob, setTob] = useState('');
 
@@ -504,11 +507,11 @@ const calc = async () => {
                   )}
                 </div>
 
-                <div style={{ textAlign: 'center', marginTop: 24 }}>
+                {/* <div style={{ textAlign: 'center', marginTop: 24 }}>
                   <button className="btn btn--outline" onClick={() => navigate('/practitioners')}>
                     {lang === 'fr' ? 'Réserver une Séance' : 'Book a Session'}
                   </button>
-                </div>
+                </div> */}
               </div>
             )}
           </div>

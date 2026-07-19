@@ -501,7 +501,9 @@ function handleSubmit(e) {
       <label>
         <span>Slug</span> <span className="admin-hint">(ex: marie-bru)</span>
         <input value={form.slug || ''}
-          onChange={e => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/\s/g, '-') })} />
+          readOnly={Boolean(initial)}
+          onChange={e => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/\s/g, '-') })}
+          style={initial ? { background: '#f5f2fa', color: '#9B6EBF', cursor: 'not-allowed' } : undefined} />
       </label>
 
       {/* Pratiques associées */}

@@ -2491,6 +2491,8 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 
 .spiritual-card__cta {
   margin-top: auto;
+  display: flex;
+  justify-content: center;
 }
 
 /* ─────────────────────────────────────────
