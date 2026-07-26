@@ -115,103 +115,113 @@ async function notifyMissingAgenda(prenom: string, praticienId: string) {
   }
 }
 
+// ---- Synchronise un praticien depuis Stripe ----
+// On lit l'etat du compte via l'API (pas via un evenement), on met la base a jour,
+// on active le praticien si son Stripe est complet, puis on envoie le mail de bienvenue.
+// force = true renvoie le mail meme si le praticien est deja actif (utile pour un test).
+async function syncOne(supabase: any, praticienId: string, force = false) {
+  const { data: sa } = await supabase
+    .from('stripe_accounts')
+    .select('stripe_account_id')
+    .eq('praticien_id', praticienId)
+    .maybeSingle();
+
+  if (!sa?.stripe_account_id) {
+    return { praticien_id: praticienId, status: 'pas_de_compte_stripe' };
+  }
+
+  const account = await stripe.accounts.retrieve(sa.stripe_account_id);
+  const chargesEnabled = account.charges_enabled ?? false;
+  const payoutsEnabled = account.payouts_enabled ?? false;
+  const detailsSubmitted = account.details_submitted ?? false;
+  const onboardingCompleted = chargesEnabled && payoutsEnabled && detailsSubmitted;
+
+  const { data: prat } = await supabase
+    .from('praticiens')
+    .select('prenom, email, actif, supersaas_agenda_url')
+    .eq('id', praticienId)
+    .single();
+
+  await supabase
+    .from('stripe_accounts')
+    .update({
+      charges_enabled: chargesEnabled,
+      payouts_enabled: payoutsEnabled,
+      details_submitted: detailsSubmitted,
+      onboarding_completed: onboardingCompleted,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('praticien_id', praticienId);
+
+  const wasActive = prat?.actif ?? false;
+  let activated = false;
+  let emailSent = false;
+
+  if (onboardingCompleted && (!wasActive || force)) {
+    if (!wasActive) {
+      await supabase.from('praticiens').update({ actif: true }).eq('id', praticienId);
+      activated = true;
+    }
+    if (prat?.email) {
+      await sendProfileActiveEmail(prat.prenom, prat.email, prat.supersaas_agenda_url || null);
+      emailSent = true;
+      if (!prat.supersaas_agenda_url) {
+        await notifyMissingAgenda(prat.prenom, praticienId);
+      }
+    }
+  }
+
+  return {
+    praticien_id: praticienId,
+    charges_enabled: chargesEnabled,
+    payouts_enabled: payoutsEnabled,
+    details_submitted: detailsSubmitted,
+    onboarding_completed: onboardingCompleted,
+    activated,
+    email_sent: emailSent,
+  };
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
-    const { token } = await req.json();
-    if (!token) {
-      return json({ error: 'MISSING_TOKEN' }, 400);
-    }
-
+    const body = await req.json().catch(() => ({}));
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // Retrouver le praticien via son token d'onboarding.
-    // On lit aussi actif et supersaas_agenda_url, necessaires pour la bascule.
-    const { data: praticien } = await supabase
-      .from('praticiens')
-      .select('id, prenom, email, actif, supersaas_agenda_url')
-      .eq('onboarding_token', token)
-      .single();
+    // Mode lot : synchronise tous les praticiens ayant un compte Stripe.
+    // Les deja actifs ne sont pas re-emailes (force reste false).
+    if (body.all === true) {
+      const { data: rows } = await supabase
+        .from('stripe_accounts')
+        .select('praticien_id');
 
-    // Token inconnu : la page affichera "lien invalide"
-    if (!praticien) {
-      return json({ found: false, completed: false }, 200);
-    }
-
-    // Compte Stripe rattache ?
-    const { data: sa } = await supabase
-      .from('stripe_accounts')
-      .select('stripe_account_id')
-      .eq('praticien_id', praticien.id)
-      .maybeSingle();
-
-    // Pas encore de compte : onboarding pas commence
-    if (!sa?.stripe_account_id) {
-      return json({ found: true, completed: false, prenom: praticien.prenom }, 200);
-    }
-
-    // Etat reel lu directement chez Stripe, sans dependre du webhook ni de la base.
-    const account = await stripe.accounts.retrieve(sa.stripe_account_id);
-    const chargesEnabled = account.charges_enabled ?? false;
-    const payoutsEnabled = account.payouts_enabled ?? false;
-    const detailsSubmitted = account.details_submitted ?? false;
-    const completed = chargesEnabled && detailsSubmitted;
-    const onboardingCompleted = chargesEnabled && payoutsEnabled && detailsSubmitted;
-
-    // On tient stripe_accounts a jour a chaque passage, sans dependre du webhook.
-    await supabase
-      .from('stripe_accounts')
-      .update({
-        charges_enabled: chargesEnabled,
-        payouts_enabled: payoutsEnabled,
-        details_submitted: detailsSubmitted,
-        onboarding_completed: onboardingCompleted,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('praticien_id', praticien.id);
-
-    // ---- Bascule : le compte est complet et le praticien n'est pas encore actif ----
-    // Le garde-fou "praticien.actif === false" garantit une seule activation et un
-    // seul mail, meme si la page appelle cette fonction plusieurs fois en polling.
-    if (onboardingCompleted && praticien.actif === false) {
-      const { error: activationError } = await supabase
-        .from('praticiens')
-        .update({ actif: true })
-        .eq('id', praticien.id);
-
-      if (activationError) {
-        console.error('Erreur activation praticien:', activationError.message);
-      } else if (praticien.email) {
-        await sendProfileActiveEmail(
-          praticien.prenom,
-          praticien.email,
-          praticien.supersaas_agenda_url || null
-        );
-        if (!praticien.supersaas_agenda_url) {
-          await notifyMissingAgenda(praticien.prenom, praticien.id);
+      const results = [];
+      for (const r of rows ?? []) {
+        try {
+          results.push(await syncOne(supabase, r.praticien_id, false));
+        } catch (e) {
+          results.push({ praticien_id: r.praticien_id, error: String(e) });
         }
       }
+      return json({ results }, 200);
     }
 
-    // Reponse au front : contrat inchange (found, completed, prenom).
-    return json({
-      found: true,
-      completed,
-      charges_enabled: chargesEnabled,
-      details_submitted: detailsSubmitted,
-      prenom: praticien.prenom,
-    }, 200);
-
+    // Mode unitaire.
+    if (!body.praticien_id) {
+      return json({ error: 'praticien_id requis (ou all: true)' }, 400);
+    }
+    const result = await syncOne(supabase, body.praticien_id, body.force === true);
+    return json(result, 200);
   } catch (err) {
-    return json({ error: 'SERVER_ERROR', details: String(err) }, 500);
+    return json({ error: 'Erreur serveur', details: String(err) }, 500);
   }
 });
 
-function json(body: unknown, status: number) {
-  return new Response(JSON.stringify(body), {
+function json(b: unknown, status: number) {
+  return new Response(JSON.stringify(b), {
     status,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
