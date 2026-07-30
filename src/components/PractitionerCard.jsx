@@ -79,9 +79,9 @@ export default function PractitionerCard({ praticien, practiceSlug }) {
               {lang === 'fr' ? 'En savoir plus' : 'Learn more'}
             </button>
           )}
-          {praticien.supersaas_schedule_id && praticien.charges_enabled ? (
+          {/* {praticien.supersaas_schedule_id && praticien.charges_enabled ? (
             <button
-              onClick={() => navigate(`/practices/${practiceSlug}/${praticien.slug}`)}
+              onClick={() => navigate(`/practices/${practiceSlug}/${praticien.slug}#offres`)}
               className="btn btn--violet-mid btn--sm"
             >
               {lang === 'fr' ? 'Réserver' : 'Book a session'}
@@ -90,7 +90,7 @@ export default function PractitionerCard({ praticien, practiceSlug }) {
             <span className="pract-card__coming-soon">
               {lang === 'fr' ? 'Bientôt disponible' : 'Coming soon'}
             </span>
-          )}
+          )} */}
         </div>
       </div>
     </div>

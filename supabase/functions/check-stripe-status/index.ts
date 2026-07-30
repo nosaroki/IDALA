@@ -132,7 +132,7 @@ Deno.serve(async (req) => {
     // On lit aussi actif et supersaas_agenda_url, necessaires pour la bascule.
     const { data: praticien } = await supabase
       .from('praticiens')
-      .select('id, prenom, email, actif, supersaas_agenda_url')
+      .select('id, prenom, email, actif, welcome_email_sent, supersaas_agenda_url')
       .eq('onboarding_token', token)
       .single();
 
@@ -173,18 +173,31 @@ Deno.serve(async (req) => {
       })
       .eq('praticien_id', praticien.id);
 
-    // ---- Bascule : le compte est complet et le praticien n'est pas encore actif ----
-    // Le garde-fou "praticien.actif === false" garantit une seule activation et un
-    // seul mail, meme si la page appelle cette fonction plusieurs fois en polling.
+    // ---- Activation : le compte est complet et le praticien n'est pas encore actif ----
     if (onboardingCompleted && praticien.actif === false) {
       const { error: activationError } = await supabase
         .from('praticiens')
         .update({ actif: true })
         .eq('id', praticien.id);
-
       if (activationError) {
         console.error('Erreur activation praticien:', activationError.message);
-      } else if (praticien.email) {
+      }
+    }
+
+    // ---- Mail de bienvenue : une seule fois, base sur welcome_email_sent, pas sur actif ----
+    // On bascule welcome_email_sent de false a true de facon atomique. Si la mise a jour
+    // touche une ligne, c'est nous qui l'avons fait passer, donc on envoie. Si elle n'en
+    // touche aucune, le mail est deja parti, on n'envoie pas de doublon. Ce verrou tient
+    // meme quand la page appelle cette fonction plusieurs fois en polling.
+    if (onboardingCompleted && praticien.welcome_email_sent === false) {
+      const { data: flipped } = await supabase
+        .from('praticiens')
+        .update({ welcome_email_sent: true })
+        .eq('id', praticien.id)
+        .eq('welcome_email_sent', false)
+        .select('id');
+
+      if (flipped && flipped.length > 0 && praticien.email) {
         await sendProfileActiveEmail(
           praticien.prenom,
           praticien.email,

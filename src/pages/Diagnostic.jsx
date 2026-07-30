@@ -8,7 +8,7 @@ import Footer from '../components/Footer'
 const SUPABASE_FN = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-const DIAGNOSTIC_SCHEDULE_ID = '841586'
+const DIAGNOSTIC_SCHEDULE_ID = '840661'
 const DIAGNOSTIC_DURATION = 20
 
 export default function Diagnostic() {

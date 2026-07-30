@@ -7,9 +7,6 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const SUPERSAAS_API_KEY = Deno.env.get('SUPERSAAS_API_KEY')!;
 const SUPERSAAS_ACCOUNT = Deno.env.get('SUPERSAAS_ACCOUNT')!;
 
-// Commission Idala : 15%
-const PLATFORM_FEE_PERCENT = 15;
-
 const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2024-06-20',
   httpClient: Stripe.createFetchHttpClient(),
@@ -37,7 +34,7 @@ Deno.serve(async (req) => {
       lang,
     } = await req.json();
 
-    // ---- Validation des entrées ----
+    // ---- Validation des entrees ----
     if (!praticien_id || !pratique_id || !offre_id || !scheduled_at || !client_name || !client_email) {
       return jsonResponse({ error: 'Champs requis manquants' }, 400);
     }
@@ -59,20 +56,21 @@ Deno.serve(async (req) => {
       ? offre.praticien_pratiques[0]
       : offre.praticien_pratiques;
     if (!ppRel || ppRel.praticien_id !== praticien_id || ppRel.pratique_id !== pratique_id) {
-      return jsonResponse({ error: 'Offre incohérente avec le praticien' }, 400);
+      return jsonResponse({ error: 'Offre incoherente avec le praticien' }, 400);
     }
 
     if (!offre.prix || offre.prix <= 0) {
       return jsonResponse({ error: 'Prix invalide pour cette offre' }, 400);
     }
     if (!offre.mode_seance) {
-      return jsonResponse({ error: 'Mode de séance manquant pour cette offre' }, 400);
+      return jsonResponse({ error: 'Mode de seance manquant pour cette offre' }, 400);
     }
 
     const priceCents = Math.round(Number(offre.prix) * 100);
-    const feeCents = Math.round(priceCents * PLATFORM_FEE_PERCENT / 100);
+    // Les frais (feeCents) sont calcules plus bas, une fois le taux de commission
+    // du praticien lu en base. On ne les calcule plus ici avec un taux fixe.
 
-    // ---- 2. Vérifier que le praticien peut ENCAISSER ----
+    // ---- 2. Verifier que le praticien peut ENCAISSER ----
     const { data: stripeAccount, error: saErr } = await supabase
       .from('stripe_accounts')
       .select('stripe_account_id, charges_enabled')
@@ -80,7 +78,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (saErr || !stripeAccount) {
-      return jsonResponse({ error: 'Le praticien n\'a pas de compte de paiement configuré' }, 400);
+      return jsonResponse({ error: 'Le praticien n\'a pas de compte de paiement configure' }, 400);
     }
     if (!stripeAccount.charges_enabled) {
       return jsonResponse({
@@ -89,16 +87,25 @@ Deno.serve(async (req) => {
       }, 403);
     }
 
-    // ---- 2bis. Vérifier que le CRÉNEAU est toujours LIBRE ----
-    // IMPORTANT : ici on compare en heure BRUTE de Paris des deux côtés (scheduled_at
-    // reçu du front et créneaux libres de SuperSaaS). On ne convertit surtout PAS ici,
-    // sinon la comparaison se désynchronise.
+    // ---- 2bis. Lire le praticien : agenda + taux de commission ----
     const { data: prat } = await supabase
       .from('praticiens')
-      .select('supersaas_schedule_id')
+      .select('supersaas_schedule_id, commission_rate')
       .eq('id', praticien_id)
       .single();
 
+    // Taux de commission du praticien, lu en base. Defaut 0.15 si absent.
+    // commission_rate est stocke en fraction : 0.15 = 15%, 0 = aucune commission.
+    const commissionRate = prat?.commission_rate != null ? Number(prat.commission_rate) : 0.15;
+
+    // Frais preleves par Idala, calcules avec le taux du praticien.
+    // Diane a 0 donnera feeCents = 0, donc elle encaisse l'integralite.
+    const feeCents = Math.round(priceCents * commissionRate);
+
+    // ---- 2ter. Verifier que le CRENEAU est toujours LIBRE ----
+    // IMPORTANT : ici on compare en heure BRUTE de Paris des deux cotes (scheduled_at
+    // recu du front et creneaux libres de SuperSaaS). On ne convertit surtout PAS ici,
+    // sinon la comparaison se desynchronise.
     if (prat?.supersaas_schedule_id) {
       const durationMin = offre.duree ? parseInt(String(offre.duree), 10) : 60;
       const wantedTime = new Date(scheduled_at).getTime();
@@ -128,16 +135,16 @@ Deno.serve(async (req) => {
           }
         }
       } catch (e) {
-        console.error('Erreur vérification créneau SuperSaaS:', String(e));
+        console.error('Erreur verification creneau SuperSaaS:', String(e));
       }
     }
 
-    // ---- 3. Convertir le créneau (heure de Paris) en instant UTC ----
-    // C'est le SEUL endroit où on convertit : la valeur devient un vrai instant,
-    // stockée telle quelle par le webhook. Tout le reste en aval formate en Europe/Paris.
+    // ---- 3. Convertir le creneau (heure de Paris) en instant UTC ----
+    // C'est le SEUL endroit ou on convertit : la valeur devient un vrai instant,
+    // stockee telle quelle par le webhook. Tout le reste en aval formate en Europe/Paris.
     const scheduledAtUTC = parisToUTC(scheduled_at);
 
-    // ---- 4. Créer le PaymentIntent en DIRECT CHARGE + application_fee ----
+    // ---- 4. Creer le PaymentIntent en DIRECT CHARGE + application_fee ----
     const paymentIntent = await stripe.paymentIntents.create(
       {
         amount: priceCents,
@@ -157,6 +164,7 @@ Deno.serve(async (req) => {
           mode_seance: offre.mode_seance,
           price_cents: String(priceCents),
           fee_cents: String(feeCents),
+          commission_rate: String(commissionRate),
           platform: 'idala',
         },
       },
@@ -179,7 +187,7 @@ Deno.serve(async (req) => {
 });
 
 // Convertit une heure locale de Paris ("2026-07-16T19:30") en instant UTC ISO.
-// Calcule le décalage réel de Paris pour la date (été +02:00, hiver +01:00).
+// Calcule le decalage reel de Paris pour la date (ete +02:00, hiver +01:00).
 function parisToUTC(local: string): string {
   const clean = local.replace(' ', 'T').slice(0, 16);
   const guess = new Date(clean + ':00Z');

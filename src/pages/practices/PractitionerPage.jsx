@@ -98,6 +98,14 @@ export default function PractitionerPage() {
       })
       setPratique(ppData?.pratiques || data.pratiques)
       setLoading(false)
+      setLoading(false)
+
+      // Si on arrive avec l'intention de réserver, on descend vers les offres
+      if (window.location.hash.includes('offres')) {
+        setTimeout(() => {
+          document.getElementById('offres')?.scrollIntoView({ behavior: 'smooth' })
+        }, 300)
+      }
     }
     fetchData()
   }, [practitionerSlug, practiceSlug])
@@ -220,7 +228,7 @@ const praticienOnboarded = praticien.supersaas_schedule_id && praticien.charges_
             )} */}
 
               {praticien.offres?.length > 0 && (
-                <div className="pract-profile__offres">
+                <div className="pract-profile__offres" id="offres">
                   <p className="pract-profile__offres-title">
                     {lang === 'fr' ? 'Offres & tarifs' : 'Offers & pricing'}
                   </p>

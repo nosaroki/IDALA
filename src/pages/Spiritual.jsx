@@ -1,28 +1,67 @@
 import { useLang } from '../components/LangContext';
-import { useNavigate } from 'react-router-dom';import { Helmet } from 'react-helmet-async';
+import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import Footer from '../components/Footer';
 import tarotOrb from '../assets/tarot2.webp'
 import OptimizedImage from '../components/OptimizedImage'
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
+const DIANE_SLUG = 'diane-emmanuelle-tho'
 
 function Spiritual() {
   const { lang } = useLang();
   const navigate = useNavigate();
 
   const [dianeReservable, setDianeReservable] = useState(false)
+  // Offres guidance de Diane, retrouvees par leur duree (30 min et 60 min),
+  // au lieu d'ids ecrits en dur qui cassent si l'offre est recreee.
+  const [offre30, setOffre30] = useState(null)
+  const [offre60, setOffre60] = useState(null)
 
   useEffect(() => {
-    async function checkDiane() {
-      const { data } = await supabase.rpc('praticien_reservable', {
-        p_slug: 'diane-emmanuelle-tho',
+    async function load() {
+      // 1. Diane est-elle reservable (Stripe complet plus agenda) ?
+      const { data: reservable } = await supabase.rpc('praticien_reservable', {
+        p_slug: DIANE_SLUG,
       })
-      setDianeReservable(data === true)
+      setDianeReservable(reservable === true)
+
+      // 2. Recuperer ses offres de guidance, via la meme fonction a droits eleves
+      //    que le reste du site, pour ne pas dependre de la RLS cote anonyme.
+      const { data: offres } = await supabase.rpc('get_offres_by_praticien_slug', {
+        p_slug: DIANE_SLUG,
+      })
+
+      const list = offres || []
+      // On repere par la duree, critere stable et deja affiche sur les cartes.
+      const find = (min) => list.find(
+        (o) => parseInt(o.duree, 10) === min && o.prix && o.mode_seance
+      ) || null
+      setOffre30(find(30))
+      setOffre60(find(60))
     }
-    checkDiane()
+    load()
   }, [])
- 
+
+  // Un bouton n'est actif que si Diane est reservable et que l'offre existe vraiment.
+  function renderCta(offre) {
+    if (dianeReservable && offre) {
+      return (
+        <button
+          className="btn btn--violet-mid"
+          onClick={() => navigate(`/reservation/${DIANE_SLUG}/guidance/${offre.id}`)}
+        >
+          {lang === 'fr' ? 'Réserver' : 'Book a session'}
+        </button>
+      )
+    }
+    return (
+      <span className="pract-card__coming-soon">
+        {lang === 'fr' ? 'Bientôt disponible' : 'Coming soon'}
+      </span>
+    )
+  }
 
   return (
     <>
@@ -93,9 +132,6 @@ function Spiritual() {
 
             {/* Lecture ciblée 30 min */}
             <div className="spiritual-card spiritual-card--c7">
-              {/* <div className="spiritual-card__image">
-                <OptimizedImage src={tarotImg} alt={lang === 'fr' ? 'Lecture ciblée' : 'Focused reading'} />
-              </div> */}
               <div className="spiritual-card__content">
                 <div className="spiritual-card__duration">30 min</div>
                 <h3 className="spiritual-card__title">
@@ -133,27 +169,13 @@ function Spiritual() {
                     : 'Ideal for a quick, clear answer focused on a specific topic.'}
                 </p>
                 <div className="spiritual-card__cta">
-                  {dianeReservable ? (
-                    <button
-                      className="btn btn--violet-mid"
-                      onClick={() => navigate('/reservation/diane-emmanuelle-tho/guidance/4e7c4d7d-d46b-45ef-8cb7-d9d5bd5f166e')}
-                    >
-                      {lang === 'fr' ? 'Réserver' : 'Book a session'}
-                    </button>
-                  ) : (
-                    <span className="pract-card__coming-soon">
-                      {lang === 'fr' ? 'Bientôt disponible' : 'Coming soon'}
-                    </span>
-                  )}
+                  {renderCta(offre30)}
                 </div>
               </div>
             </div>
 
             {/* Lecture complète 60 min */}
             <div className="spiritual-card spiritual-card--c5">
-              {/* <div className="spiritual-card__image">
-                <OptimizedImage src={psychicImg} alt={lang === 'fr' ? 'Lecture complète' : 'Full reading'} />
-              </div> */}
               <div className="spiritual-card__content">
                 <div className="spiritual-card__duration">60 min</div>
                 <h3 className="spiritual-card__title">
@@ -193,18 +215,7 @@ function Spiritual() {
                     : 'Recommended to step back on a life period and benefit from more complete support.'}
                 </p>
                 <div className="spiritual-card__cta">
-                  {dianeReservable ? (
-                    <button
-                      className="btn btn--violet-mid"
-                      onClick={() => navigate('/reservation/diane-emmanuelle-tho/guidance/22b102b5-d120-40dc-bd1f-403f852d2285')}
-                    >
-                      {lang === 'fr' ? 'Réserver' : 'Book a session'}
-                    </button>
-                  ) : (
-                    <span className="pract-card__coming-soon">
-                      {lang === 'fr' ? 'Bientôt disponible' : 'Coming soon'}
-                    </span>
-                  )}
+                  {renderCta(offre60)}
                 </div>
               </div>
             </div>

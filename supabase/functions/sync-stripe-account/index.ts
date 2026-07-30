@@ -138,7 +138,7 @@ async function syncOne(supabase: any, praticienId: string, force = false) {
 
   const { data: prat } = await supabase
     .from('praticiens')
-    .select('prenom, email, actif, supersaas_agenda_url')
+    .select('prenom, email, actif, welcome_email_sent, supersaas_agenda_url')
     .eq('id', praticienId)
     .single();
 
@@ -157,12 +157,32 @@ async function syncOne(supabase: any, praticienId: string, force = false) {
   let activated = false;
   let emailSent = false;
 
-  if (onboardingCompleted && (!wasActive || force)) {
-    if (!wasActive) {
-      await supabase.from('praticiens').update({ actif: true }).eq('id', praticienId);
-      activated = true;
+  // Activation si le compte est complet et le praticien pas encore actif.
+  if (onboardingCompleted && !wasActive) {
+    await supabase.from('praticiens').update({ actif: true }).eq('id', praticienId);
+    activated = true;
+  }
+
+  // Mail de bienvenue : une seule fois via welcome_email_sent.
+  // force = true reenvoie meme si le mail est deja parti (usage admin, rattrapage).
+  // Sinon, verrou atomique : on ne l'envoie que si on fait passer le flag de false a true.
+  if (onboardingCompleted && prat?.email) {
+    let shouldSend = false;
+
+    if (force) {
+      shouldSend = true;
+      await supabase.from('praticiens').update({ welcome_email_sent: true }).eq('id', praticienId);
+    } else {
+      const { data: flipped } = await supabase
+        .from('praticiens')
+        .update({ welcome_email_sent: true })
+        .eq('id', praticienId)
+        .eq('welcome_email_sent', false)
+        .select('id');
+      shouldSend = !!(flipped && flipped.length > 0);
     }
-    if (prat?.email) {
+
+    if (shouldSend) {
       await sendProfileActiveEmail(prat.prenom, prat.email, prat.supersaas_agenda_url || null);
       emailSent = true;
       if (!prat.supersaas_agenda_url) {

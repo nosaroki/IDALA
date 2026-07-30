@@ -187,14 +187,13 @@ function followupClientHTML(p: {
       ${FONT_IMPORT}
       <div style="font-family: ${BODY_FONT}; max-width: 560px; margin: 0 auto; color: #2b2b2b; line-height: 1.6;">
         <h2 style="font-family: ${TITLE_FONT}; color: #6b4a8a; font-weight: 500;">A little word after your session</h2>
-        <p>Hi ${p.clientPrenom},</p>
-        <p>I hope your ${p.sessionType} session with ${p.praticienPrenom} yesterday brought you what you were looking for.</p>
-        <p>If you enjoyed the experience, a Google review would help us a lot to reach other people in search of care.</p>
+        <p>Hello ${p.clientPrenom},</p>
+        <p>I hope your session with ${p.praticienPrenom} went well.</p>
+        <p>Feel free to leave us a Google review, it would help a great deal in making Idala known.</p>
         <p style="text-align: center; margin: 32px 0;">
           <a href="${GOOGLE_REVIEW_URL}" style="font-family: ${BODY_FONT}; background: #6b4a8a; color: white; padding: 12px 28px; text-decoration: none; border-radius: 6px; display: inline-block;">Leave a review</a>
         </p>
-        <p>Thank you, see you soon.</p>
-        <p style="color: #888; font-size: 13px;">The Idala team</p>
+        <p style="margin-top: 32px;">With love and kindness,<br>Idala</p>
       </div>
     `;
   }
@@ -203,13 +202,12 @@ function followupClientHTML(p: {
     <div style="font-family: ${BODY_FONT}; max-width: 560px; margin: 0 auto; color: #2b2b2b; line-height: 1.6;">
       <h2 style="font-family: ${TITLE_FONT}; color: #6b4a8a; font-weight: 500;">Un petit mot après votre séance</h2>
       <p>Bonjour ${p.clientPrenom},</p>
-      <p>J'espère que votre séance de ${p.sessionType} avec ${p.praticienPrenom} hier vous a apporté ce que vous cherchiez.</p>
-      <p>Si vous avez apprécié ce moment, un avis Google nous aiderait beaucoup à faire connaître Idala à d'autres personnes en recherche.</p>
+      <p>J'espère que votre séance avec ${p.praticienPrenom} s'est bien passée.</p>
+      <p>N'hésitez pas à nous laisser un avis Google, cela aiderait grandement à faire connaître Idala.</p>
       <p style="text-align: center; margin: 32px 0;">
         <a href="${GOOGLE_REVIEW_URL}" style="font-family: ${BODY_FONT}; background: #6b4a8a; color: white; padding: 12px 28px; text-decoration: none; border-radius: 6px; display: inline-block;">Laisser un avis</a>
       </p>
-      <p>Merci, à très vite.</p>
-      <p style="color: #888; font-size: 13px;">L'équipe Idala</p>
+      <p style="margin-top: 32px;">Avec amour et bienveillance,<br>Idala</p>
     </div>
   `;
 }
