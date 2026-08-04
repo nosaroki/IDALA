@@ -4,6 +4,7 @@
 
 import { useLang } from '../components/LangContext';
 import { useNavigate } from 'react-router-dom';
+import { useCookieConsent } from '../cookies/CookieConsentProvider';
 
 const InstagramIcon = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -14,8 +15,9 @@ const InstagramIcon = () => (
 );
 
 function Footer() {
-  const { lang }   = useLang();
-  const navigate   = useNavigate();
+  const { lang }       = useLang();
+  const navigate       = useNavigate();
+  const { reopenBanner } = useCookieConsent();
 
   return (
     <footer className="site-footer">
@@ -49,6 +51,10 @@ function Footer() {
         <a href="mailto:contact@theidalafamily.com" className="footer-link">
           Contact
         </a>
+        <span className="footer-sep">·</span>
+        <button onClick={reopenBanner} className="footer-link">
+          {lang === 'fr' ? 'Gérer les cookies' : 'Manage cookies'}
+        </button>
       </nav>
 
       {/* Bas : copyright */}

@@ -1,0 +1,155 @@
+/* CookieBanner.css
+   Banniere de consentement Idala.
+   Reprend l'univers du site : lavande, degrade chakra, Cormorant Garamond + Jost.
+   Les polices sont deja importees globalement par le site. */
+
+.cookie-banner {
+  --cb-violet: #7a4fa0;
+  --cb-violet-deep: #3e295d;
+  --cb-text: #281745;
+  --cb-text-soft: #413459;
+  --cb-bg: #ffffff;
+  --cb-radius: 18px;
+
+  /* Coin bas gauche (pour eviter la diagnostic bubble a droite).
+     Pour repasser a droite : right: 24px; left: auto. */
+  position: fixed;
+  left: 24px;
+  right: auto;
+  bottom: 24px;
+  width: min(380px, calc(100vw - 48px));
+
+  background: var(--cb-bg);
+  color: var(--cb-text);
+  border-radius: var(--cb-radius);
+  box-shadow: 0 22px 60px rgba(62, 41, 93, 0.22);
+  overflow: hidden; /* pour que la barre chakra epouse les coins arrondis */
+  z-index: 9999;
+  will-change: transform;
+  animation: cb-rise 0.5s ease-out both, cb-float 7s ease-in-out 0.5s infinite;
+}
+
+/* Barre degrade chakra en haut de la box (les 7 couleurs du site). */
+.cookie-banner__chakra {
+  display: block;
+  height: 5px;
+  background: linear-gradient(
+    90deg,
+    #ff6b6b,
+    #ff9a3c,
+    #ffd600,
+    #3dcc70,
+    #3aa8e0,
+    #7b4fd8,
+    #c060e0
+  );
+}
+
+.cookie-banner__content {
+  padding: 22px 24px 24px;
+}
+
+.cookie-banner__title {
+  margin: 0 0 10px;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--cb-violet-deep);
+}
+
+.cookie-banner__text {
+  margin: 0 0 18px;
+  font-family: 'Jost', system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--cb-text-soft);
+}
+
+.cookie-banner__actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Meme taille pour les deux : le refus est aussi simple que l'acceptation (CNIL). */
+.cookie-banner__btn {
+  flex: 1 1 0;
+  padding: 11px 16px;
+  font-family: 'Jost', system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.25s ease, color 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.cookie-banner__btn--accept {
+  border: 1px solid var(--cb-violet-deep);
+  background: var(--cb-violet-deep);
+  color: #ffffff;
+}
+
+.cookie-banner__btn--accept:hover {
+  background: var(--cb-violet);
+  border-color: var(--cb-violet);
+}
+
+.cookie-banner__btn--refuse {
+  border: 1px solid var(--cb-violet);
+  background: transparent;
+  color: var(--cb-violet);
+}
+
+.cookie-banner__btn--refuse:hover {
+  background: rgba(122, 79, 160, 0.08);
+}
+
+.cookie-banner__btn:focus-visible {
+  outline: 3px solid rgba(122, 79, 160, 0.4);
+  outline-offset: 2px;
+}
+
+@keyframes cb-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes cb-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cookie-banner {
+    animation: none;
+  }
+  .cookie-banner__btn {
+    transition: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .cookie-banner {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    width: auto;
+  }
+  .cookie-banner__actions {
+    flex-direction: column;
+  }
+}

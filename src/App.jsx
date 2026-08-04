@@ -32,6 +32,10 @@ import Seance from './pages/Seance';
 import OnboardingPaymentReturn from './pages/OnboardingPaymentReturn'
 import OnboardingPaymentRefresh from './pages/OnboardingPaymentRefresh'
 import ModifyReservation from './pages/ModifyReservation'
+import DiagnosticSeance from './pages/DiagnosticSeance'
+import { CookieConsentProvider } from './cookies/CookieConsentProvider';
+import CookieBanner from './cookies/CookieBanner';
+
 
 import { HelmetProvider } from 'react-helmet-async';
 import './styles.css';
@@ -69,6 +73,9 @@ export default function App() {
     <HelmetProvider>
       <LangCtx.Provider value={{ lang, setLang }}>
         <HashRouter>
+          <CookieConsentProvider>
+          <CookieBanner />
+        
           <ScrollToTop />
           {showLoader && (
             <div className={`loader${fading ? ' fade-out' : ''}`}>
@@ -94,6 +101,7 @@ export default function App() {
                <Route path="/diagnostic" element={<Diagnostic />} />
                <Route path="/seance/:sessionId" element={<Seance />} />
                <Route path="/modifier/:token" element={<ModifyReservation />} />
+               <Route path="/diagnostic-seance" element={<DiagnosticSeance />} />
 
 
             <Route element={<Layout />}>
@@ -113,6 +121,7 @@ export default function App() {
               <Route path="/cgu" element={<CGU />} />
             </Route>
           </Routes>
+          </CookieConsentProvider>  
         </HashRouter>
       </LangCtx.Provider>
     </HelmetProvider>

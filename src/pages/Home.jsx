@@ -92,14 +92,6 @@ function Home() {
       <div className="page-wrap">
         <section className="home-hero">
           <div className="home-hero__inner">
-            <div className="home-hero__left">
-              <div className="home-hero__logo-wrap">
-                <img src={newlogo} alt="The Idala Family" className="home-hero__logo" />
-              </div>
-              <p className="home-hero__tagline">
-                {lang === 'fr' ? 'Corps · Esprit · Énergie' : 'Body · Mind · Energy'}
-              </p>
-            </div>
             
             <div className="home-hero__content">
               <h1 className="home-hero__headline">
@@ -144,6 +136,31 @@ function Home() {
                 {lang === 'fr' ? 'Découvrez les praticiens' : 'Discover our practitioners'}
               </button>
             </div>
+             <div className="home-hero__left">
+              <div className="home-hero__logo-wrap">
+                <img src={newlogo} alt="The Idala Family" className="home-hero__logo" />
+              </div>
+              <p className="home-hero__tagline">
+                {lang === 'fr' ? 'Corps · Esprit · Énergie' : 'Body · Mind · Energy'}
+              </p>
+            </div>
+          </div>
+        </section>
+
+                {/* ── FRISE PRATICIENS ── */}
+        <section className="home-practitioners-strip reveal" ref={refStrip}>
+          <div className="home-practitioners-strip__track">
+            {[...Array(2)].map((_, pass) => (
+              <div key={pass} className="home-practitioners-strip__row">
+                <OptimizedImage src={gogong} alt="Qi Gong" onClick={() => navigate('/practices/qi-gong')} style={{ cursor: 'pointer' }} />
+                <OptimizedImage src={ladyyoga} alt="Yoga" onClick={() => navigate('/practices/yoga')} style={{ cursor: 'pointer' }} />
+                <OptimizedImage src={taichilady} alt="Tai Chi" onClick={() => navigate('/practices/tai-chi')} style={{ cursor: 'pointer' }} />
+                {/* <OptimizedImage src={acu} alt="Acupuncture" onClick={() => navigate('/practices/acupuncture')} style={{ cursor: 'pointer' }} /> */}
+                <OptimizedImage src={gobowl} alt="Sound Healing" onClick={() => navigate('/practices/sound-healing')} style={{ cursor: 'pointer' }} />
+                <OptimizedImage src={breathwork} alt="Breathwork" onClick={() => navigate('/practices/breathwork')} style={{ cursor: 'pointer' }} />
+                <OptimizedImage src={facemedit} alt="Meditation" onClick={() => navigate('/practices/meditation')} style={{ cursor: 'pointer' }} />
+              </div>
+            ))}
           </div>
         </section>
 
@@ -179,23 +196,6 @@ function Home() {
                 </>
               )}
             </div>
-          </div>
-        </section>
-
-        {/* ── FRISE PRATICIENS ── */}
-        <section className="home-practitioners-strip reveal" ref={refStrip}>
-          <div className="home-practitioners-strip__track">
-            {[...Array(2)].map((_, pass) => (
-              <div key={pass} className="home-practitioners-strip__row">
-                <OptimizedImage src={gogong} alt="Qi Gong" onClick={() => navigate('/practices/qi-gong')} style={{ cursor: 'pointer' }} />
-                <OptimizedImage src={ladyyoga} alt="Yoga" onClick={() => navigate('/practices/yoga')} style={{ cursor: 'pointer' }} />
-                <OptimizedImage src={taichilady} alt="Tai Chi" onClick={() => navigate('/practices/tai-chi')} style={{ cursor: 'pointer' }} />
-                {/* <OptimizedImage src={acu} alt="Acupuncture" onClick={() => navigate('/practices/acupuncture')} style={{ cursor: 'pointer' }} /> */}
-                <OptimizedImage src={gobowl} alt="Sound Healing" onClick={() => navigate('/practices/sound-healing')} style={{ cursor: 'pointer' }} />
-                <OptimizedImage src={breathwork} alt="Breathwork" onClick={() => navigate('/practices/breathwork')} style={{ cursor: 'pointer' }} />
-                <OptimizedImage src={facemedit} alt="Meditation" onClick={() => navigate('/practices/meditation')} style={{ cursor: 'pointer' }} />
-              </div>
-            ))}
           </div>
         </section>
 
