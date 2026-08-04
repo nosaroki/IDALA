@@ -507,6 +507,25 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
   align-items: flex-end;
   gap: 12px;
   flex-direction: row-reverse;
+  /* Etat initial : hors ecran a droite. Glisse en place avec .is-visible. */
+  transform: translateX(calc(100% + 60px));
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.diagnostic-bubble.is-visible {
+  animation: bubble-slide-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes bubble-slide-in {
+  from {
+    transform: translateX(calc(100% + 60px));
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .diagnostic-bubble__trigger-wrap {
@@ -761,6 +780,12 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .diagnostic-bubble {
+    transform: none;
+    opacity: 1;
+    animation: none;
+  }
+
   .diagnostic-bubble__ripple {
     animation: none;
     opacity: 0;
@@ -1008,19 +1033,30 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 .testimonials-wrap { background: var(--pale); padding: 64px 0; border-top: 1px solid rgba(155,110,191,.15); overflow: hidden; }
 .testimonials-header { text-align: center; padding: 0 var(--px); margin-bottom: 48px; }
 .testimonials-track-outer { overflow: hidden; }
-.testimonials-track { display: flex; gap: 24px; padding: 0 var(--px) 16px; animation: scroll-left 44s linear infinite; width: max-content; }
+.testimonials-track { display: flex; gap: 24px; padding: 0 var(--px) 16px; animation: scroll-left 80s linear infinite; width: max-content; }
 .testimonials-track:hover { animation-play-state: paused; }
 @keyframes scroll-left {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
-.tcard { flex-shrink: 0; width: clamp(240px,28vw,340px); background: white; padding: 28px; border-left: 3px solid var(--c6); box-shadow: var(--shadow-sm); border-radius: 8px; }
+.tcard {
+  height: 380px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  flex-shrink: 0; width: clamp(240px,28vw,340px); background: white; padding: 28px; border-left: 3px solid var(--c6); box-shadow: var(--shadow-sm); border-radius: 8px;
+}
 .tcard:nth-child(6n+2) { border-left-color: var(--c4); }
 .tcard:nth-child(6n+3) { border-left-color: var(--c2); }
 .tcard:nth-child(6n+4) { border-left-color: var(--c5); }
 .tcard:nth-child(6n+5) { border-left-color: var(--c7); }
 .tcard:nth-child(6n+6) { border-left-color: var(--c3); }
-.tcard-text { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-style: italic; line-height: 1.85; color: var(--text); margin-bottom: 18px; }
+.tcard-text { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-style: italic; line-height: 1.85; color: var(--text); margin-bottom: 18px;   display: -webkit-box;
+  /* -webkit-line-clamp: 5;  
+  -webkit-box-orient: vertical; */
+  overflow: hidden;
+  text-overflow: ellipsis; }
 .tcard-author { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--violet-mid); }
 .tcard-controls { display: flex; justify-content: center; gap: 12px; margin-top: 32px; }
 .tcard-btn { width: 42px; height: 42px; border: 1px solid var(--violet-light); background: white; display: flex; align-items: center; justify-content: center; font-size: 17px; color: var(--violet-mid); transition: all var(--transition); cursor: pointer; border-radius: 8px; }

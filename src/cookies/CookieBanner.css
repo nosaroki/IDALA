@@ -1,7 +1,7 @@
 /* CookieBanner.css
    Banniere de consentement Idala.
-   Reprend l'univers du site : lavande, degrade chakra, Cormorant Garamond + Jost.
-   Les polices sont deja importees globalement par le site. */
+   Lavande, degrade chakra, Cormorant Garamond + Jost (polices deja globales).
+   Entree : glisse depuis le bas de l'ecran apres le loader d'accueil. */
 
 .cookie-banner {
   --cb-violet: #7a4fa0;
@@ -11,8 +11,7 @@
   --cb-bg: #ffffff;
   --cb-radius: 18px;
 
-  /* Coin bas gauche (pour eviter la diagnostic bubble a droite).
-     Pour repasser a droite : right: 24px; left: auto. */
+  /* Coin bas gauche. Pour repasser a droite : right: 24px; left: auto. */
   position: fixed;
   left: 24px;
   right: auto;
@@ -25,8 +24,17 @@
   box-shadow: 0 22px 60px rgba(62, 41, 93, 0.22);
   overflow: hidden; /* pour que la barre chakra epouse les coins arrondis */
   z-index: 9999;
-  will-change: transform;
-  animation: cb-rise 0.5s ease-out both, cb-float 7s ease-in-out 0.5s infinite;
+  will-change: transform, opacity;
+
+  /* Etat initial : hors ecran, en bas. La box ne glisse vers le haut
+     que lorsque le composant ajoute la classe .is-visible (apres le loader). */
+  transform: translateY(calc(100% + 40px));
+  opacity: 0;
+}
+
+.cookie-banner.is-visible {
+  animation: cb-slide-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    cb-float 7s ease-in-out 0.7s infinite;
 }
 
 /* Barre degrade chakra en haut de la box (les 7 couleurs du site). */
@@ -112,14 +120,14 @@
   outline-offset: 2px;
 }
 
-@keyframes cb-rise {
+@keyframes cb-slide-in {
   from {
+    transform: translateY(calc(100% + 40px));
     opacity: 0;
-    transform: translateY(16px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
+    opacity: 1;
   }
 }
 
@@ -133,15 +141,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .cookie-banner {
-    animation: none;
-  }
-  .cookie-banner__btn {
-    transition: none;
-  }
-}
-
 @media (max-width: 480px) {
   .cookie-banner {
     left: 16px;
@@ -151,5 +150,20 @@
   }
   .cookie-banner__actions {
     flex-direction: column;
+  }
+}
+
+/* Accessibilite : pas d'animation, la box est simplement visible. */
+@media (prefers-reduced-motion: reduce) {
+  .cookie-banner {
+    transform: none;
+    opacity: 1;
+    animation: none;
+  }
+  .cookie-banner.is-visible {
+    animation: none;
+  }
+  .cookie-banner__btn {
+    transition: none;
   }
 }
