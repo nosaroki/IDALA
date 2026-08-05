@@ -32,6 +32,14 @@ Deno.serve(async (req) => {
       client_name,
       client_email,
       lang,
+      client_adresse,
+      client_code_postal,
+      client_ville,
+      client_digicode,
+      client_interphone,
+      client_etage,
+      client_complement,
+      
     } = await req.json();
 
     // ---- Validation des entrees ----
@@ -162,6 +170,13 @@ Deno.serve(async (req) => {
           duree_seance: String(offre.duree ?? ''),
           max_participants: String(offre.max_participants ?? 1),
           mode_seance: offre.mode_seance,
+          client_adresse:     client_adresse     ?? '',
+          client_code_postal: client_code_postal ?? '',
+          client_ville:       client_ville       ?? '',
+          client_digicode:    client_digicode    ?? '',
+          client_interphone:  client_interphone  ?? '',
+          client_etage:       client_etage       ?? '',
+          client_complement:  client_complement  ?? '',
           price_cents: String(priceCents),
           fee_cents: String(feeCents),
           commission_rate: String(commissionRate),

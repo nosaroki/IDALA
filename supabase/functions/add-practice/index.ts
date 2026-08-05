@@ -19,7 +19,7 @@ serve(async (req) => {
   }
 
   try {
-    const { praticien_id, pratiques_details, lang } = await req.json()
+    const { praticien_id, pratiques_details, lang, cabinet } = await req.json()
 
     if (!praticien_id || !pratiques_details) {
       return json({ error: 'MISSING_FIELDS' }, 400)
@@ -39,6 +39,23 @@ serve(async (req) => {
 
     if (pErr || !praticien) {
       return json({ error: 'PRACTITIONER_NOT_FOUND' }, 404)
+    }
+
+    // ---- Adresse cabinet : écrite si fournie (le formulaire ne l'envoie
+    // que si le praticien n'en a pas déjà une). ----
+    if (cabinet && cabinet.adresse) {
+      await supabase
+        .from('praticiens')
+        .update({
+          cabinet_adresse:     cabinet.adresse     || null,
+          cabinet_code_postal: cabinet.code_postal || null,
+          cabinet_ville:       cabinet.ville       || null,
+          cabinet_digicode:    cabinet.digicode    || null,
+          cabinet_interphone:  cabinet.interphone  || null,
+          cabinet_etage:       cabinet.etage        || null,
+          cabinet_complement:  cabinet.complement  || null,
+        })
+        .eq('id', praticien.id)
     }
 
     const slugs = Object.keys(pratiques_details)

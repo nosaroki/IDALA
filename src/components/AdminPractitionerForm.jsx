@@ -80,6 +80,8 @@ export default function AdminPractitionerForm({ initial, pratiques, onSave, onCa
     pratiques_associees: [],
     instagram: '', site_web: '',
     siret: '',
+    cabinet_adresse: '', cabinet_code_postal: '', cabinet_ville: '',
+    cabinet_digicode: '', cabinet_interphone: '', cabinet_etage: '', cabinet_complement: '',
   }
 
   const [langDropOpen, setLangDropOpen] = useState(false)
@@ -505,6 +507,46 @@ function handleSubmit(e) {
           onChange={e => setForm({ ...form, slug: e.target.value.toLowerCase().replace(/\s/g, '-') })}
           style={initial ? { background: '#f5f2fa', color: '#9B6EBF', cursor: 'not-allowed' } : undefined} />
       </label>
+
+      {/* Adresse du cabinet */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '16px' }}>        
+        <p className="admin-pratiques-section__title" style={{ margin: 0 }}>Adresse du cabinet</p>
+        <label>Adresse
+          <input value={form.cabinet_adresse || ''}
+            placeholder="ex : 123 rue des bois"
+            onChange={e => setForm({ ...form, cabinet_adresse: e.target.value })} />
+        </label>
+        <div className="admin-form__row">
+          <label>Code postal
+            <input value={form.cabinet_code_postal || ''}
+              onChange={e => setForm({ ...form, cabinet_code_postal: e.target.value })} />
+          </label>
+          <label>Ville
+            <input value={form.cabinet_ville || ''}
+              onChange={e => setForm({ ...form, cabinet_ville: e.target.value })} />
+          </label>
+        </div>
+        <div className="admin-form__row">
+          <label>Digicode
+            <input value={form.cabinet_digicode || ''}
+              onChange={e => setForm({ ...form, cabinet_digicode: e.target.value })} />
+          </label>
+          <label>Interphone
+            <input value={form.cabinet_interphone || ''}
+              onChange={e => setForm({ ...form, cabinet_interphone: e.target.value })} />
+          </label>
+        </div>
+        <div className="admin-form__row">
+          <label>Étage
+            <input value={form.cabinet_etage || ''}
+              onChange={e => setForm({ ...form, cabinet_etage: e.target.value })} />
+          </label>
+          <label>Complément
+            <input value={form.cabinet_complement || ''}
+              onChange={e => setForm({ ...form, cabinet_complement: e.target.value })} />
+          </label>
+        </div>
+      </div>
 
       {/* Pratiques associées */}
       <div className="admin-pratiques-section">

@@ -35,6 +35,14 @@ export default function Reservation() {
   const [clientEmail, setClientEmail] = useState('')
   const [cgvAccepted, setCgvAccepted] = useState(false)
 
+  const [clientAdresse, setClientAdresse] = useState('')
+  const [clientCodePostal, setClientCodePostal] = useState('')
+  const [clientVille, setClientVille] = useState('')
+  const [clientDigicode, setClientDigicode] = useState('')
+  const [clientInterphone, setClientInterphone] = useState('')
+  const [clientEtage, setClientEtage] = useState('')
+  const [clientComplement, setClientComplement] = useState('')
+
   const [clientSecret, setClientSecret] = useState(null)
   const [stripeAccountId, setStripeAccountId] = useState(null)
   const [preparingPayment, setPreparingPayment] = useState(false)
@@ -104,7 +112,9 @@ export default function Reservation() {
 
   // Email valide ?
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clientEmail)
-  const infosValid = clientName.trim().length > 1 && emailValid && cgvAccepted
+  const isHome = offre?.mode_seance === 'home'
+  const addressValid = !isHome || (clientAdresse.trim() && clientCodePostal.trim() && clientVille.trim())
+  const infosValid = clientName.trim().length > 1 && emailValid && cgvAccepted && addressValid
 
   // Préparer le paiement automatiquement quand les infos deviennent valides
   useEffect(() => {
@@ -128,6 +138,13 @@ export default function Reservation() {
             scheduled_at: selectedSlot.start,
             client_name: clientName,
             client_email: clientEmail,
+            client_adresse:     isHome ? clientAdresse     : null,
+            client_code_postal: isHome ? clientCodePostal  : null,
+            client_ville:       isHome ? clientVille       : null,
+            client_digicode:    isHome ? clientDigicode    : null,
+            client_interphone:  isHome ? clientInterphone  : null,
+            client_etage:       isHome ? clientEtage       : null,
+            client_complement:  isHome ? clientComplement  : null,
             lang,
           }),
         })
@@ -340,6 +357,52 @@ export default function Reservation() {
                 placeholder="vous@email.com"
               />
             </div>
+
+            {isHome && (
+              <div className="resa-address-block">
+                <p className="resa-hint" style={{ marginTop: 0, marginBottom: '12px' }}>
+                  {lang === 'fr'
+                    ? 'Cette séance a lieu à votre domicile. Indiquez l\'adresse où le praticien doit se rendre.'
+                    : 'This session takes place at your home. Please provide the address where the practitioner should come.'}
+                </p>
+                <div className="resa-field">
+                  <label>{lang === 'fr' ? 'Adresse' : 'Address'}</label>
+                  <input value={clientAdresse}
+                    onChange={e => { setClientAdresse(e.target.value); resetPaymentOnEdit() }}
+                    placeholder={lang === 'fr' ? '123 rue des bois' : '123 Wood Street'} />
+                </div>
+                <div className="resa-field">
+                  <label>{lang === 'fr' ? 'Code postal' : 'Postal code'}</label>
+                  <input value={clientCodePostal}
+                    onChange={e => { setClientCodePostal(e.target.value); resetPaymentOnEdit() }} />
+                </div>
+                <div className="resa-field">
+                  <label>{lang === 'fr' ? 'Ville' : 'City'}</label>
+                  <input value={clientVille}
+                    onChange={e => { setClientVille(e.target.value); resetPaymentOnEdit() }} />
+                </div>
+                <div className="resa-field">
+                  <label>{lang === 'fr' ? 'Digicode' : 'Door code'}</label>
+                  <input value={clientDigicode}
+                    onChange={e => { setClientDigicode(e.target.value); resetPaymentOnEdit() }} />
+                </div>
+                <div className="resa-field">
+                  <label>{lang === 'fr' ? 'Interphone' : 'Intercom'}</label>
+                  <input value={clientInterphone}
+                    onChange={e => { setClientInterphone(e.target.value); resetPaymentOnEdit() }} />
+                </div>
+                <div className="resa-field">
+                  <label>{lang === 'fr' ? 'Étage' : 'Floor'}</label>
+                  <input value={clientEtage}
+                    onChange={e => { setClientEtage(e.target.value); resetPaymentOnEdit() }} />
+                </div>
+                <div className="resa-field">
+                  <label>{lang === 'fr' ? 'Complément' : 'Additional info'}</label>
+                  <input value={clientComplement}
+                    onChange={e => { setClientComplement(e.target.value); resetPaymentOnEdit() }} />
+                </div>
+              </div>
+            )}
 
             <label className="resa-cgv">
               <input

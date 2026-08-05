@@ -142,6 +142,13 @@ Deno.serve(async (req) => {
         currency: 'eur',
         stripe_payment_intent_id: pi.id,
         stripe_charge_id: typeof pi.latest_charge === 'string' ? pi.latest_charge : null,
+        client_adresse:     m.client_adresse     || null,
+        client_code_postal: m.client_code_postal || null,
+        client_ville:       m.client_ville       || null,
+        client_digicode:    m.client_digicode    || null,
+        client_interphone:  m.client_interphone  || null,
+        client_etage:       m.client_etage        || null,
+        client_complement:  m.client_complement  || null,
       })
       .select('id, cancel_token')
       .single();
@@ -343,7 +350,7 @@ Deno.serve(async (req) => {
     try {
       const { data: praticienData } = await supabase
         .from('praticiens')
-        .select('prenom, nom, email, langues')
+        .select('prenom, nom, email, langues, cabinet_adresse, cabinet_code_postal, cabinet_ville, cabinet_digicode, cabinet_interphone, cabinet_etage, cabinet_complement')        
         .eq('id', m.praticien_id)
         .single();
 
@@ -444,6 +451,40 @@ Deno.serve(async (req) => {
           <td style="padding:8px 0;font-size:14px;color:#281745;text-align:right;font-weight:500;">${value}</td>
         </tr>`;
 
+        // Objets adresse : cabinet du praticien, domicile du client
+      const praticienCabinet = {
+        adresse: praticienData?.cabinet_adresse || '', code_postal: praticienData?.cabinet_code_postal || '',
+        ville: praticienData?.cabinet_ville || '', digicode: praticienData?.cabinet_digicode || '',
+        interphone: praticienData?.cabinet_interphone || '', etage: praticienData?.cabinet_etage || '',
+        complement: praticienData?.cabinet_complement || '',
+      };
+      const clientAddress = {
+        adresse: m.client_adresse || '', code_postal: m.client_code_postal || '',
+        ville: m.client_ville || '', digicode: m.client_digicode || '',
+        interphone: m.client_interphone || '', etage: m.client_etage || '',
+        complement: m.client_complement || '',
+      };
+
+      const addrBlock = (title: string, a: any, l: 'fr' | 'en') => {
+        if (!a.adresse) return '';
+        const L = l === 'en'
+          ? { digicode: 'Door code', interphone: 'Intercom', etage: 'Floor' }
+          : { digicode: 'Digicode', interphone: 'Interphone', etage: 'Étage' };
+        const lines = [
+          a.adresse,
+          [a.code_postal, a.ville].filter(Boolean).join(' '),
+          a.digicode ? `${L.digicode} : ${a.digicode}` : '',
+          a.interphone ? `${L.interphone} : ${a.interphone}` : '',
+          a.etage ? `${L.etage} : ${a.etage}` : '',
+          a.complement,
+        ].filter(Boolean);
+        return `
+          <div style="margin:8px 0 24px;padding:18px 20px;background:#F7F2FE;border:1px solid #E4D8F5;border-radius:12px;">
+            <p style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#9B6EBF;margin:0 0 10px;">${title}</p>
+            <p style="font-size:14px;color:#281745;line-height:1.7;margin:0;">${lines.join('<br/>')}</p>
+          </div>`;
+      };
+
       // MAIL CLIENT
       const clientRecapFr = `
         <table style="width:100%;border-collapse:collapse;margin:8px 0 24px;">
@@ -470,6 +511,7 @@ Deno.serve(async (req) => {
           Bonjour ${m.client_name},<br/>votre séance est confirmée.
         </p>
         ${clientRecapFr}
+        ${modeSession === 'cabinet' ? addrBlock('Adresse du cabinet', praticienCabinet, 'fr') : ''}
         ${modeSeance === 'visio'
           ? joinButton(clientSeanceUrl, 'Rejoindre ma séance', "La salle s'ouvre 15 minutes avant le début de la séance.")
           : `<p style="font-size:13px;color:#413459;line-height:1.7;margin:0;">Vous recevrez un rappel avant votre rendez-vous.</p>`}
@@ -483,6 +525,7 @@ Deno.serve(async (req) => {
           Hello ${m.client_name},<br/>your session is confirmed.
         </p>
         ${clientRecapEn}
+        ${modeSession === 'cabinet' ? addrBlock('Practice address', praticienCabinet, 'en') : ''}
         ${modeSeance === 'visio'
           ? joinButton(clientSeanceUrl, 'Join my session', 'The room opens 15 minutes before the session starts.')
           : `<p style="font-size:13px;color:#413459;line-height:1.7;margin:0;">You will receive a reminder before your appointment.</p>`}
@@ -525,6 +568,7 @@ Deno.serve(async (req) => {
           Bonjour ${praticienData?.prenom || ''},<br/>vous avez une nouvelle réservation.
         </p>
         ${pratRecapFr}
+        ${modeSession === 'domicile' ? addrBlock('Adresse du client', clientAddress, 'fr') : ''}
         ${modeSeance === 'visio' && praticienSeanceUrl
           ? joinButton(praticienSeanceUrl, 'Rejoindre ma séance', "La salle s'ouvre 15 minutes avant le début de la séance.")
           : `<p style="font-size:13px;color:#413459;line-height:1.7;margin:0;">${modeSeance === 'visio' ? 'Le lien de la visioconférence vous sera transmis avant la séance.' : 'Pensez à préparer votre séance.'}</p>`}`;
@@ -534,6 +578,7 @@ Deno.serve(async (req) => {
           Hello ${praticienData?.prenom || ''},<br/>you have a new booking.
         </p>
         ${pratRecapEn}
+        ${modeSession === 'domicile' ? addrBlock('Client address', clientAddress, 'en') : ''}
         ${modeSeance === 'visio' && praticienSeanceUrl
           ? joinButton(praticienSeanceUrl, 'Join my session', 'The room opens 15 minutes before the session starts.')
           : `<p style="font-size:13px;color:#413459;line-height:1.7;margin:0;">${modeSeance === 'visio' ? 'The video link will be sent to you before the session.' : 'Remember to prepare for your session.'}</p>`}`;

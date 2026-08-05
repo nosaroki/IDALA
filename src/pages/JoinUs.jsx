@@ -33,6 +33,8 @@ const emptyForm = {
   bio_fr: '', bio_en: '',
   instagram: '', site_web: '',
   photos: [], main_photo: '',
+  cabinet_adresse: '', cabinet_code_postal: '', cabinet_ville: '',
+  cabinet_digicode: '', cabinet_interphone: '', cabinet_etage: '', cabinet_complement: '',
 }
 
 export default function JoinUs() {
@@ -67,7 +69,7 @@ export default function JoinUs() {
       setCheckingEmail(true)
       const { data } = await supabase
         .from('praticiens')
-        .select('id, prenom, nom, email, slug')
+        .select('id, prenom, nom, email, slug, cabinet_adresse, cabinet_code_postal, cabinet_ville, cabinet_digicode, cabinet_interphone, cabinet_etage, cabinet_complement')
         .ilike('email', email.trim().toLowerCase())
 
       if (data?.[0]) {
@@ -170,6 +172,18 @@ async function compressImage(file) {
     }
 
   function validate() {
+    // Adresse cabinet obligatoire si au moins une offre est au cabinet et que le praticien n'en a pas déjà une en fiche.
+    const needsCab = form.specialites.some(slug =>
+      (form.pratiques_details[slug]?.offres || []).some(o => o.mode_seance === 'in-person')
+    )
+    const showCab = needsCab && (!existingPraticien || !existingPraticien.cabinet_adresse)
+    if (showCab) {
+      if (!form.cabinet_adresse?.trim() || !form.cabinet_code_postal?.trim() || !form.cabinet_ville?.trim()) {
+        return lang === 'fr'
+          ? "Veuillez renseigner l'adresse du cabinet : adresse, code postal, ville."
+          : 'Please provide the practice address: address, postal code, city.'
+      }
+    }
       // Mode allégé pour praticien existant : vérifier uniquement les pratiques
         if (existingPraticien) {
           if (form.specialites.length === 0) {
@@ -289,6 +303,15 @@ async function compressImage(file) {
           praticien_id: existingPraticien.id,
           pratiques_details: form.pratiques_details,
           lang,
+          cabinet: (needsCabinet && !existingPraticien.cabinet_adresse) ? {
+            adresse:     form.cabinet_adresse,
+            code_postal: form.cabinet_code_postal,
+            ville:       form.cabinet_ville,
+            digicode:    form.cabinet_digicode,
+            interphone:  form.cabinet_interphone,
+            etage:       form.cabinet_etage,
+            complement:  form.cabinet_complement,
+          } : null,
         }
       })
       if (addError || data?.error) {
@@ -330,7 +353,14 @@ async function compressImage(file) {
       photos_urls: form.specialites.map(s => form.pratiques_details[s]?.photo_url).filter(Boolean),
       main_photo: fallbackPhoto,
       candidature_uuid: candidatureId,
-      langue_interface: lang
+      langue_interface: lang,
+      cabinet_adresse:     form.cabinet_adresse     || null,
+      cabinet_code_postal: form.cabinet_code_postal || null,
+      cabinet_ville:       form.cabinet_ville       || null,
+      cabinet_digicode:    form.cabinet_digicode    || null,
+      cabinet_interphone:  form.cabinet_interphone  || null,
+      cabinet_etage:       form.cabinet_etage        || null,
+      cabinet_complement:  form.cabinet_complement  || null,
     })
 
     if (error) {
@@ -345,6 +375,11 @@ async function compressImage(file) {
     setSubmitted(true)
     setLoading(false)
   }
+
+  const needsCabinet = form.specialites.some(slug =>
+    (form.pratiques_details[slug]?.offres || []).some(o => o.mode_seance === 'in-person')
+  )
+  const showCabinetBlock = needsCabinet && (!existingPraticien || !existingPraticien.cabinet_adresse)
 
     if (submitted) return (
       <div className="join-success">
@@ -948,6 +983,62 @@ async function compressImage(file) {
           )}
 
             </div>
+
+            {/* ── Adresse du cabinet (conditionnel) ── */}
+          {showCabinetBlock && (
+            <div className="join-section">
+              <h2 className="join-section__title">
+                {lang === 'fr' ? 'Adresse du cabinet' : 'Practice address'}
+              </h2>
+               <p className="join-hint" style={{ marginTop: 0, marginBottom: '20px', fontSize: '13.5px', lineHeight: 1.6 }}>                
+                {lang === 'fr'
+                  ? 'Vous proposez au moins une offre au cabinet. Cette adresse sera transmise au client dans son email de confirmation.'
+                  : 'You offer at least one in-person session. This address will be shared with the client in their confirmation email.'}
+              </p>
+              <div className="join-field">
+                <label>{lang === 'fr' ? 'Adresse *' : 'Address *'}</label>
+                <input value={form.cabinet_adresse}
+                  placeholder={lang === 'fr' ? 'ex : 123 rue des Bois' : 'e.g. 123 Wood Street'}
+                  onChange={e => setForm({ ...form, cabinet_adresse: e.target.value })} />
+              </div>
+              <div className="join-row">
+                <div className="join-field">
+                  <label>{lang === 'fr' ? 'Code postal *' : 'Postal code *'}</label>
+                  <input value={form.cabinet_code_postal}
+                    onChange={e => setForm({ ...form, cabinet_code_postal: e.target.value })} />
+                </div>
+                <div className="join-field">
+                  <label>{lang === 'fr' ? 'Ville *' : 'City *'}</label>
+                  <input value={form.cabinet_ville}
+                    onChange={e => setForm({ ...form, cabinet_ville: e.target.value })} />
+                </div>
+              </div>
+              <div className="join-row">
+                <div className="join-field">
+                  <label>{lang === 'fr' ? 'Digicode' : 'Door code'}</label>
+                  <input value={form.cabinet_digicode}
+                    onChange={e => setForm({ ...form, cabinet_digicode: e.target.value })} />
+                </div>
+                <div className="join-field">
+                  <label>{lang === 'fr' ? 'Interphone' : 'Intercom'}</label>
+                  <input value={form.cabinet_interphone}
+                    onChange={e => setForm({ ...form, cabinet_interphone: e.target.value })} />
+                </div>
+              </div>
+              <div className="join-row">
+                <div className="join-field">
+                  <label>{lang === 'fr' ? 'Étage' : 'Floor'}</label>
+                  <input value={form.cabinet_etage}
+                    onChange={e => setForm({ ...form, cabinet_etage: e.target.value })} />
+                </div>
+                <div className="join-field">
+                  <label>{lang === 'fr' ? 'Complément' : 'Additional info'}</label>
+                  <input value={form.cabinet_complement}
+                    onChange={e => setForm({ ...form, cabinet_complement: e.target.value })} />
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* ── Présence en ligne ── */}
           {!existingPraticien && (

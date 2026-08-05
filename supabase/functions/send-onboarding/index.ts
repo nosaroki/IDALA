@@ -61,6 +61,18 @@ serve(async (req) => {
     })
   }
 
+  // Adresse cabinet transmise par la candidature (mirror candidatures -> praticiens)
+  const cabinetFields = {
+    cabinet_adresse:     cand.cabinet_adresse     || null,
+    cabinet_code_postal: cand.cabinet_code_postal || null,
+    cabinet_ville:       cand.cabinet_ville       || null,
+    cabinet_digicode:    cand.cabinet_digicode    || null,
+    cabinet_interphone:  cand.cabinet_interphone  || null,
+    cabinet_etage:       cand.cabinet_etage        || null,
+    cabinet_complement:  cand.cabinet_complement  || null,
+  }
+  const hasCabinet = !!cand.cabinet_adresse
+
   const isFr = cand.langue_interface !== 'en'
   const token = crypto.randomUUID()
 
@@ -167,6 +179,9 @@ serve(async (req) => {
     newPraticien = existingPraticien
     isExistingPraticien = true
     praticienSlug = existingPraticien.slug
+    if (hasCabinet && !existingPraticien.cabinet_adresse) {
+      await supabase.from('praticiens').update(cabinetFields).eq('id', existingPraticien.id)
+    }
     console.log('✔ Praticien existant détecté:', existingPraticien.id)
 
   } else {
@@ -206,6 +221,7 @@ serve(async (req) => {
           slug: praticienSlug,
           onboarding_token: token,
           actif: false,
+          ...cabinetFields,
         })
         .select()
         .single()
