@@ -177,20 +177,20 @@ function Home() {
                 {lang === 'fr' ? (
                   <>
                     Le bien-être commence par la{' '}
-                    <span style={{ color: '#9B6EBF' }}>bonne rencontre</span>
+                    <span style={{ color: '#9B6EBF', whiteSpace: 'nowrap' }}>bonne rencontre</span>
                   </>
                 ) : (
                   <>
                     Wellness begins with the{' '}
-                    <span style={{ color: '#9B6EBF' }}>right connection</span>
+                    <span style={{ color: '#9B6EBF', whiteSpace: 'nowrap' }}>right connection</span>
                   </>
                 )}
               </h1>
 
               <p className="home-hero__subtext">
                 {lang === 'fr'
-                  ? 'Des praticiens d\'excellence sélectionnés pour vous.'
-                  : 'Top-tier practitioners selected for you.'}
+                  ? <>Des praticiens d'excellence sélectionnés pour vous : <span style={{ color: '#9B6EBF' }}>yoga</span>, <span style={{ color: '#9B6EBF' }}>reiki</span>, <span style={{ color: '#9B6EBF' }}>breathwork</span>, <span style={{ color: '#9B6EBF' }}>méditation</span> et bien d'autres disciplines.</>
+                  : <>Top-tier practitioners selected for you: <span style={{ color: '#9B6EBF' }}>yoga</span>, <span style={{ color: '#9B6EBF' }}>reiki</span>, <span style={{ color: '#9B6EBF' }}>breathwork</span>, <span style={{ color: '#9B6EBF' }}>meditation</span> and many more disciplines.</>}
               </p>
 
               <button 
