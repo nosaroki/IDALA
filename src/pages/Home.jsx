@@ -190,7 +190,7 @@ function Home() {
               <p className="home-hero__subtext">
                 {lang === 'fr'
                   ? <>Des praticiens d'excellence sélectionnés pour vous : <span style={{ color: '#9B6EBF' }}>yoga</span>, <span style={{ color: '#9B6EBF' }}>reiki</span>, <span style={{ color: '#9B6EBF' }}>breathwork</span>, <span style={{ color: '#9B6EBF' }}>méditation</span> et bien d'autres disciplines.</>
-                  : <>Top-tier practitioners selected for you: <span style={{ color: '#9B6EBF' }}>yoga</span>, <span style={{ color: '#9B6EBF' }}>reiki</span>, <span style={{ color: '#9B6EBF' }}>breathwork</span>, <span style={{ color: '#9B6EBF' }}>meditation</span> and many more disciplines.</>}
+                  : <>A curated selection of exceptional practitioners specializing in <span style={{ color: '#9B6EBF' }}>yoga</span>, <span style={{ color: '#9B6EBF' }}>reiki</span>, <span style={{ color: '#9B6EBF' }}>breathwork</span>, <span style={{ color: '#9B6EBF' }}>meditation</span> and beyond.</>}
               </p>
 
               <button 
