@@ -48,6 +48,7 @@ Deno.serve(async (req) => {
   const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
   if (event.type === 'payment_intent.succeeded') {
+   try {
     const pi = event.data.object as Stripe.PaymentIntent;
     const m = pi.metadata ?? {};
 
@@ -56,7 +57,7 @@ Deno.serve(async (req) => {
     // Anti-doublon
     const { data: existingResa } = await supabase
       .from('reservations')
-      .select('id')
+      .select('id, confirmation_email_sent_at')
       .eq('stripe_payment_intent_id', pi.id)
       .maybeSingle();
     if (existingResa) return ok();
@@ -362,11 +363,14 @@ Deno.serve(async (req) => {
           weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
         }).format(startDate);
 
-      const fmtTime = (locale: string) =>
-        new Intl.DateTimeFormat(locale, {
+      const fmtTime = (locale: string) => {
+        const time = new Intl.DateTimeFormat(locale, {
           timeZone: 'Europe/Paris',
           hour: '2-digit', minute: '2-digit',
         }).format(startDate);
+        const tz = locale.startsWith('en') ? 'Paris time, France' : 'heure de Paris, France';
+        return `${time} (${tz})`;
+      };
 
       // Clé en convention sessions (visio / domicile / cabinet), on consulte avec modeSession.
       const modeMap: Record<string, { fr: string; en: string }> = {
@@ -675,9 +679,21 @@ Deno.serve(async (req) => {
         });
       }
 
-    } catch (mailErr) {
+      if (reservationId) {
+        await supabase
+          .from('reservations')
+          .update({ confirmation_email_sent_at: new Date().toISOString() })
+          .eq('id', reservationId);
+      }
+
+   } catch (mailErr) {
       console.error('Erreur envoi emails de confirmation:', String(mailErr));
     }
+
+   } catch (e) {
+     console.error('payment-webhook: erreur inattendue', String(e));
+     return new Response('Erreur interne', { status: 500 });
+   }
 
   }
 

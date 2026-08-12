@@ -132,10 +132,10 @@ function Practitioners() {
                 : 'Find the support that fits your needs'}
             </h1>
             <div className="divider divider--center" />
-            <p className="pract-hero__body">
+            <p className="pract-hero__body" >
               {lang === 'fr'
-                ? <> The Idala Family vous met en relation avec des praticiens certifiés et rigoureusement sélectionnés, engagés à soutenir votre bien‑être physique et mental. <br /> Chaque professionnel est choisi pour son sérieux, sa qualité de pratique et son éthique, afin que vous puissiez faire votre choix en toute confiance. <br />Explorez les catégories et trouvez l'approche qui correspond le mieux à vos besoins.</>
-                : <>The Idala Family connects you with certified and rigorously selected practitioners,<br /> committed to supporting your physical and mental well-being. <br /> Each professional is chosen for their seriousness, quality of practice and ethics,<br /> so you can make your choice with full confidence. <br />Explore the categories and find the approach that best fits your needs.</>}
+                ? <>The Idala Family vous met en relation avec des <strong>praticiens certifiés et rigoureusement sélectionnés</strong>, engagés à soutenir votre bien‑être physique et mental. <br />Chaque professionnel est choisi pour son sérieux, son savoir-faire et son éthique, afin que vous puissiez faire votre choix en toute confiance. <br />Explorez les catégories, trouvez l'approche qui correspond le mieux à vos besoins.</>
+                : <>The Idala Family connects you with <strong>certified, carefully selected practitioners</strong> dedicated to supporting your physical and mental well-being. <br />Each professional is chosen for their expertise, professionalism and ethical approach, so you can make your choice with complete confidence. <br />Explore the categories, find the approach that best suits your needs.</>}
             </p>
             <div className="pract-hero__quote">
               <span className="pract-hero__quote-mark">"</span>

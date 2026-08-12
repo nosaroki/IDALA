@@ -217,7 +217,7 @@ function Home() {
             </div>
              <div className="home-hero__left">
               <div className="home-hero__logo-wrap">
-                <img src={newlogo} alt="The Idala Family" className="home-hero__logo" />
+                <img src={newlogo} alt="The Idala Family" className="home-hero__logo" fetchpriority="high" decoding="async"/>
               </div>
               <p className="home-hero__tagline">
                 {lang === 'fr' ? 'Corps · Esprit · Énergie' : 'Body · Mind · Energy'}
@@ -252,25 +252,30 @@ function Home() {
             <div className="home-concept__text-col">
               {lang === 'en' ? (
                 <>
-                   <p className="home-concept__body">The Idala Family is a premium space dedicated to those who wish to evolve with intention and consistency.</p>
-                   <p className="home-concept__body">We bring together practitioners of excellence around a vision of well-being that <strong>unifies body, mind and energy</strong>: strengthening the body, calming the mind and cultivating inner clarity.</p>
-                   <p className="home-concept__body">Well-being is not a sum of practices, but a living balance. <strong>Physical strength, emotional stability and clarity</strong> nourish one another when one dimension rises, the whole transforms.</p>
-                   <p className="home-concept__body">We converge these dimensions within a structured and demanding approach to modern well-being, designed for those seeking <strong>meaning, alignment and lasting transformation.</strong></p>
-                   <div className="home-concept__trust">
-                    <span className="home-concept__trust-icon">✦</span>
-                    <p>Every practitioner on The Idala Family platform is <strong>rigorously verified and selected</strong> through a thorough and supported vetting process, so you can explore with confidence.</p>
-                  </div>
+                   <p className="home-concept__body"><strong>A premium space</strong> for those seeking to grow with intention and purpose. <strong>Exceptional practitioners.</strong><br/> <strong>A vision of well-being</strong> that unites body, mind, and energy.</p>
+                   <p className="home-concept__body" style={{ textAlign: 'center', color: '#9B6EBF', whiteSpace: 'nowrap' }}>
+                     Strengthen the body<br/>
+                     Calm the mind<br/>
+                     Cultivate inner clarity
+                   </p>
+                   <p className="home-concept__body"><strong>A living balance</strong>: physical strength, emotional stability, and mental clarity. A structured and rigorous approach designed to create lasting transformation.</p>
+                  <p className="home-concept__body" style={{ fontStyle: 'italic', textAlign: 'center', color: '#9B6EBF', whiteSpace: 'nowrap' }}>
+                    “When one dimension is elevated, the whole transforms.”</p>
                 </>
               ) : (
                 <>
-                  <p className="home-concept__body">The Idala Family est un espace premium dédié à celles et ceux qui souhaitent évoluer avec intention et cohérence.</p>
-                  <p className="home-concept__body">Nous rassemblons des praticiens d’excellence autour d’une vision du bien‑être qui <strong>unifie corps, mental et énergie</strong>: renforcer le corps, apaiser le mental et cultiver la clarté intérieure.</p>
-                  <p className="home-concept__body">Le bien‑être n’est pas une somme de pratiques, mais un équilibre vivant. <strong>Force physique, stabilité émotionnelle et lucidité</strong> se nourrissent mutuellement, quand une dimension s’élève, l’ensemble se transforme.</p>
-                  <p className="home-concept__body">Nous faisons converger ces dimensions au sein d’une approche structurée et exigeante du bien‑être moderne pensée pour celles et ceux qui recherchent <strong>sens, alignement et transformation durable.</strong></p>                 
-                  <div className="home-concept__trust">
-                    <span className="home-concept__trust-icon">✦</span>
-                    <p>Chaque praticien de la plateforme The Idala Family est <strong>rigoureusement vérifié et sélectionné</strong> via un processus d'évaluation soutenu et exigeant, pour que vous puissiez explorer en toute confiance.</p>
-                  </div>
+                 <p className="home-concept__body"><strong>Un espace premium</strong> dédié à celles et ceux qui souhaitent évoluer avec intention et cohérence.</p>
+                  <p className="home-concept__body"><strong>Des praticiens d’excellence.</strong></p>
+                  <p className="home-concept__body"><strong>Une vision du bien‑être</strong> qui unifie corps, mental et énergie.</p>
+                  <p className="home-concept__body" style={{ textAlign: 'center', color: '#9B6EBF', whiteSpace: 'nowrap' }}>
+                    Renforcer le corps<br/>
+                    Apaiser le mental<br/>
+                    Cultiver la clarté intérieure
+                  </p>
+                  <p className="home-concept__body"><strong>Un équilibre vivant</strong> : le bien‑être. Force physique, stabilité émotionnelle et lucidité.</p>
+                  <p className="home-concept__body">Un processus structuré et exigeant pour une transformation durable.</p>
+                  <p className="home-concept__body" style={{ fontStyle: 'italic', textAlign: 'center', color: '#9B6EBF', whiteSpace: 'nowrap' }}>
+                    « Quand une dimension s’élève, l’ensemble se transforme. »</p>
                 </>
               )}
             </div>
@@ -291,25 +296,26 @@ function Home() {
             <div className="home-philosophy__text-col">
               {lang === 'en' ? (
                 <>
-                  <p className="home-concept__body">At the core of IDALA lies a simple truth: the body and the mind cannot be separated.</p>
-                  <p className="home-concept__body">A stronger body creates a clearer, more stable mind. A regulated mind allows the body to perform, adapt and recover at its highest level. True well-being is built through this alignment.</p>
-                  <p className="home-concept__body">We exist to make this connection accessible through a refined and trusted ecosystem of practices and practitioners.</p>
+                  <p className="home-concept__body">At the heart of IDALA lies <strong>a refined ecosystem</strong>.</p>
+                  <p className="home-concept__body"><strong>A simple truth</strong>: the body and mind cannot be separated. A stronger body creates a clearer, more resilient mind. A balanced mind allows the body to perform, adapt, and recover at its highest level. True well-being is built through this alignment.</p>
                 </>
               ) : (
                 <>
-                  <p className="home-concept__body">Au cœur d'IDALA se trouve une vérité simple : le corps et l'esprit ne peuvent pas être séparés.</p>
-                  <p className="home-concept__body">Un corps plus fort crée un esprit plus clair et plus stable. Un esprit régulé permet au corps de performer, s'adapter et récupérer à son plus haut niveau. Le vrai bien-être se construit à travers cet alignement.</p>
-                  <p className="home-concept__body">Nous existons pour rendre cette connexion accessible à travers un écosystème raffiné et de confiance de pratiques et de praticiens.</p>
+                  <p className="home-concept__body">Au cœur d’IDALA <strong>un écosystème raffiné</strong>.</p>
+                  <p className="home-concept__body"><strong>Une vérité simple</strong> : le corps et l'esprit ne peuvent pas être séparés.</p>
+                  <p className="home-concept__body">Un corps plus fort crée un esprit plus clair et plus stable.</p>
+                  <p className="home-concept__body">Un esprit régulé permet au corps de performer, s'adapter et récupérer à son plus haut niveau.</p>
+                  <p className="home-concept__body">Le vrai bien-être se construit à travers cet alignement.</p>
                 </>
               )}
             </div>
 
             {/* Citation */}
-            <div className="home-philosophy__quote">
+            {/* <div className="home-philosophy__quote">
               <span className="home-philosophy__quote-mark">"</span>
               <p className="home-philosophy__quote-text">Mens sana in corpore sano</p>
               <span className="home-philosophy__quote-mark">"</span>
-            </div>
+            </div> */}
 
           </div>
         </section>
@@ -343,11 +349,11 @@ function Home() {
               <span className="eyebrow">{lang === 'fr' ? 'La Fondatrice' : 'The Founder'}</span>
               <h2 className="home-diane__name">Diane Thomas</h2>
               <div className="divider" />
-              <p className="home-diane__body">
+              {/* <p className="home-diane__body">
                 {lang === 'fr'
                   ? "Diane a fondé The Idala Family pour créer un espace où le corps et l'esprit se renforcent ensemble, au sein d'une communauté de confiance."
                   : 'Diane founded The Idala Family to create a space where body and mind strengthen together, within a trusted community.'}
-              </p>
+              </p> */}
               <button className="btn btn--outline" onClick={() => navigate('/about')}>
                 {lang === 'fr' ? 'En savoir plus' : 'Learn More'}
               </button>

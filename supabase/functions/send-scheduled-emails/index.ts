@@ -36,17 +36,19 @@ async function sendEmail(to: string, subject: string, html: string) {
 }
 
 function formatDateFR(iso: string) {
-  return new Date(iso).toLocaleDateString('fr-FR', {
+  const formatted = new Date(iso).toLocaleDateString('fr-FR', {
     weekday: 'long', day: 'numeric', month: 'long',
     hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris',
   });
+  return `${formatted} (heure de Paris, France)`;
 }
 
 function formatDateEN(iso: string) {
-  return new Date(iso).toLocaleDateString('en-GB', {
+  const formatted = new Date(iso).toLocaleDateString('en-GB', {
     weekday: 'long', day: 'numeric', month: 'long',
     hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris',
   });
+  return `${formatted} (Paris time, France)`;
 }
 
 function firstName(fullName: string | null): string {
