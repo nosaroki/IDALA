@@ -1073,7 +1073,7 @@ button { cursor: pointer; font-family: inherit; border: none; background: none; 
 } 
 .pract-hero__title { font-family: 'Cormorant Garamond', serif; font-size: clamp(28px,4vw,48px); font-weight: 400; color: var(--text); line-height: 1.15; letter-spacing: .5px; margin-bottom: 16px; }
 .pract-hero__body { font-size: clamp(15px,1.5vw,17px); line-height: 1.95; color: var(--text-light); margin-bottom: 28px; margin-left: auto;
-  margin-right: auto; max-width: 680px;
+  margin-right: auto; max-width: 700px;
  }
 .pract-hero__quote { display: flex; align-items: baseline; justify-content: center; gap: 6px; }
 .pract-hero__quote-mark { font-family: 'Cormorant Garamond', serif; font-size: 48px; color: var(--violet-light); line-height: .8; flex-shrink: 0; }

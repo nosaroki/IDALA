@@ -69,7 +69,6 @@ function clientReminderSubject(variant: ReminderVariant, lang: 'fr' | 'en') {
 function reminderClientHTML(p: {
   clientPrenom: string;
   praticienPrenom: string;
-  praticienNom: string;
   sessionType: string;
   duration: number;
   dateStr: string;
@@ -79,16 +78,12 @@ function reminderClientHTML(p: {
   variant: ReminderVariant;
 }) {
   if (p.lang === 'en') {
-    const heading = p.variant === 'proche'
-      ? 'Reminder: your session is coming up'
-      : 'Reminder: your session tomorrow';
     const intro = p.variant === 'proche'
-      ? `Your session with <strong>${p.praticienPrenom} ${p.praticienNom}</strong> is coming up.`
-      : `A friendly reminder about your upcoming session with <strong>${p.praticienPrenom} ${p.praticienNom}</strong>.`;
+      ? `Your session with <strong>${p.praticienPrenom}</strong> is coming up.`
+      : `A friendly reminder about your upcoming session with <strong>${p.praticienPrenom}</strong>.`;
     return `
       ${FONT_IMPORT}
       <div style="font-family: ${BODY_FONT}; max-width: 560px; margin: 0 auto; color: #2b2b2b; line-height: 1.6;">
-        <h2 style="font-family: ${TITLE_FONT}; color: #6b4a8a; font-weight: 500;">${heading}</h2>
         <p>Hi ${p.clientPrenom},</p>
         <p>${intro}</p>
         <div style="background: #f7f4fa; border-left: 3px solid #6b4a8a; padding: 16px 20px; margin: 24px 0; border-radius: 4px;">
@@ -104,16 +99,12 @@ function reminderClientHTML(p: {
       </div>
     `;
   }
-  const heading = p.variant === 'proche'
-    ? 'Rappel : votre séance approche'
-    : 'Rappel : votre séance demain';
   const intro = p.variant === 'proche'
-    ? `Votre séance avec <strong>${p.praticienPrenom} ${p.praticienNom}</strong> approche.`
-    : `Petit rappel de votre séance à venir avec <strong>${p.praticienPrenom} ${p.praticienNom}</strong>.`;
+    ? `Votre séance avec <strong>${p.praticienPrenom}</strong> approche.`
+    : `Petit rappel de votre séance à venir avec <strong>${p.praticienPrenom}</strong>.`;
   return `
     ${FONT_IMPORT}
     <div style="font-family: ${BODY_FONT}; max-width: 560px; margin: 0 auto; color: #2b2b2b; line-height: 1.6;">
-      <h2 style="font-family: ${TITLE_FONT}; color: #6b4a8a; font-weight: 500;">${heading}</h2>
       <p>Bonjour ${p.clientPrenom},</p>
       <p>${intro}</p>
       <div style="background: #f7f4fa; border-left: 3px solid #6b4a8a; padding: 16px 20px; margin: 24px 0; border-radius: 4px;">
@@ -188,7 +179,6 @@ function followupClientHTML(p: {
     return `
       ${FONT_IMPORT}
       <div style="font-family: ${BODY_FONT}; max-width: 560px; margin: 0 auto; color: #2b2b2b; line-height: 1.6;">
-        <h2 style="font-family: ${TITLE_FONT}; color: #6b4a8a; font-weight: 500;">A little word after your session</h2>
         <p>Hello ${p.clientPrenom},</p>
         <p>I hope your session with ${p.praticienPrenom} went well.</p>
         <p>Feel free to leave us a Google review, it would help a great deal in making Idala known.</p>
@@ -202,7 +192,6 @@ function followupClientHTML(p: {
   return `
     ${FONT_IMPORT}
     <div style="font-family: ${BODY_FONT}; max-width: 560px; margin: 0 auto; color: #2b2b2b; line-height: 1.6;">
-      <h2 style="font-family: ${TITLE_FONT}; color: #6b4a8a; font-weight: 500;">Un petit mot après votre séance</h2>
       <p>Bonjour ${p.clientPrenom},</p>
       <p>J'espère que votre séance avec ${p.praticienPrenom} s'est bien passée.</p>
       <p>N'hésitez pas à nous laisser un avis Google, cela aiderait grandement à faire connaître Idala.</p>
@@ -273,7 +262,6 @@ async function runReminderPass(opts: {
         reminderClientHTML({
           clientPrenom: firstName(r.client_name),
           praticienPrenom: r.praticien.prenom,
-          praticienNom: r.praticien.nom,
           sessionType: r.pratique.nom,
           duration: r.session.duration_minutes,
           dateStr,

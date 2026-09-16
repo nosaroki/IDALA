@@ -1,0 +1,1 @@
+var e=`/assets/dianeregard-CVbdabI2.webp`;export{e as t};
