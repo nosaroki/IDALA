@@ -1,1 +1,0 @@
-const e=[{value:`adults`,fr:`Adultes`,en:`Adults`},{value:`children`,fr:`Enfants`,en:`Children`},{value:`seniors`,fr:`Seniors`,en:`Seniors`},{value:`all`,fr:`Tous publics`,en:`All ages`}],t=[{value:`individual`,fr:`Individuelle`,en:`Individual`},{value:`group`,fr:`Groupe`,en:`Group`},{value:`both`,fr:`Les deux`,en:`Both`}];export{t as n,e as t};
