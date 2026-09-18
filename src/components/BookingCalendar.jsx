@@ -21,7 +21,7 @@ function groupByDay(slots) {
   return map
 }
 
-export default function BookingCalendar({ praticienId, scheduleId, lengthMinutes, onSelectSlot, selectedSlot }) {
+export default function BookingCalendar({ praticienId, scheduleId, offreId, lengthMinutes, onSelectSlot, selectedSlot }) {
   const { lang } = useContext(LangCtx)
 
   const today = useMemo(() => new Date(), [])
@@ -70,6 +70,9 @@ export default function BookingCalendar({ praticienId, scheduleId, lengthMinutes
           },
           body: JSON.stringify({
             ...(scheduleId ? { schedule_id: scheduleId } : { praticien_id: praticienId }),
+            // offre_id permet à get-availability de réinjecter les cours collectifs
+            // ouverts (créneaux pris côté SuperSaaS mais encore disponibles à la place).
+            ...(offreId ? { offre_id: offreId } : {}),
             from: effectiveFrom.toISOString(),
             to: to.toISOString(),
             length_minutes: lengthMinutes,
@@ -96,7 +99,7 @@ export default function BookingCalendar({ praticienId, scheduleId, lengthMinutes
     }
     if (praticienId || scheduleId) load()
     return () => { cancelled = true }
-  }, [praticienId, scheduleId, lengthMinutes, viewYear, viewMonth, lang])
+  }, [praticienId, scheduleId, offreId, lengthMinutes, viewYear, viewMonth, lang])
 
   // Construction de la grille du mois
   const grid = useMemo(() => {

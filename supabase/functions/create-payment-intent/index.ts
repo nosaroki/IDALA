@@ -7,6 +7,14 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const SUPERSAAS_API_KEY = Deno.env.get('SUPERSAAS_API_KEY')!;
 const SUPERSAAS_ACCOUNT = Deno.env.get('SUPERSAAS_ACCOUNT')!;
 
+// Traduction convention offre (modes.jsx : visio / home / in-person)
+// vers la convention stockée dans la table sessions (visio / domicile / cabinet).
+const MODE_TO_SESSION: Record<string, string> = {
+  visio: 'visio',
+  home: 'domicile',
+  'in-person': 'cabinet',
+};
+
 const stripe = new Stripe(STRIPE_SECRET_KEY, {
   apiVersion: '2024-06-20',
   httpClient: Stripe.createFetchHttpClient(),
@@ -110,40 +118,69 @@ Deno.serve(async (req) => {
     // Diane a 0 donnera feeCents = 0, donc elle encaisse l'integralite.
     const feeCents = Math.round(priceCents * commissionRate);
 
+    // Nombre de places de l'offre : > 1 = cours collectif.
+    const maxParticipants = offre.max_participants ? Number(offre.max_participants) : 1;
+
     // ---- 2ter. Verifier que le CRENEAU est toujours LIBRE ----
     // IMPORTANT : ici on compare en heure BRUTE de Paris des deux cotes (scheduled_at
     // recu du front et creneaux libres de SuperSaaS). On ne convertit surtout PAS ici,
     // sinon la comparaison se desynchronise.
     if (prat?.supersaas_schedule_id) {
-      const durationMin = offre.duree ? parseInt(String(offre.duree), 10) : 60;
-      const wantedTime = new Date(scheduled_at).getTime();
-      const fromCheck = new Date(wantedTime - 60 * 1000);
-
-      const params = new URLSearchParams({
-        account: SUPERSAAS_ACCOUNT,
-        api_key: SUPERSAAS_API_KEY,
-        schedule_id: prat.supersaas_schedule_id,
-        from: toSuperSaasDate(fromCheck),
-        maxresults: '50',
-      });
-      if (durationMin) params.set('length', String(durationMin));
-
-      try {
-        const freeRes = await fetch(
-          `https://www.supersaas.com/api/free/${prat.supersaas_schedule_id}.json?${params.toString()}`
-        );
-        if (freeRes.ok) {
-          const freeData = await freeRes.json();
-          const freeSlots = (freeData.slots || []) as { start: string }[];
-          const isFree = freeSlots.some(
-            s => Math.abs(new Date(s.start).getTime() - wantedTime) < 60 * 1000
-          );
-          if (!isFree) {
-            return jsonResponse({ error: 'SLOT_TAKEN' }, 409);
-          }
+      // Cas collectif : si une session ouverte existe deja a ce creneau et qu'il reste
+      // de la place, le client REJOINT le cours. Le creneau est alors "pris" cote
+      // SuperSaaS (c'est normal), donc on n'exige pas qu'il soit libre. Ne concerne
+      // que les offres a plusieurs places : un creneau individuel reste non partageable.
+      let joinableCollectiveSession = false;
+      if (maxParticipants > 1) {
+        // La table sessions stocke scheduled_at en instant UTC : on convertit ici
+        // (et seulement pour cette lecture en base, pas pour le check SuperSaaS).
+        const scheduledAtUTCForCheck = parisToUTC(scheduled_at);
+        const sessionMode = MODE_TO_SESSION[offre.mode_seance] || offre.mode_seance;
+        const { data: openSess } = await supabase
+          .from('sessions')
+          .select('booked_count, max_participants')
+          .eq('praticien_id', praticien_id)
+          .eq('pratique_id', pratique_id)
+          .eq('mode_seance', sessionMode)
+          .eq('scheduled_at', scheduledAtUTCForCheck)
+          .eq('status', 'open')
+          .maybeSingle();
+        if (openSess && openSess.booked_count < openSess.max_participants) {
+          joinableCollectiveSession = true;
         }
-      } catch (e) {
-        console.error('Erreur verification creneau SuperSaaS:', String(e));
+      }
+
+      if (!joinableCollectiveSession) {
+        const durationMin = offre.duree ? parseInt(String(offre.duree), 10) : 60;
+        const wantedTime = new Date(scheduled_at).getTime();
+        const fromCheck = new Date(wantedTime - 60 * 1000);
+
+        const params = new URLSearchParams({
+          account: SUPERSAAS_ACCOUNT,
+          api_key: SUPERSAAS_API_KEY,
+          schedule_id: prat.supersaas_schedule_id,
+          from: toSuperSaasDate(fromCheck),
+          maxresults: '50',
+        });
+        if (durationMin) params.set('length', String(durationMin));
+
+        try {
+          const freeRes = await fetch(
+            `https://www.supersaas.com/api/free/${prat.supersaas_schedule_id}.json?${params.toString()}`
+          );
+          if (freeRes.ok) {
+            const freeData = await freeRes.json();
+            const freeSlots = (freeData.slots || []) as { start: string }[];
+            const isFree = freeSlots.some(
+              s => Math.abs(new Date(s.start).getTime() - wantedTime) < 60 * 1000
+            );
+            if (!isFree) {
+              return jsonResponse({ error: 'SLOT_TAKEN' }, 409);
+            }
+          }
+        } catch (e) {
+          console.error('Erreur verification creneau SuperSaaS:', String(e));
+        }
       }
     }
 

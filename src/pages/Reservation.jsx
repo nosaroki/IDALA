@@ -318,6 +318,7 @@ export default function Reservation() {
 
             <BookingCalendar
               praticienId={praticien.id}
+              offreId={offreId}
               lengthMinutes={durationMin}
               onSelectSlot={handleSelectSlot}
               selectedSlot={selectedSlot}

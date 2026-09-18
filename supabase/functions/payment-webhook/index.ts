@@ -65,6 +65,9 @@ Deno.serve(async (req) => {
     const durationMin = parseInt(m.duree_seance || '60', 10) || 60;
     const maxParticipants = parseInt(m.max_participants || '1', 10) || 1;
 
+    // Cours collectif = plusieurs places sur un même créneau.
+    const isCollective = maxParticipants > 1;
+
     // mode_seance en convention modes.jsx (visio / home / in-person).
     // Défaut prudent : 'in-person' (jamais 'visio' par défaut, pour ne pas créer
     // de room Daily inutile si une métadonnée était absente).
@@ -73,21 +76,28 @@ Deno.serve(async (req) => {
     const modeSession = MODE_TO_SESSION[modeSeance] || modeSeance;
 
     // Session existante (groupe) ou nouvelle.
-    // On matche aussi sur le mode traduit : deux modes différents au même créneau
-    // ne doivent pas être fusionnés dans la même session.
     let sessionId: string;
     let sessionScheduledAt: string = m.scheduled_at;
     let sessionRoomName: string | null = null;
     let praticienJoinSecret: string | null = null;
 
-    const { data: existingSession } = await supabase
-      .from('sessions')
-      .select('id, booked_count, max_participants, status, scheduled_at, daily_room_name, praticien_join_secret')
-      .eq('praticien_id', m.praticien_id)
-      .eq('pratique_id', m.pratique_id)
-      .eq('scheduled_at', m.scheduled_at)
-      .eq('mode_seance', modeSession)
-      .maybeSingle();
+    // On ne cherche à rejoindre une session existante QUE pour une offre collective.
+    // Une offre individuelle (max_participants = 1) crée toujours sa propre session :
+    // un créneau individuel n'est jamais partageable, même si un cours de groupe
+    // existait au même horaire et même mode.
+    let existingSession: any = null;
+    if (isCollective) {
+      const { data } = await supabase
+        .from('sessions')
+        .select('id, booked_count, max_participants, status, scheduled_at, daily_room_name, praticien_join_secret')
+        .eq('praticien_id', m.praticien_id)
+        .eq('pratique_id', m.pratique_id)
+        .eq('scheduled_at', m.scheduled_at)
+        .eq('mode_seance', modeSession)
+        .eq('status', 'open')
+        .maybeSingle();
+      existingSession = data;
+    }
 
     if (existingSession) {
       if (existingSession.status === 'full' ||
@@ -174,82 +184,88 @@ Deno.serve(async (req) => {
     }
 
     // ---- Créer la réservation dans SuperSaaS (bloque le créneau) ----
-    try {
-      const { data: prat } = await supabase
-        .from('praticiens')
-        .select('supersaas_schedule_id')
-        .eq('id', m.praticien_id)
-        .single();
+    // UNIQUEMENT pour une NOUVELLE session (1re inscription). Les inscriptions
+    // suivantes d'un cours collectif rejoignent la session sans rebloquer le créneau :
+    // la 1re réservation a déjà bloqué le temps du praticien côté SuperSaaS, et la
+    // place restante se gère dans la table sessions (booked_count / max_participants).
+    if (!existingSession) {
+      try {
+        const { data: prat } = await supabase
+          .from('praticiens')
+          .select('supersaas_schedule_id')
+          .eq('id', m.praticien_id)
+          .single();
 
-      if (prat?.supersaas_schedule_id) {
-        const scheduleId = prat.supersaas_schedule_id;
+        if (prat?.supersaas_schedule_id) {
+          const scheduleId = prat.supersaas_schedule_id;
 
-        // Calcul du finish (start + durée)
-        const startDate = new Date(m.scheduled_at);
-        const finishDate = new Date(startDate.getTime() + durationMin * 60 * 1000);
+          // Calcul du finish (start + durée)
+          const startDate = new Date(m.scheduled_at);
+          const finishDate = new Date(startDate.getTime() + durationMin * 60 * 1000);
 
-        const fmt = (d: Date) => {
-          const parts = new Intl.DateTimeFormat('en-CA', {
-            timeZone: 'Europe/Paris',
-            year: 'numeric', month: '2-digit', day: '2-digit',
-            hour: '2-digit', minute: '2-digit', second: '2-digit',
-            hour12: false,
-          }).formatToParts(d);
-          const get = (t: string) => parts.find((p) => p.type === t)?.value || '00';
-          const hour = get('hour') === '24' ? '00' : get('hour');
-          return `${get('year')}-${get('month')}-${get('day')} ${hour}:${get('minute')}:${get('second')}`;
-        };
+          const fmt = (d: Date) => {
+            const parts = new Intl.DateTimeFormat('en-CA', {
+              timeZone: 'Europe/Paris',
+              year: 'numeric', month: '2-digit', day: '2-digit',
+              hour: '2-digit', minute: '2-digit', second: '2-digit',
+              hour12: false,
+            }).formatToParts(d);
+            const get = (t: string) => parts.find((p) => p.type === t)?.value || '00';
+            const hour = get('hour') === '24' ? '00' : get('hour');
+            return `${get('year')}-${get('month')}-${get('day')} ${hour}:${get('minute')}:${get('second')}`;
+          };
 
-        const libelle = `${pratiqueNom} ${modeSession} - ${m.client_name}`;
+          const libelle = `${pratiqueNom} ${modeSession} - ${m.client_name}`;
 
-        const params = new URLSearchParams({
-          account: SUPERSAAS_ACCOUNT,
-          api_key: SUPERSAAS_API_KEY,
-        });
+          const params = new URLSearchParams({
+            account: SUPERSAAS_ACCOUNT,
+            api_key: SUPERSAAS_API_KEY,
+          });
 
-        const bookingRes = await fetch(
-          `https://www.supersaas.com/api/bookings.json?${params.toString()}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              schedule_id: scheduleId,
-              booking: {
-                start: fmt(startDate),
-                finish: fmt(finishDate),
-                full_name: m.client_name,
-                email: m.client_email,
-                description: libelle,
-              },
-            }),
-          }
-        );
-
-        if (bookingRes.ok) {
-          let bookingId: string | null = null;
-          try {
-            const bookingData = await bookingRes.json();
-            bookingId = String(bookingData.id || bookingData.booking_id || '');
-          } catch {
-            const loc = bookingRes.headers.get('Location');
-            if (loc) {
-              const match = loc.match(/(\d+)\.json/);
-              if (match) bookingId = match[1];
+          const bookingRes = await fetch(
+            `https://www.supersaas.com/api/bookings.json?${params.toString()}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                schedule_id: scheduleId,
+                booking: {
+                  start: fmt(startDate),
+                  finish: fmt(finishDate),
+                  full_name: m.client_name,
+                  email: m.client_email,
+                  description: libelle,
+                },
+              }),
             }
-          }
+          );
 
-          if (bookingId) {
-            await supabase
-              .from('sessions')
-              .update({ supersaas_booking_id: bookingId })
-              .eq('id', sessionId);
+          if (bookingRes.ok) {
+            let bookingId: string | null = null;
+            try {
+              const bookingData = await bookingRes.json();
+              bookingId = String(bookingData.id || bookingData.booking_id || '');
+            } catch {
+              const loc = bookingRes.headers.get('Location');
+              if (loc) {
+                const match = loc.match(/(\d+)\.json/);
+                if (match) bookingId = match[1];
+              }
+            }
+
+            if (bookingId) {
+              await supabase
+                .from('sessions')
+                .update({ supersaas_booking_id: bookingId })
+                .eq('id', sessionId);
+            }
+          } else {
+            console.error('Erreur création booking SuperSaaS:', await bookingRes.text());
           }
-        } else {
-          console.error('Erreur création booking SuperSaaS:', await bookingRes.text());
         }
+      } catch (e) {
+        console.error('Exception booking SuperSaaS:', String(e));
       }
-    } catch (e) {
-      console.error('Exception booking SuperSaaS:', String(e));
     }
 
     // Incrémenter le compteur (update direct)

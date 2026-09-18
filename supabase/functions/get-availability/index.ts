@@ -14,6 +14,14 @@ const CHUNK_DAYS = 5;         // taille d'une tranche
 const MAXRESULTS_PER_CALL = 200;
 const MAX_CHUNKS = 8;         // garde-fou (8 x 5 = 40 jours max couverts)
 
+// Traduction convention offre (modes.jsx : visio / home / in-person)
+// vers la convention stockée dans la table sessions (visio / domicile / cabinet).
+const MODE_TO_SESSION: Record<string, string> = {
+  visio: 'visio',
+  home: 'domicile',
+  'in-person': 'cabinet',
+};
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -26,11 +34,13 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { praticien_id, schedule_id, from, to, length_minutes } = await req.json();
+    const { praticien_id, schedule_id, offre_id, from, to, length_minutes } = await req.json();
 
     if (!praticien_id && !schedule_id) {
       return jsonResponse({ error: 'praticien_id ou schedule_id requis' }, 400);
     }
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     let scheduleId: string;
 
@@ -38,8 +48,6 @@ Deno.serve(async (req) => {
       // Agenda direct (ex: diagnostic), pas lié à un praticien
       scheduleId = String(schedule_id);
     } else {
-      const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-
       const { data: praticien, error: pErr } = await supabase
         .from('praticiens')
         .select('supersaas_schedule_id')
@@ -126,6 +134,68 @@ Deno.serve(async (req) => {
       }
     }
 
+    // ---- Réinjection des sessions collectives ouvertes ----
+    // Un cours de groupe déjà démarré est "pris" côté SuperSaaS (ressource unique),
+    // donc absent des créneaux libres ci-dessus. Tant qu'il reste de la place, le
+    // créneau doit rester visible pour les participants suivants. On lit ces sessions
+    // en base et on les repasse au format des créneaux SuperSaaS ("2026-09-20T16:00").
+    // Ne se déclenche que pour une offre collective (max_participants > 1).
+    if (offre_id) {
+      try {
+        const { data: offre } = await supabase
+          .from('praticien_offres')
+          .select('duree, mode_seance, max_participants, praticien_pratiques(praticien_id, pratique_id)')
+          .eq('id', offre_id)
+          .single();
+
+        const maxParticipants = offre?.max_participants ? Number(offre.max_participants) : 1;
+
+        if (offre && maxParticipants > 1) {
+          const ppRel = Array.isArray(offre.praticien_pratiques)
+            ? offre.praticien_pratiques[0]
+            : offre.praticien_pratiques;
+          const sessionMode = MODE_TO_SESSION[offre.mode_seance] || offre.mode_seance;
+          const durationMin = offre.duree ? parseInt(String(offre.duree), 10) : 60;
+
+          if (ppRel?.praticien_id && ppRel?.pratique_id) {
+            const { data: openSessions } = await supabase
+              .from('sessions')
+              .select('scheduled_at, booked_count, max_participants, status')
+              .eq('praticien_id', ppRel.praticien_id)
+              .eq('pratique_id', ppRel.pratique_id)
+              .eq('mode_seance', sessionMode)
+              .eq('status', 'open')
+              .gte('scheduled_at', fromDate.toISOString())
+              .lte('scheduled_at', toDate.toISOString());
+
+            for (const sess of openSessions || []) {
+              // Place restante : on ne remet le créneau que s'il reste des places.
+              if (sess.booked_count >= sess.max_participants) continue;
+
+              const startDate = new Date(sess.scheduled_at);
+              if (startDate < fromDate || startDate > toDate) continue;
+
+              // scheduled_at est un instant UTC : on le repasse en heure murale de Paris
+              // pour coller au format SuperSaaS renvoyé plus haut.
+              const startParis = utcToParisWall(sess.scheduled_at);
+              if (!startParis) continue;
+
+              const finishDate = new Date(startDate.getTime() + durationMin * 60 * 1000);
+              const finishParis = utcToParisWall(finishDate.toISOString());
+
+              if (!seen.has(startParis)) {
+                seen.add(startParis);
+                allSlots.push({ start: startParis, finish: finishParis || startParis });
+              }
+            }
+          }
+        }
+      } catch (e) {
+        // On n'échoue pas la disponibilité pour autant : on renvoie au moins les créneaux SuperSaaS.
+        console.error('Erreur réinjection sessions collectives:', String(e));
+      }
+    }
+
     // Tri chronologique
     allSlots.sort((a, b) => a.start.localeCompare(b.start));
 
@@ -145,6 +215,27 @@ Deno.serve(async (req) => {
 function toSuperSaasDate(d: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+// Instant UTC ("2026-09-20T14:00:00.000Z") vers heure murale de Paris ("2026-09-20T16:00").
+// Format aligné sur les créneaux SuperSaaS, pour que le front les traite à l'identique.
+function utcToParisWall(utcIso: string): string | null {
+  try {
+    const d = new Date(utcIso);
+    if (isNaN(d.getTime())) return null;
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Paris',
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit',
+      hour12: false,
+    }).formatToParts(d);
+    const get = (t: string) => parts.find((p) => p.type === t)?.value || '';
+    let hour = get('hour');
+    if (hour === '24') hour = '00';
+    return `${get('year')}-${get('month')}-${get('day')}T${hour}:${get('minute')}`;
+  } catch {
+    return null;
+  }
 }
 
 function jsonResponse(body: unknown, status: number) {
