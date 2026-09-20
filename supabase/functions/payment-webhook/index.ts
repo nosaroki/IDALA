@@ -268,15 +268,10 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Incrémenter le compteur (update direct)
-    const newCount = (existingSession?.booked_count ?? 0) + 1;
-    await supabase
-      .from('sessions')
-      .update({
-        booked_count: newCount,
-        status: newCount >= maxParticipants ? 'full' : 'open',
-      })
-      .eq('id', sessionId);
+    // Incrémenter le compteur de façon atomique via la RPC increment_session_booked.
+    // L'incrément et le passage en 'full' se font dans un seul UPDATE SQL, donc pas
+    // de course sur booked_count si deux paiements aboutissent au même instant.
+    await supabase.rpc('increment_session_booked', { p_session_id: sessionId });
 
     // Créer la room Daily.co DIRECTEMENT (si visio et pas déjà créée).
     // home / in-person = pas de room : séance en présentiel.
